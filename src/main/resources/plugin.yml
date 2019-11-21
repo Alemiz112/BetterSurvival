@@ -1,0 +1,7 @@
+name: "BetterSurvival"
+version: 1.0.0
+author: "Alemiz"
+description: "BetterSurvival features plugin for Nukkit"
+
+main: alemiz.bettersurvival.BetterSurvival
+api: ["1.0.0"]
