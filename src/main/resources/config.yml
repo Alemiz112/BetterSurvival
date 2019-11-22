@@ -1,10 +1,3 @@
 #BetterSurvival by Alemiz
 #Alemiz#3386
 
-#Usefull codes {player}, {home}
-homes:
-  enable: true
-  homeLimit: 3
-  homeTeleport: "§6»§7Woosh! Welcome home §6@{player} §7{home}!"
-  homeSet: "§6»§7Your home §6{home}§7 has been saved!"
-  homeDel: "§6»§7Your home §6{home}67 was deleted!"
