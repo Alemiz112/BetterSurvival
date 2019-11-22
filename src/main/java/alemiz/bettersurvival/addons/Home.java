@@ -1,6 +1,12 @@
 package alemiz.bettersurvival.addons;
 
 import alemiz.bettersurvival.BetterSurvival;
+import alemiz.bettersurvival.commands.DelCommand;
+import alemiz.bettersurvival.commands.GetHomeCommand;
+import alemiz.bettersurvival.commands.HomeCommand;
+import alemiz.bettersurvival.commands.SetHomeCommand;
+import alemiz.bettersurvival.utils.Addon;
+import alemiz.bettersurvival.utils.ConfigManager;
 import cn.nukkit.Player;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.Config;
@@ -8,14 +14,40 @@ import cn.nukkit.utils.Config;
 import java.util.List;
 import java.util.Set;
 
-public class Home {
+public class Home extends Addon {
 
-    public static void setHome(Player player, String home){
+    public Home(String path){
+        super("home", path);
+        registerCommands();
+    }
+
+    @Override
+    public void loadConfig() {
+        if (!configFile.exists("enable")){
+            configFile.set("enable", true);
+            configFile.set("homeLimit", 3);
+            configFile.set("homeTeleport", "§6»§7Woosh! Welcome home §6@{player} §7{home}!");
+            configFile.set("homeSet", "§6»§7Your home §6{home}§7 has been saved!");
+            configFile.set("homeDel", "§6»§7Your home §6{home}§7 was deleted!");
+            configFile.save();
+        }
+    }
+
+    public void registerCommands(){
+        if (configFile.getBoolean("enable", true)){
+            plugin.getServer().getCommandMap().register("home", new HomeCommand("home", this));
+            plugin.getServer().getCommandMap().register("sethome", new SetHomeCommand("sethome", this));
+            plugin.getServer().getCommandMap().register("gethome", new GetHomeCommand("gethome", this));
+            plugin.getServer().getCommandMap().register("delhome", new DelCommand("delhome", this));
+        }
+    }
+
+    public void setHome(Player player, String home){
         if (player == null || !player.isConnected()) return;
 
-        Config config = BetterSurvival.getInstance().loadPlayer(player);
+        Config config = ConfigManager.getInstance().loadPlayer(player);
         if (config == null) return;
-        int limit = BetterSurvival.getInstance().cfg.getInt("homes.homeLimit");
+        int limit = configFile.getInt("homeLimit");
 
         Set<String> homes = config.getSection("home").getKeys();
         if (homes != null && homes.size() >= limit && !player.isOp()){
@@ -27,7 +59,7 @@ public class Home {
         config.set("home."+home, pos);
         config.save();
 
-        String message = BetterSurvival.getInstance().cfg.getString("homes.homeSet");
+        String message = configFile.getString("homeSet");
         message = message.replace("{player}", player.getName());
         message = message.replace("{home}", home);
         player.sendMessage(message);
@@ -35,10 +67,10 @@ public class Home {
 
 
 
-    public static void delHome(Player player, String home){
+    public void delHome(Player player, String home){
         if (player == null || !player.isConnected()) return;
 
-        Config config = BetterSurvival.getInstance().loadPlayer(player);
+        Config config = ConfigManager.getInstance().loadPlayer(player);
         if (config == null) return;
 
         if (!config.exists("home."+home.toLowerCase())){
@@ -49,7 +81,7 @@ public class Home {
         config.remove("home."+home.toLowerCase());
         config.save();
 
-        String message = BetterSurvival.getInstance().cfg.getString("homes.homeDel");
+        String message = configFile.getString("homeDel");
         message = message.replace("{player}", player.getName());
         message = message.replace("{home}", home);
         player.sendMessage(message);
@@ -57,10 +89,10 @@ public class Home {
 
 
 
-    public static void teleportToHome(Player player, String home){
+    public void teleportToHome(Player player, String home){
         if (player == null || !player.isConnected()) return;
 
-        Config config = BetterSurvival.getInstance().loadPlayer(player);
+        Config config = ConfigManager.getInstance().loadPlayer(player);
         if (config == null) return;
 
         if (!config.exists("home."+home.toLowerCase())){
@@ -75,7 +107,7 @@ public class Home {
         }
         player.teleport(new Vector3((double) data.get(0), (double) data.get(1), (double) data.get(2)));
 
-        String message = BetterSurvival.getInstance().cfg.getString("homes.homeTeleport");
+        String message = configFile.getString("homeTeleport");
         message = message.replace("{player}", player.getName());
         message = message.replace("{home}", home);
         player.sendMessage(message);
@@ -83,10 +115,10 @@ public class Home {
 
 
 
-    public static Set<String> getHomes(Player player){
+    public Set<String> getHomes(Player player){
         if (player == null || !player.isConnected()) return null;
 
-        Config config = BetterSurvival.getInstance().loadPlayer(player);
+        Config config = ConfigManager.getInstance().loadPlayer(player);
         if (config == null) return null;
 
         return config.getSection("home").getKeys();

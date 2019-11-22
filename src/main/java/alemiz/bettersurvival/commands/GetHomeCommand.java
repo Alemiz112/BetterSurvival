@@ -13,14 +13,21 @@ public class GetHomeCommand extends Command {
     protected static final String usage = "§6Get Home:\n"+
             "§7/gethome: Prints your homes";
 
-    public GetHomeCommand(String name) {
+
+
+    public Home loader;
+
+    public GetHomeCommand(String name, Home loader) {
         super(name, "Prints your homes", usage);
         this.commandParameters.clear();
 
         this.commandParameters.put("default", new CommandParameter[]{
                 new CommandParameter("home", true)
         });
+
+        this.loader = loader;
     }
+
 
     @Override
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
@@ -34,7 +41,7 @@ public class GetHomeCommand extends Command {
 
         Player player = (Player) sender;
 
-        Set<String> homes = Home.getHomes(player);
+        Set<String> homes = loader.getHomes(player);
         if (homes.isEmpty()){
             player.sendMessage("§6»§7You dont have any homes yet!");
             return true;
