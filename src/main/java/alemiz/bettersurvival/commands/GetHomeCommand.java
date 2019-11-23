@@ -25,6 +25,7 @@ public class GetHomeCommand extends Command {
                 new CommandParameter("home", true)
         });
 
+        setAliases(new String[]{"listhome"});
         this.loader = loader;
     }
 

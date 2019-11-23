@@ -12,6 +12,7 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.Config;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class Home extends Addon {
@@ -26,7 +27,7 @@ public class Home extends Addon {
         if (!configFile.exists("enable")){
             configFile.set("enable", true);
             configFile.set("homeLimit", 3);
-            configFile.set("homeTeleport", "§6»§7Woosh! Welcome home §6@{player} §7{home}!");
+            configFile.set("homeTeleport", "§6»§7Woosh! Welcome at {home} §6@{player}!");
             configFile.set("homeSet", "§6»§7Your home §6{home}§7 has been saved!");
             configFile.set("homeDel", "§6»§7Your home §6{home}§7 was deleted!");
             configFile.save();
@@ -56,7 +57,7 @@ public class Home extends Addon {
         }
 
         Double[] pos = {player.getX(), player.getY(), player.getZ()};
-        config.set("home."+home, pos);
+        config.set("home."+home.toLowerCase(), pos);
         config.save();
 
         String message = configFile.getString("homeSet");
@@ -78,7 +79,7 @@ public class Home extends Addon {
             return;
         }
 
-        config.remove("home."+home.toLowerCase());
+        ((Map) config.get("home")).remove(home.toLowerCase());
         config.save();
 
         String message = configFile.getString("homeDel");
