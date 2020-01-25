@@ -38,6 +38,7 @@ public class GetHomeCommand extends Command {
 
         if (!(sender instanceof Player)){
             sender.sendMessage("§cThis command can be run only in game!");
+            return true;
         }
 
         Player player = (Player) sender;
@@ -53,7 +54,7 @@ public class GetHomeCommand extends Command {
             format += home+", ";
         }
 
-        player.sendMessage("§6»§7Your homes: "+format.substring(0, format.length()-1));
+        player.sendMessage("§6»§7Your homes: "+format.substring(0, format.length()-2));
         return true;
     }
 }

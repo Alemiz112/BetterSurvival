@@ -1,14 +1,11 @@
 package alemiz.bettersurvival.commands;
 
-import alemiz.bettersurvival.BetterSurvival;
 import alemiz.bettersurvival.addons.Home;
 import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
-import cn.nukkit.utils.Config;
 
-import java.util.Set;
 
 public class SetHomeCommand extends Command {
 
@@ -38,6 +35,7 @@ public class SetHomeCommand extends Command {
 
         if (!(sender instanceof Player)){
             sender.sendMessage("§cThis command can be run only in game!");
+            return true;
         }
 
         Player player = (Player) sender;

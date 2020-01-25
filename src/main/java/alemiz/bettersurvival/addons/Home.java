@@ -1,14 +1,13 @@
 package alemiz.bettersurvival.addons;
 
-import alemiz.bettersurvival.BetterSurvival;
-import alemiz.bettersurvival.commands.DelCommand;
+import alemiz.bettersurvival.commands.DelHomeCommand;
 import alemiz.bettersurvival.commands.GetHomeCommand;
 import alemiz.bettersurvival.commands.HomeCommand;
 import alemiz.bettersurvival.commands.SetHomeCommand;
 import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.ConfigManager;
-import cn.nukkit.Player;
 import cn.nukkit.math.Vector3;
+import cn.nukkit.Player;
 import cn.nukkit.utils.Config;
 
 import java.util.List;
@@ -39,7 +38,7 @@ public class Home extends Addon {
             plugin.getServer().getCommandMap().register("home", new HomeCommand("home", this));
             plugin.getServer().getCommandMap().register("sethome", new SetHomeCommand("sethome", this));
             plugin.getServer().getCommandMap().register("gethome", new GetHomeCommand("gethome", this));
-            plugin.getServer().getCommandMap().register("delhome", new DelCommand("delhome", this));
+            plugin.getServer().getCommandMap().register("delhome", new DelHomeCommand("delhome", this));
         }
     }
 
@@ -106,7 +105,7 @@ public class Home extends Addon {
             player.sendMessage("§eError occurs while teleporting to home!");
             return;
         }
-        player.teleport(new Vector3((double) data.get(0), (double) data.get(1), (double) data.get(2)));
+        player.teleport(new Vector3(data.get(0), data.get(1), data.get(2)));
 
         String message = configFile.getString("homeTeleport");
         message = message.replace("{player}", player.getName());

@@ -1,14 +1,17 @@
 package alemiz.bettersurvival.addons;
 
-import alemiz.bettersurvival.BetterSurvival;
+import alemiz.bettersurvival.commands.FeedCommand;
+import alemiz.bettersurvival.commands.FlyCommand;
+import alemiz.bettersurvival.commands.HealCommand;
 import alemiz.bettersurvival.commands.TpaCommand;
 import alemiz.bettersurvival.utils.Addon;
 import cn.nukkit.AdventureSettings;
-import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.player.PlayerChatEvent;
 import cn.nukkit.event.player.PlayerJoinEvent;
+import cn.nukkit.Player;
+import cn.nukkit.potion.Effect;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +31,7 @@ public class MoreVanilla extends Addon{
             configFile.set("enable", true);
 
             configFile.set("chatFormat", "§6{player} §7> {message}");
-
+            configFile.set("playerNotFound", "§6»§7Player {player} was not found!");
 
             configFile.set("permission-fly", "bettersurvival.fly");
             configFile.set("flyMessage", "§6»§7Flying mode has been turned §6{state}§7!");
@@ -45,7 +48,7 @@ public class MoreVanilla extends Addon{
             configFile.set("healMessage", "§6»§7You was healed!");
 
             configFile.set("permission-feed", "bettersurvival.feed");
-            configFile.set("feedMessage", "§6»§7You feed level has been increased!");
+            configFile.set("feedMessage", "§6»§7Your feed level has been increased to {state}!");
             configFile.save();
         }
     }
@@ -53,6 +56,9 @@ public class MoreVanilla extends Addon{
     public void registerCommands(){
         if (configFile.getBoolean("enable", true)){
             plugin.getServer().getCommandMap().register("tpa", new TpaCommand("tpa", this));
+            plugin.getServer().getCommandMap().register("fly", new FlyCommand("fly", this));
+            plugin.getServer().getCommandMap().register("heal", new HealCommand("heal", this));
+            plugin.getServer().getCommandMap().register("feed", new FeedCommand("feed", this));
         }
     }
 
@@ -70,32 +76,6 @@ public class MoreVanilla extends Addon{
         format = format.replace("{player}", player.getName());
         format = format.replace("{message}", event.getMessage());
         event.setFormat(format);
-    }
-
-    public void fly(Player player){
-        fly(player, player.getName());
-    }
-
-    public void fly(Player player, String executor){
-        if (executor.equals(player.getName()) && !player.hasPermission(configFile.getString("permission-fly"))){
-            player.sendMessage("§cYou dont have permission to fly!");
-            return;
-        }
-
-        Player pexecutor = Server.getInstance().getPlayer(executor);
-        if (!executor.equals("console") && pexecutor != null && !pexecutor.isOp()) return;
-
-        if (pexecutor != null){
-            pexecutor.sendMessage("§6»§7You changed flying mode of §6@"+player.getName()+"§7!");
-        }
-
-        boolean canFly = player.getAdventureSettings().get(AdventureSettings.Type.ALLOW_FLIGHT);
-        player.getAdventureSettings().set(AdventureSettings.Type.ALLOW_FLIGHT, !canFly);
-
-        String message = configFile.getString("flyMessage");
-        message = message.replace("{player}", player.getName());
-        message = message.replace("{state}", (!canFly ? "on" : "off"));
-        player.sendMessage(message);
     }
 
     public void tpa(Player executor, String player){
@@ -154,5 +134,99 @@ public class MoreVanilla extends Addon{
 
         String message = configFile.getString("tpaDennyConfirmMessage").replace("{player}", player.getName());
         player.sendMessage(message);
+    }
+
+    public void fly(Player player, String executor){
+        Player pexecutor = Server.getInstance().getPlayer(executor);
+        if (!checkForPlayer(player, pexecutor)) return;
+
+        if (executor.equals(player.getName()) && !player.hasPermission(configFile.getString("permission-fly"))){
+            player.sendMessage("§cYou dont have permission to fly!");
+            return;
+        }
+
+        if (!executor.equals("console") && pexecutor != null && !pexecutor.hasPermission(configFile.getString("permission-fly"))){
+            pexecutor.sendMessage("§cYou dont have permission to fly!");
+            return;
+        }
+
+        if (pexecutor != null && !executor.equals(player.getName())){
+            pexecutor.sendMessage("§6»§7You changed flying mode of §6@"+player.getName()+"§7!");
+        }
+
+        boolean canFly = player.getAdventureSettings().get(AdventureSettings.Type.ALLOW_FLIGHT);
+        player.getAdventureSettings().set(AdventureSettings.Type.ALLOW_FLIGHT, !canFly);
+        player.getAdventureSettings().update();
+
+        String message = configFile.getString("flyMessage");
+        message = message.replace("{player}", player.getName());
+        message = message.replace("{state}", (!canFly ? "on" : "off"));
+        player.sendMessage(message);
+    }
+
+
+    public void feed(Player player, String executor){
+        Player pexecutor = Server.getInstance().getPlayer(executor);
+        if (!checkForPlayer(player, pexecutor)) return;
+
+        if (executor.equals(player.getName()) && !player.hasPermission(configFile.getString("permission-feed"))){
+            player.sendMessage("§cYou dont have permission to feed!");
+            return;
+        }
+
+        if (!executor.equals("console") && pexecutor != null && !pexecutor.hasPermission(configFile.getString("permission-feed"))){
+            pexecutor.sendMessage("§cYou dont have permission to feed!");
+            return;
+        }
+
+        if (pexecutor != null && !executor.equals(player.getName())){
+            pexecutor.sendMessage("§6»§7You feeded §6@"+player.getName()+"§7!");
+        }
+
+        player.getFoodData().reset();
+
+        String message = configFile.getString("feedMessage");
+        message = message.replace("{player}", player.getName());
+        message = message.replace("{state}", (String.valueOf(player.getFoodData().getLevel())));
+        player.sendMessage(message);
+    }
+
+    public void heal(Player player, String executor){
+        Player pexecutor = Server.getInstance().getPlayer(executor);
+        if (!checkForPlayer(player, pexecutor)) return;
+
+        if (executor.equals(player.getName()) && !player.hasPermission(configFile.getString("permission-heal"))){
+            player.sendMessage("§cYou dont have permission to heal yourself!");
+            return;
+        }
+
+        if (!executor.equals("console") && pexecutor != null && !pexecutor.hasPermission(configFile.getString("permission-heal"))){
+            pexecutor.sendMessage("§cYou dont have permission to heal player!");
+            return;
+        }
+
+        if (pexecutor != null && !executor.equals(player.getName())){
+            pexecutor.sendMessage("§6»§7You healed §6@"+player.getName()+"§7!");
+        }
+
+        player.addEffect(Effect.getEffect(Effect.REGENERATION).setAmplifier(1).setDuration(5 * 20));
+
+        String message = configFile.getString("healMessage");
+        message = message.replace("{player}", player.getName());
+        message = message.replace("{state}", (String.valueOf(player.getHealth())));
+        player.sendMessage(message);
+    }
+
+
+    public boolean checkForPlayer(Player player, Player pexecutor){
+        if (player == null){
+            if (pexecutor != null){
+                String message = configFile.getString("playerNotFound");
+                message = message.replace("{player}", "");
+                pexecutor.sendMessage(message);
+            }
+            return false;
+        }
+        return true;
     }
 }

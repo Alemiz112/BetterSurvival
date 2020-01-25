@@ -1,6 +1,5 @@
 package alemiz.bettersurvival.commands;
 
-import alemiz.bettersurvival.addons.Home;
 import alemiz.bettersurvival.addons.MoreVanilla;
 import cn.nukkit.Player;
 import cn.nukkit.command.Command;
@@ -37,6 +36,7 @@ public class TpaCommand extends Command {
 
         if (!(sender instanceof Player)){
             sender.sendMessage("§cThis command can be run only in game!");
+            return true;
         }
 
         Player player = (Player) sender;

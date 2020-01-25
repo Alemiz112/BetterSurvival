@@ -4,4 +4,4 @@ author: "Alemiz"
 description: "BetterSurvival features plugin for Nukkit"
 
 main: alemiz.bettersurvival.BetterSurvival
-api: ["1.0.0"]
+api: ["1.0.0", "2.0.0"]

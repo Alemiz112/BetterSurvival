@@ -2,15 +2,9 @@ package alemiz.bettersurvival;
 
 import alemiz.bettersurvival.addons.Home;
 import alemiz.bettersurvival.addons.MoreVanilla;
-import alemiz.bettersurvival.commands.DelCommand;
-import alemiz.bettersurvival.commands.GetHomeCommand;
-import alemiz.bettersurvival.commands.HomeCommand;
-import alemiz.bettersurvival.commands.SetHomeCommand;
 import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.ConfigManager;
-import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
-import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.plugin.PluginBase;
 
 public class BetterSurvival extends PluginBase implements Listener {

@@ -6,7 +6,7 @@ import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
 
-public class DelCommand extends Command {
+public class DelHomeCommand extends Command {
 
     protected static final String usage = "§6Delete Home:\n"+
             "§7/home <home - optional> : Teleport to your home";
@@ -15,7 +15,7 @@ public class DelCommand extends Command {
 
     public Home loader;
 
-    public DelCommand(String name, Home loader) {
+    public DelHomeCommand(String name, Home loader) {
         super(name, "Teleport to home", usage);
         this.commandParameters.clear();
 
@@ -34,6 +34,7 @@ public class DelCommand extends Command {
 
         if (!(sender instanceof Player)){
             sender.sendMessage("§cThis command can be run only in game!");
+            return true;
         }
 
         Player player = (Player) sender;
