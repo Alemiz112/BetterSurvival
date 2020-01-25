@@ -10,7 +10,7 @@ import cn.nukkit.command.data.CommandParameter;
 public class FeedCommand extends Command {
 
     protected static final String usage = "§6Feed Command:\n"+
-            "§7/feed <player: optional> : Load full food bar";
+            "§7/feed <player - optional> : Load full food bar";
 
 
     public MoreVanilla loader;

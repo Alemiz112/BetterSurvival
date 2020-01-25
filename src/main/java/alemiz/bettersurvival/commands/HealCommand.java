@@ -10,7 +10,7 @@ import cn.nukkit.command.data.CommandParameter;
 public class HealCommand extends Command {
 
     protected static final String usage = "§6Heal Command:\n"+
-            "§7/heal <player: optional> : Heal player or yourself";
+            "§7/heal <player - optional> : Heal player or yourself";
 
 
     public MoreVanilla loader;

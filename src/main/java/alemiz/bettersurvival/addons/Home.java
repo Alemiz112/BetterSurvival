@@ -18,7 +18,6 @@ public class Home extends Addon {
 
     public Home(String path){
         super("home", path);
-        registerCommands();
     }
 
     @Override
@@ -33,7 +32,8 @@ public class Home extends Addon {
         }
     }
 
-    public void registerCommands(){
+    @Override
+    public void registerCommands() {
         if (configFile.getBoolean("enable", true)){
             plugin.getServer().getCommandMap().register("home", new HomeCommand("home", this));
             plugin.getServer().getCommandMap().register("sethome", new SetHomeCommand("sethome", this));

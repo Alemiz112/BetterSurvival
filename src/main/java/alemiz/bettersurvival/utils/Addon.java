@@ -42,7 +42,13 @@ public abstract class Addon implements Listener{
            plugin.getLogger().info("§eLoading BetterSurvival addon: §3"+name);
             Server.getInstance().getPluginManager().registerEvents(this, plugin);
         }
+
+        registerCommands();
     }
 
     public abstract void loadConfig();
+
+    public void registerCommands(){
+        //Should be implemented
+    }
 }

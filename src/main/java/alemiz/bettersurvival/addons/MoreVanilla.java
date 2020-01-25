@@ -22,7 +22,6 @@ public class MoreVanilla extends Addon{
 
     public MoreVanilla(String path){
         super("morevanilla", path);
-        registerCommands();
     }
 
     @Override
@@ -53,7 +52,8 @@ public class MoreVanilla extends Addon{
         }
     }
 
-    public void registerCommands(){
+    @Override
+    public void registerCommands() {
         if (configFile.getBoolean("enable", true)){
             plugin.getServer().getCommandMap().register("tpa", new TpaCommand("tpa", this));
             plugin.getServer().getCommandMap().register("fly", new FlyCommand("fly", this));

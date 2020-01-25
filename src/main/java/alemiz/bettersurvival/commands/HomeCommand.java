@@ -13,7 +13,6 @@ public class HomeCommand extends Command {
             "§7/home <home - optional> : Teleport to your home";
 
 
-
     public Home loader;
 
     public HomeCommand(String name, Home loader) {

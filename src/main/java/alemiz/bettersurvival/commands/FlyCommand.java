@@ -10,7 +10,7 @@ import cn.nukkit.Player;
 public class FlyCommand extends Command {
 
     protected static final String usage = "§6Fly Command:\n"+
-            "§7/fly <player: optional> : Turn fly mode on/off";
+            "§7/fly <player - optional> : Turn fly mode on/off";
 
 
     public MoreVanilla loader;
