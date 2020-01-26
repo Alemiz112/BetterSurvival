@@ -8,6 +8,11 @@ import java.util.List;
 
 public class LandRegion {
 
+    public static final String WHITELIST_ADD = "add";
+    public static final String WHITELIST_REMOVE = "remove";
+    public static final String WHITELIST_LIST = "list";
+
+
     public String owner = "";
     public String land = "";
 
@@ -35,8 +40,8 @@ public class LandRegion {
         Config config = ConfigManager.getInstance().loadPlayer(owner);
         if (config == null) return;
 
-        config.set("land."+land.toLowerCase()+".pos1", new float[]{pos1.getX(), pos1.getY(), pos1.getZ()});
-        config.set("land."+land.toLowerCase()+".pos2", new float[]{pos2.getX(), pos2.getY(), pos2.getZ()});
+        config.set("land."+land.toLowerCase()+".pos0", new float[]{pos1.getX(), pos1.getY(), pos1.getZ()});
+        config.set("land."+land.toLowerCase()+".pos1", new float[]{pos2.getX(), pos2.getY(), pos2.getZ()});
 
         config.set("land."+land.toLowerCase()+".whitelist", whitelist);
         config.save();

@@ -1,5 +1,6 @@
 package alemiz.bettersurvival.commands;
 
+import alemiz.bettersurvival.addons.myland.LandRegion;
 import alemiz.bettersurvival.addons.myland.MyLandProtect;
 import cn.nukkit.Player;
 import cn.nukkit.command.Command;
@@ -11,14 +12,16 @@ public class LandCommand extends Command {
 
     protected static final String usage = "§6Land Command:\n"+
             "§7/land <wand> : Get wand to select positions\n" +
-            "§7/land <create|add> : Create land after selected positions\n" +
-            "§7/land <remove|del> : Deny players request";
+            "§7/land <create|add> <land>: Create land after selected positions\n" +
+            "§7/land <remove|del> <land>: Deny players request\n"+
+            "§7/land <whitelist> <add|remove|list> <land> <player> : Manage lands whitelist\n"+
+            "§7/land <here> : Shows area where you are";
 
 
     public MyLandProtect loader;
 
     public LandCommand(String name, MyLandProtect loader) {
-        super(name, "Protect your home", usage);
+        super(name, "Protect your area", usage);
         this.commandParameters.clear();
 
         this.loader = loader;
@@ -55,7 +58,7 @@ public class LandCommand extends Command {
             case "add":
                 if (args.length < 2){
                     player.sendMessage(usage);
-                    return true;
+                    break;
                 }
 
                 this.loader.createLand(player, args[1]);
@@ -64,10 +67,27 @@ public class LandCommand extends Command {
             case "del":
                 if (args.length < 2){
                     player.sendMessage(usage);
-                    return true;
+                    break;
                 }
 
                 this.loader.removeLand(player, args[1]);
+                break;
+            case "here":
+                this.loader.findLand(player);
+                break;
+            case "whitelist":
+                if (args.length < 4){
+                    if (args.length == 3 && args[1].equals(LandRegion.WHITELIST_LIST)){
+                        this.loader.whitelist(player, "", args[2], args[1]);
+                    }else {
+                        player.sendMessage(usage);
+                    }
+                    break;
+                }
+                this.loader.whitelist(player, args[3], args[2], args[1]);
+                break;
+            default:
+                player.sendMessage(usage);
                 break;
         }
         return true;
