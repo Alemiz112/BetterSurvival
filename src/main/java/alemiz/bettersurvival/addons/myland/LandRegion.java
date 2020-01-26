@@ -4,6 +4,7 @@ import alemiz.bettersurvival.utils.ConfigManager;
 import cn.nukkit.math.Vector3f;
 import cn.nukkit.utils.Config;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class LandRegion {
@@ -16,7 +17,7 @@ public class LandRegion {
     public String owner = "";
     public String land = "";
 
-    public List<String> whitelist;
+    public List<String> whitelist = new ArrayList<>();
 
     public Vector3f pos1;
     public Vector3f pos2;
