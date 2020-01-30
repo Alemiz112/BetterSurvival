@@ -52,20 +52,23 @@ public class MyLandProtect extends Addon {
             configFile.set("landsAccessPermission", "bettersurvival.land.access");
 
             configFile.set("landNotExists", "§6»§7Land §6{land}§7 not found!");
-            configFile.set("landWarn", "§6»§7Hey {player}, this is not your region! Ask §6{owner} §7to access §6{land}§7!");
+            configFile.set("landWithNameExists", "§6»§7Land §6{land}§7 already exists§7!");
+            configFile.set("landWarn", "§6»§7Hey §6@{player}67, this is not your region! Ask §6@{owner} §7to access §6{land}§7!");
             configFile.set("landTooBig", "§6»§7Selected land is bigger than maximum allowed limit §6{limit} blocks§7!");
             configFile.set("landPosSelected", "§6»§7Successfully selected position at §6{pos}§7!");
+            configFile.set("landLimitWarn", "§6»§7Lands limit reached!");
+            configFile.set("landHereNotFound", "§6»§7This land is free§7!");
 
             configFile.set("landCreate", "§6»§7You have created new land §6{land}§7!");
             configFile.set("landRemove", "§6»§7You have removed your land §6{land}§7!");
             configFile.set("landSetPos", "§6»§7Break 2 blocks with wand to select border positions§7!");
             configFile.set("landWhitelist", "§6»§7Whitelist for §6{land}§7 saved§7!");
-            configFile.set("landWhitelistList", "§6»§7Land §6{land}§7 access: {players}!");
+            configFile.set("landWhitelistList", "§6»{land}§7 access: {players}");
             configFile.set("landHere", "§6»§7The land §6{land}§7 is owned by §6{owner}§7!");
-            configFile.set("landHereNotFound", "§6»§7This land is free§7!");
+            configFile.set("landList", "§6»§7Your lands: {lands}");
 
-            configFile.set("landWhitelistAdd", "§6»§7You gain access §6{player}§7 to your land §6{land}§7!");
-            configFile.set("landWhitelistRemove", "§6»§7You restrict §6{player}§7's access to your land §6{land}§7!");
+            configFile.set("landWhitelistAdd", "§6»§7You gain access §6@{player}§7 to your land §6{land}§7!");
+            configFile.set("landWhitelistRemove", "§6»§7You restrict §6@{player}§7's access to your land §6{land}§7!");
             configFile.save();
         }
     }
@@ -151,6 +154,17 @@ public class MyLandProtect extends Addon {
         return null;
     }
 
+    public Set<String> getLands(Player player){
+        return getLands(player.getName());
+    }
+
+    public Set<String> getLands(String player){
+        Config config = ConfigManager.getInstance().loadPlayer(player);
+        if (config == null) return null;
+
+        return config.getSection("land").getKeys(false);
+    }
+
     public boolean validateLand(List<Block> blocks){
         return validateLand(blocks, null);
     }
@@ -213,7 +227,18 @@ public class MyLandProtect extends Addon {
 
         Set<String> lands = config.getSection("land").getKeys();
         if (lands != null && lands.size() >= limit && !player.isOp()){
-            player.sendMessage("§6»§7Lands limit reached!");
+            String message = configFile.getString("landLimitWarn");
+            message = message.replace("{land}", land);
+            message = message.replace("{player}", player.getName());
+            player.sendMessage(message);
+            return;
+        }
+
+        if (lands != null && lands.contains(land.toLowerCase())){
+            String message = configFile.getString("landWithNameExists");
+            message = message.replace("{land}", land);
+            message = message.replace("{player}", player.getName());
+            player.sendMessage(message);
             return;
         }
 
@@ -332,5 +357,14 @@ public class MyLandProtect extends Addon {
         message = message.replace("{land}", region.land);
         message = message.replace("{player}", owner.getName());
         owner.sendMessage(message);
+    }
+
+    public void listLands(Player player){
+        Set<String> lands = this.getLands(player);
+
+        String message = configFile.getString("landList");
+        message = message.replace("{lands}", String.join(", ", lands));
+        message = message.replace("{player}", player.getName());
+        player.sendMessage(message);
     }
 }

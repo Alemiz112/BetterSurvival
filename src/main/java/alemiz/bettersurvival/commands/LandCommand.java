@@ -15,7 +15,8 @@ public class LandCommand extends Command {
             "§7/land <create|add> <land>: Create land after selected positions\n" +
             "§7/land <remove|del> <land>: Deny players request\n"+
             "§7/land <whitelist> <add|remove|list> <land> <player> : Manage lands whitelist\n"+
-            "§7/land <here> : Shows area where you are";
+            "§7/land <here> : Shows area where you are\n" +
+            "§7/land <list> : Shows your lands";
 
 
     public MyLandProtect loader;
@@ -85,6 +86,9 @@ public class LandCommand extends Command {
                     break;
                 }
                 this.loader.whitelist(player, args[3], args[2], args[1]);
+                break;
+            case "list":
+                this.loader.listLands(player);
                 break;
             default:
                 player.sendMessage(usage);
