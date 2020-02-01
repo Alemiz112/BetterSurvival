@@ -53,7 +53,7 @@ public class MyLandProtect extends Addon {
 
             configFile.set("landNotExists", "§6»§7Land §6{land}§7 not found!");
             configFile.set("landWithNameExists", "§6»§7Land §6{land}§7 already exists§7!");
-            configFile.set("landWarn", "§6»§7Hey §6@{player}67, this is not your region! Ask §6@{owner} §7to access §6{land}§7!");
+            configFile.set("landWarn", "§6»§7Hey §6@{player}§7, this is not your region! Ask §6@{owner} §7to access §6{land}§7!");
             configFile.set("landTooBig", "§6»§7Selected land is bigger than maximum allowed limit §6{limit} blocks§7!");
             configFile.set("landPosSelected", "§6»§7Successfully selected position at §6{pos}§7!");
             configFile.set("landLimitWarn", "§6»§7Lands limit reached!");
