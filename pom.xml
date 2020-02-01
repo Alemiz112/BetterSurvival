@@ -6,7 +6,7 @@
 
     <groupId>alemiz.bettersurvival</groupId>
     <artifactId>bettersurvival</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0-CUBEMC</version>
 
     <repositories>
         <repository>
@@ -20,6 +20,12 @@
         <dependency>
             <groupId>cn.nukkit</groupId>
             <artifactId>nukkit</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>cubemc.connector</groupId>
+            <artifactId>CubeMC-Connector</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>

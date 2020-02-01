@@ -24,7 +24,7 @@ public class LandCommand extends Command {
     public LandCommand(String name, MyLandProtect loader) {
         super(name, "Protect your area", usage);
         this.commandParameters.clear();
-
+        this.setPermission(loader.configFile.getString("landsCommandPermission"));
         this.loader = loader;
     }
 

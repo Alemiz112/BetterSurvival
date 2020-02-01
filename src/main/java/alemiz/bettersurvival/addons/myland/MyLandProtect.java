@@ -10,6 +10,7 @@ import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.block.BlockBreakEvent;
 import cn.nukkit.event.block.BlockPlaceEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
+import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.math.Vector3f;
 import cn.nukkit.utils.Config;
 
@@ -48,6 +49,7 @@ public class MyLandProtect extends Addon {
             configFile.set("landsLimitSize", 50);
             configFile.set("landsLimitSizeVip", 100);
 
+            configFile.set("landsCommandPermission", "bettersurvival.land.vip");
             configFile.set("landsVipPermission", "bettersurvival.land.vip");
             configFile.set("landsAccessPermission", "bettersurvival.land.access");
 
@@ -78,6 +80,12 @@ public class MyLandProtect extends Addon {
         if (configFile.getBoolean("enable", true)){
             plugin.getServer().getCommandMap().register("land", new LandCommand("land", this));
         }
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event){
+        /* Set Default Permissions*/
+        event.getPlayer().addAttachment(plugin, configFile.getString("landsCommandPermission"), true);
     }
 
     @EventHandler

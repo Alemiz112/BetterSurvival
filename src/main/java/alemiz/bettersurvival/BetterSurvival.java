@@ -1,5 +1,6 @@
 package alemiz.bettersurvival;
 
+import alemiz.bettersurvival.addons.CubeBridge;
 import alemiz.bettersurvival.addons.Home;
 import alemiz.bettersurvival.addons.MoreVanilla;
 import alemiz.bettersurvival.addons.myland.MyLandProtect;
@@ -40,5 +41,6 @@ public class BetterSurvival extends PluginBase implements Listener {
         Addon.loadAddon(new Home("homes.yml"));
         Addon.loadAddon(new MoreVanilla("more_vanilla.yml"));
         Addon.loadAddon(new MyLandProtect("my_land_protect.yml"));
+        Addon.loadAddon(new CubeBridge("cube_bridge.yml"));
     }
 }
