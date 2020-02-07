@@ -57,7 +57,7 @@ public class MyLandProtect extends Addon {
             configFile.set("landWithNameExists", "§6»§7Land §6{land}§7 already exists§7!");
             configFile.set("landWarn", "§6»§7Hey §6@{player}§7, this is not your region! Ask §6@{owner} §7to access §6{land}§7!");
             configFile.set("landTooBig", "§6»§7Selected land is bigger than maximum allowed limit §6{limit} blocks§7!");
-            configFile.set("landPosSelected", "§6»§7Successfully selected position at §6{pos}§7!");
+            configFile.set("landPosSelected", "§6»§7Successfully selected {select} position at §6{pos}§7!");
             configFile.set("landLimitWarn", "§6»§7Lands limit reached!");
             configFile.set("landHereNotFound", "§6»§7This land is free§7!");
 
@@ -104,11 +104,12 @@ public class MyLandProtect extends Addon {
             if (blocks.size() >= 2) blocks.clear();
 
             blocks.add(event.getBlock());
-            selectors.put(player.getName(), blocks);
+            selectors.put(player.getName().toLowerCase(), blocks);
 
             String message = configFile.getString("landPosSelected");
             message = message.replace("{pos}", event.getBlock().x +", "+ event.getBlock().y +", "+ event.getBlock().z);
             message = message.replace("{player}", player.getName());
+            message = message.replace("{select}", (blocks.size() == 1)? "first" : "second");
             player.sendMessage(message);
             event.setCancelled();
         }
