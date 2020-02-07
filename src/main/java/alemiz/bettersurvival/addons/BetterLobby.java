@@ -18,6 +18,7 @@ import java.util.List;
 public class BetterLobby extends Addon {
 
     private String joinMessage = "";
+    private String quitMessage = "";
     private int broadcastInterval = 1200;
     private List<String> broadcastMessages = new ArrayList<>();
 
@@ -45,6 +46,7 @@ public class BetterLobby extends Addon {
         this.broadcastMessages = configFile.getStringList("broadcast");
         this.broadcastInterval = configFile.getInt("broadcastInterval");
         this.joinMessage = configFile.getString("joinMessage");
+        this.quitMessage = configFile.getString("quitMessage");
     }
     public void loadBroadcaster(){
         Task task = new Task() {
@@ -95,7 +97,7 @@ public class BetterLobby extends Addon {
         };
         LevelDecoration.sendDecoration(decorations, player.getLevel().getPlayers());
 
-        String message = joinMessage.replace("{player}", player.getName());
+        String message = quitMessage.replace("{player}", player.getName());
         event.setQuitMessage(message);
     }
 
