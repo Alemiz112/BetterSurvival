@@ -3,6 +3,7 @@ package alemiz.bettersurvival.addons;
 import alemiz.bettersurvival.utils.Addon;
 import cn.nukkit.Player;
 import cn.nukkit.event.EventHandler;
+import cn.nukkit.network.protocol.GameRulesChangedPacket;
 import cubemc.connector.events.CubePlayerJoinEvent;
 
 import java.util.ArrayList;
@@ -62,5 +63,10 @@ public class CubeBridge extends Addon {
         for (String perm : perms){
             player.addAttachment(plugin, perm, true);
         }
+
+        /* Send new GameRules to player after player changes server*/
+        GameRulesChangedPacket packet = new GameRulesChangedPacket();
+        packet.gameRules = player.getLevel().getGameRules();
+        player.dataPacket(packet);
     }
 }
