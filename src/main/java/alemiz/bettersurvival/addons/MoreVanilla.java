@@ -11,6 +11,7 @@ import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.player.PlayerChatEvent;
 import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.Player;
+import cn.nukkit.level.GameRule;
 import cn.nukkit.potion.Effect;
 
 import java.util.HashMap;
@@ -22,6 +23,10 @@ public class MoreVanilla extends Addon{
 
     public MoreVanilla(String path){
         super("morevanilla", path);
+
+        /* make sure coordinates will be shown*/
+        plugin.getServer().getDefaultLevel().getGameRules().setGameRule(GameRule.SHOW_COORDINATES,
+                configFile.getBoolean("showCoordinates", true));
     }
 
     @Override
@@ -48,6 +53,8 @@ public class MoreVanilla extends Addon{
 
             configFile.set("permission-feed", "bettersurvival.feed");
             configFile.set("feedMessage", "§6»§7Your feed level has been increased to {state}!");
+
+            configFile.set("showCoordinates", true);
             configFile.save();
         }
     }
@@ -64,8 +71,10 @@ public class MoreVanilla extends Addon{
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event){
+        Player player = event.getPlayer();
+
         /* Set Default Permissions*/
-        event.getPlayer().addAttachment(plugin, configFile.getString("permission-tpa"), true);
+        player.addAttachment(plugin, configFile.getString("permission-tpa"), true);
     }
 
     @EventHandler
