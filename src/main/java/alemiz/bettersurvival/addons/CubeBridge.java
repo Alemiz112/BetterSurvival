@@ -63,10 +63,5 @@ public class CubeBridge extends Addon {
         for (String perm : perms){
             player.addAttachment(plugin, perm, true);
         }
-
-        /* Send new GameRules to player after player changes server*/
-        GameRulesChangedPacket packet = new GameRulesChangedPacket();
-        packet.gameRules = player.getLevel().getGameRules();
-        player.dataPacket(packet);
     }
 }
