@@ -1,17 +1,19 @@
 package alemiz.bettersurvival.addons;
 
-import alemiz.bettersurvival.commands.FeedCommand;
-import alemiz.bettersurvival.commands.FlyCommand;
-import alemiz.bettersurvival.commands.HealCommand;
-import alemiz.bettersurvival.commands.TpaCommand;
+import alemiz.bettersurvival.commands.*;
 import alemiz.bettersurvival.utils.Addon;
 import cn.nukkit.AdventureSettings;
 import cn.nukkit.Server;
 import cn.nukkit.event.EventHandler;
+import cn.nukkit.event.EventPriority;
 import cn.nukkit.event.player.PlayerChatEvent;
+import cn.nukkit.event.player.PlayerDeathEvent;
 import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.Player;
+import cn.nukkit.event.player.PlayerQuitEvent;
 import cn.nukkit.level.GameRule;
+import cn.nukkit.level.GameRules;
+import cn.nukkit.level.Location;
 import cn.nukkit.potion.Effect;
 
 import java.util.HashMap;
@@ -20,13 +22,17 @@ import java.util.Map;
 public class MoreVanilla extends Addon{
 
     protected Map<String, String> tpa = new HashMap<>();
+    protected Map<String, Location> back = new HashMap<>();
 
     public MoreVanilla(String path){
         super("morevanilla", path);
 
         /* make sure coordinates will be shown*/
-        plugin.getServer().getDefaultLevel().getGameRules().setGameRule(GameRule.SHOW_COORDINATES,
+        GameRules gameRules = plugin.getServer().getDefaultLevel().getGameRules();
+        gameRules.setGameRule(GameRule.SHOW_COORDINATES,
                 configFile.getBoolean("showCoordinates", true));
+        gameRules.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN,
+                configFile.getBoolean("doImmediateRespawn", true));
     }
 
     @Override
@@ -51,10 +57,15 @@ public class MoreVanilla extends Addon{
             configFile.set("permission-heal", "bettersurvival.heal");
             configFile.set("healMessage", "§6»§7You was healed!");
 
+            configFile.set("permission-back", "bettersurvival.back");
+            configFile.set("backMessage", "§6»§7You was teleported back to your death position!");
+            configFile.set("backPosNotFound", "§6»§7You dont have saved any death position!");
+
             configFile.set("permission-feed", "bettersurvival.feed");
             configFile.set("feedMessage", "§6»§7Your feed level has been increased to {state}!");
 
             configFile.set("showCoordinates", true);
+            configFile.set("doImmediateRespawn", true);
             configFile.save();
         }
     }
@@ -66,15 +77,24 @@ public class MoreVanilla extends Addon{
             plugin.getServer().getCommandMap().register("fly", new FlyCommand("fly", this));
             plugin.getServer().getCommandMap().register("heal", new HealCommand("heal", this));
             plugin.getServer().getCommandMap().register("feed", new FeedCommand("feed", this));
+            plugin.getServer().getCommandMap().register("back", new BackCommand("back", this));
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOW)
     public void onJoin(PlayerJoinEvent event){
         Player player = event.getPlayer();
 
         /* Set Default Permissions*/
         player.addAttachment(plugin, configFile.getString("permission-tpa"), true);
+        player.addAttachment(plugin, configFile.getString("permission-back"), true);
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event){
+        Player player = event.getPlayer();
+
+        this.back.remove(player.getName());
     }
 
     @EventHandler
@@ -85,6 +105,12 @@ public class MoreVanilla extends Addon{
         format = format.replace("{player}", player.getName());
         format = format.replace("{message}", event.getMessage());
         event.setFormat(format);
+    }
+
+    @EventHandler
+    public void onDeath(PlayerDeathEvent event){
+        Player player = event.getEntity();
+        this.back.put(player.getName(), player.clone());
     }
 
     public void tpa(Player executor, String player){
@@ -223,6 +249,23 @@ public class MoreVanilla extends Addon{
         String message = configFile.getString("healMessage");
         message = message.replace("{player}", player.getName());
         message = message.replace("{state}", (String.valueOf(player.getHealth())));
+        player.sendMessage(message);
+    }
+
+    public void back(Player player){
+        Location location = this.back.get(player.getName());
+        if (location == null){
+            String message = configFile.getString("backPosNotFound");
+            message = message.replace("{player}", "");
+            player.sendMessage(message);
+            return;
+        }
+
+        this.back.remove(player.getName());
+        player.teleport(location);
+
+        String message = configFile.getString("backMessage");
+        message = message.replace("{player}", "");
         player.sendMessage(message);
     }
 
