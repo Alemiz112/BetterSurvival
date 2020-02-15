@@ -14,6 +14,7 @@ public class CubeBridge extends Addon {
     public static String VIP_PERM = "cube.vip";
     public static String PLUS_PERM = "cube.plus";
     public static String SUBSCRIBER_PERM = "cube.subscriber";
+    public static String STAFF_PERM = "cube.staff";
 
 
     public CubeBridge(String path){
@@ -22,6 +23,7 @@ public class CubeBridge extends Addon {
         VIP_PERM = configFile.getString("vip-rank");
         PLUS_PERM = configFile.getString("plus-rank");
         SUBSCRIBER_PERM = configFile.getString("subscriber-rank");
+        STAFF_PERM = configFile.getString("staff-rank");
     }
 
     @Override
@@ -32,7 +34,7 @@ public class CubeBridge extends Addon {
             configFile.set("vip-rank", "cube.vip");
             configFile.set("plus-rank", "cube.plus");
             configFile.set("subscriber-rank", "cube.subscriber");
-
+            configFile.set("staff-rank", "cube.staff");
             configFile.save();
         }
     }
@@ -42,22 +44,28 @@ public class CubeBridge extends Addon {
         Player player = event.getPlayer();
         List<String> perms = new ArrayList<>();
 
-        if (player.hasPermission(SUBSCRIBER_PERM)){
+        boolean isStaff = player.hasPermission(STAFF_PERM);
+
+        if (player.hasPermission(SUBSCRIBER_PERM) || isStaff){
             //Subscriber Features
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-feed"));
         }
 
-        if (player.hasPermission(PLUS_PERM)){
+        if (player.hasPermission(PLUS_PERM) || isStaff){
             //Cube+ Freatures
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-heal"));
         }
 
-        if (player.hasPermission(VIP_PERM)){
+        if (player.hasPermission(VIP_PERM) || isStaff){
             //VIP Perms
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-fly"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-heal"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-feed"));
             perms.add(Addon.getAddon("mylandprotect").configFile.getString("landsVipPermission"));
+        }
+
+        if (player.hasPermission(STAFF_PERM)){
+            //STAFF Perms here
         }
 
         for (String perm : perms){
