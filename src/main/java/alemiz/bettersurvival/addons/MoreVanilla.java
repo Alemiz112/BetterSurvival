@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class MoreVanilla extends Addon{
 
@@ -285,7 +286,7 @@ public class MoreVanilla extends Addon{
                 players.addAll(level.getChunkPlayers(pos.getChunkX()+x, pos.getChunkZ()+z).values());
             }
         }
-        return players;
+        return players.stream().distinct().collect(Collectors.toList());
     }
 
 
