@@ -12,6 +12,7 @@ import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.Player;
 import cn.nukkit.event.player.PlayerQuitEvent;
 import cn.nukkit.level.GameRule;
+import cn.nukkit.level.GameRules;
 import cn.nukkit.level.Location;
 import cn.nukkit.potion.Effect;
 
@@ -27,8 +28,11 @@ public class MoreVanilla extends Addon{
         super("morevanilla", path);
 
         /* make sure coordinates will be shown*/
-        plugin.getServer().getDefaultLevel().getGameRules().setGameRule(GameRule.SHOW_COORDINATES,
+        GameRules gameRules = plugin.getServer().getDefaultLevel().getGameRules();
+        gameRules.setGameRule(GameRule.SHOW_COORDINATES,
                 configFile.getBoolean("showCoordinates", true));
+        gameRules.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN,
+                configFile.getBoolean("doImmediateRespawn", true));
     }
 
     @Override
@@ -61,6 +65,7 @@ public class MoreVanilla extends Addon{
             configFile.set("feedMessage", "§6»§7Your feed level has been increased to {state}!");
 
             configFile.set("showCoordinates", true);
+            configFile.set("doImmediateRespawn", true);
             configFile.save();
         }
     }
