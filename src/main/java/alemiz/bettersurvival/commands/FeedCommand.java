@@ -24,6 +24,7 @@ public class FeedCommand extends Command {
 
         this.setPermission(loader.configFile.getString("permission-feed"));
         this.loader = loader;
+        this.setAliases(new String[]{"eat", "food"});
     }
 
     @Override

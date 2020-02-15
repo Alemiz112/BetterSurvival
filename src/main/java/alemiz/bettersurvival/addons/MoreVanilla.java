@@ -13,10 +13,13 @@ import cn.nukkit.Player;
 import cn.nukkit.event.player.PlayerQuitEvent;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.GameRules;
+import cn.nukkit.level.Level;
 import cn.nukkit.level.Location;
 import cn.nukkit.potion.Effect;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MoreVanilla extends Addon{
@@ -64,6 +67,9 @@ public class MoreVanilla extends Addon{
             configFile.set("permission-feed", "bettersurvival.feed");
             configFile.set("feedMessage", "§6»§7Your feed level has been increased to {state}!");
 
+            configFile.set("permission-near", "bettersurvival.near");
+            configFile.set("nearMessage", "§6»§7Players near you: §6{players}!");
+
             configFile.set("showCoordinates", true);
             configFile.set("doImmediateRespawn", true);
             configFile.save();
@@ -78,6 +84,7 @@ public class MoreVanilla extends Addon{
             plugin.getServer().getCommandMap().register("heal", new HealCommand("heal", this));
             plugin.getServer().getCommandMap().register("feed", new FeedCommand("feed", this));
             plugin.getServer().getCommandMap().register("back", new BackCommand("back", this));
+            plugin.getServer().getCommandMap().register("near", new NearCommand("near", this));
         }
     }
 
@@ -267,6 +274,18 @@ public class MoreVanilla extends Addon{
         String message = configFile.getString("backMessage");
         message = message.replace("{player}", "");
         player.sendMessage(message);
+    }
+
+    public List<Player> getNearPlayers(Location pos, int radius){
+        Level level = pos.getLevel();
+        List<Player> players = new ArrayList<>();
+
+        for (int x = -radius; x < radius; x++){
+            for (int z = -radius; z < radius; z++){
+                players.addAll(level.getChunkPlayers(pos.getChunkX()+x, pos.getChunkZ()+z).values());
+            }
+        }
+        return players;
     }
 
 
