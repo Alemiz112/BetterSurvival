@@ -38,7 +38,7 @@ public class NearCommand extends Command {
         int radius = 8;
         if (args.length >= 1){
             try {
-                radius = Integer.parseInt(args[1]);
+                radius = Integer.parseInt(args[0]);
             }catch (Exception e){
                 player.sendMessage("§cPlease enter numerical radius!");
                 return true;
