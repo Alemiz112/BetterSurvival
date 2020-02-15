@@ -54,10 +54,8 @@ public class NearCommand extends Command {
             pplayers += pplayer.getName() + ", ";
         }
 
-        if (pplayers.equals("")) pplayers = "Not found";
-
         String message = this.loader.configFile.getString("nearMessage");
-        message = message.replace("{players}", pplayers.substring(0, pplayers.length()-2));
+        message = message.replace("{players}", (pplayers.equals("")? "Not found" : pplayers.substring(0, pplayers.length()-2)));
         player.sendMessage(message);
         return true;
     }
