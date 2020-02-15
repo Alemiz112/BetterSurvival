@@ -49,11 +49,14 @@ public class CubeBridge extends Addon {
         if (player.hasPermission(SUBSCRIBER_PERM) || isStaff){
             //Subscriber Features
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-feed"));
+            perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-near"));
         }
 
         if (player.hasPermission(PLUS_PERM) || isStaff){
             //Cube+ Freatures
+            perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-feed"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-heal"));
+            perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-near"));
         }
 
         if (player.hasPermission(VIP_PERM) || isStaff){
