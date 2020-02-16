@@ -62,7 +62,9 @@ public class Troller extends Addon {
         }
 
         boolean hidden = this.vanishPlayers.contains(player.getName());
-        if (!hidden) this.vanishPlayers.add(player.getName());
+        if (!hidden){
+            this.vanishPlayers.add(player.getName());
+        }else this.vanishPlayers.remove(player.getName());
 
         for (Player pplayer : plugin.getServer().getOnlinePlayers().values()){
             if (hidden){
