@@ -215,7 +215,7 @@ public class MyLandProtect extends Addon {
            region.pos2 = new Vector3f(data.get(0), data.get(1), data.get(2));
 
            region.whitelist = config.getStringList("land."+land+".whitelist");
-           this.lands.put(land, region);
+           this.lands.put(owner.toLowerCase()+"-"+land, region);
        }
     }
 
@@ -272,13 +272,11 @@ public class MyLandProtect extends Addon {
         LandRegion region = new LandRegion(player.getName().toLowerCase(), land.toLowerCase());
         region.pos1 = blocks.get(0).asVector3f();
         region.pos2 = blocks.get(1).asVector3f();
-        this.lands.put(land.toLowerCase(), region);
+        this.lands.put(player.getName().toLowerCase()+"-"+land.toLowerCase(), region);
     }
 
     public void removeLand(Player player, String land){
         if (player == null || !player.isConnected()) return;
-
-        this.lands.remove(land);
 
         Config config = ConfigManager.getInstance().loadPlayer(player);
         if (config == null) return;
@@ -293,6 +291,8 @@ public class MyLandProtect extends Addon {
 
         ((Map) config.get("land")).remove(land.toLowerCase());
         config.save();
+
+        this.lands.remove(player.getName().toLowerCase()+"-"+land);
 
         String message = configFile.getString("landRemove");
         message = message.replace("{player}", player.getName());
@@ -317,7 +317,7 @@ public class MyLandProtect extends Addon {
     }
 
     public void whitelist(Player owner, String player, String land, String action){
-        LandRegion region = this.lands.get(land.toLowerCase());
+        LandRegion region = this.lands.get(owner.getName().toLowerCase()+"-"+land.toLowerCase());
 
         if (region == null){
             String message = configFile.getString("landNotExists");
