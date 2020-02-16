@@ -8,9 +8,13 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.event.player.PlayerQuitEvent;
+import cn.nukkit.event.server.DataPacketReceiveEvent;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.LevelEventPacket;
+import cn.nukkit.network.protocol.SetLocalPlayerAsInitializedPacket;
 import cn.nukkit.scheduler.Task;
+import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.DummyBossBar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +44,10 @@ public class BetterLobby extends Addon {
             configFile.set("broadcastInterval", 1200);
             configFile.set("joinMessage", "§6»§7Be careful, §6@{player}§7 joined!");
             configFile.set("quitMessage", "§6»§7Oops §6@{player}§7 left!");
+
+            configFile.set("bossBar", true);
+            configFile.set("bossBarText", "§bCube§eMC §5Survival");
+            configFile.set("bossBarSize", 50);
             configFile.save();
         }
 
@@ -101,4 +109,25 @@ public class BetterLobby extends Addon {
         event.setQuitMessage(message);
     }
 
+    @EventHandler
+    public void onInitialize(DataPacketReceiveEvent event){
+        if (!(event.getPacket() instanceof SetLocalPlayerAsInitializedPacket)) return;
+        Player player = event.getPlayer();
+
+        if (configFile.getBoolean("bossBar")){
+            player.createBossBar(buildBossBar(player).build());
+        }
+    }
+
+    public DummyBossBar.Builder buildBossBar(Player player){
+        if (!configFile.getBoolean("bossBar")){
+            return new DummyBossBar.Builder(player);
+        }
+
+        DummyBossBar.Builder builder = new DummyBossBar.Builder(player);
+        builder.text(configFile.getString("bossBarText"));
+        builder.length(configFile.getInt("bossBarSize"));
+        builder.color(BlockColor.RED_BLOCK_COLOR);
+        return builder;
+    }
 }
