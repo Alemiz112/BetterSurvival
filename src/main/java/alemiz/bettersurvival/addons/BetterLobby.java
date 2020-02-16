@@ -16,8 +16,7 @@ import cn.nukkit.scheduler.Task;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.DummyBossBar;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class BetterLobby extends Addon {
 
@@ -27,6 +26,8 @@ public class BetterLobby extends Addon {
     private List<String> broadcastMessages = new ArrayList<>();
 
     private int nextMessage = 0;
+
+    private Map<String, Long> bossBars = new HashMap<>();
 
     public BetterLobby(String path){
         super("betterlobby", path);
@@ -40,13 +41,13 @@ public class BetterLobby extends Addon {
         if (!configFile.exists("enable")){
             configFile.set("enable", true);
 
-            configFile.set("broadcast", new String[]{"§eDid you find hacker? Use §b/report§e to report him!", "§eDo people actually read these?", "§aCheck out our youtube channel §cCubeMC Official§a!", "§bVote for us and get §eSubscriber §brank!"});
+            configFile.set("broadcast", Arrays.asList("§eDid you find hacker? Use §b/report§e to report him!", "§eDo people actually read these?", "§aCheck out our youtube channel §cCubeMC Official§a!", "§bVote for us and get §eSubscriber §brank!"));
             configFile.set("broadcastInterval", 1200);
             configFile.set("joinMessage", "§6»§7Be careful, §6@{player}§7 joined!");
             configFile.set("quitMessage", "§6»§7Oops §6@{player}§7 left!");
 
             configFile.set("bossBar", true);
-            configFile.set("bossBarText", "§bCube§eMC §5Survival");
+            configFile.set("bossBarText", "§bCube§eMC §cSurvival");
             configFile.set("bossBarSize", 50);
             configFile.save();
         }
@@ -105,6 +106,12 @@ public class BetterLobby extends Addon {
         };
         LevelDecoration.sendDecoration(decorations, player.getLevel().getPlayers());
 
+
+
+        if (configFile.getBoolean("bossBar")){
+            this.bossBars.remove(player.getName());
+        }
+
         String message = quitMessage.replace("{player}", player.getName());
         event.setQuitMessage(message);
     }
@@ -115,19 +122,27 @@ public class BetterLobby extends Addon {
         Player player = event.getPlayer();
 
         if (configFile.getBoolean("bossBar")){
-            player.createBossBar(buildBossBar(player).build());
+            player.createBossBar(buildBossBar(player));
         }
     }
 
-    public DummyBossBar.Builder buildBossBar(Player player){
+    public DummyBossBar buildBossBar(Player player){
         if (!configFile.getBoolean("bossBar")){
-            return new DummyBossBar.Builder(player);
+            return new DummyBossBar.Builder(player).build();
         }
 
         DummyBossBar.Builder builder = new DummyBossBar.Builder(player);
         builder.text(configFile.getString("bossBarText"));
         builder.length(configFile.getInt("bossBarSize"));
         builder.color(BlockColor.RED_BLOCK_COLOR);
-        return builder;
+
+        DummyBossBar bossBar = builder.build();
+        this.bossBars.put(player.getName(), bossBar.getBossBarId());
+        return bossBar;
+    }
+
+
+    public Map<String, Long> getBossBars() {
+        return bossBars;
     }
 }

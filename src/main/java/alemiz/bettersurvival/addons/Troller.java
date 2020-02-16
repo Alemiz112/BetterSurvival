@@ -6,6 +6,7 @@ import cn.nukkit.Player;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.event.player.PlayerQuitEvent;
+import cn.nukkit.utils.DummyBossBar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,21 +56,67 @@ public class Troller extends Addon {
         }
     }
 
+
+    public void showVanishPlayers(Player player){
+        for (String pname : this.vanishPlayers){
+            Player pplayer = plugin.getServer().getPlayer(pname);
+
+            if (pplayer == null || !pplayer.isConnected()){
+                this.vanishPlayers.remove(pname);
+                continue;
+            }
+
+            player.showPlayer(pplayer);
+        }
+    }
+
+    public void hideVanishPlayers(Player player){
+        for (String pname : this.vanishPlayers){
+            Player pplayer = plugin.getServer().getPlayer(pname);
+
+            if (pplayer == null || !pplayer.isConnected()){
+                this.vanishPlayers.remove(pname);
+                continue;
+            }
+
+            player.hidePlayer(pplayer);
+        }
+    }
+
     public void vanish(Player player){
         if (!player.hasPermission(configFile.getString("permission-vanish"))){
             player.sendMessage("§cYou dont have permission to vanish!");
             return;
         }
 
+        DummyBossBar bossBar = null;
+        long bossBarId = 0;
+        if (Addon.getAddon("betterlobby") != null && Addon.getAddon("betterlobby").enabled){
+            bossBarId = ((BetterLobby) Addon.getAddon("betterlobby")).getBossBars().get(player.getName());
+            bossBar = ((BetterLobby) Addon.getAddon("betterlobby")).buildBossBar(player);
+        }
+
         boolean hidden = this.vanishPlayers.contains(player.getName());
-        if (!hidden){
+        if (hidden){
+            this.vanishPlayers.remove(player.getName());
+            hideVanishPlayers(player);
+        }else {
             this.vanishPlayers.add(player.getName());
-        }else this.vanishPlayers.remove(player.getName());
+            showVanishPlayers(player);
+            if (bossBar != null) bossBar.setText(bossBar.getText()+" §7- §3Vanished");
+        }
 
         for (Player pplayer : plugin.getServer().getOnlinePlayers().values()){
             if (hidden){
                 pplayer.showPlayer(player);
-            }else pplayer.hidePlayer(player);
+            }else{
+                pplayer.hidePlayer(player);
+            }
+        }
+
+        if (bossBar != null){
+            player.removeBossBar(bossBarId);
+            player.createBossBar(bossBar);
         }
 
         String message = configFile.getString("vanishMessage");
