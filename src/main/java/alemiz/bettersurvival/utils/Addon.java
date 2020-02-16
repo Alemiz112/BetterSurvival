@@ -11,6 +11,7 @@ import java.util.Map;
 public abstract class Addon implements Listener{
     public String PATH = null;
     public Config configFile = null;
+    public boolean enabled = false;
 
     protected static Map<String, Addon> addons = new HashMap<>();
 
@@ -32,13 +33,15 @@ public abstract class Addon implements Listener{
     public BetterSurvival plugin;
 
     public Addon(String name, String path){
-        PATH = path;
+        this.PATH = path;
         this.name = name;
         this.plugin = BetterSurvival.getInstance();
-        configFile = ConfigManager.getInstance().loadAddon(this);
+        this.configFile = ConfigManager.getInstance().loadAddon(this);
         loadConfig();
 
-        if (configFile.getBoolean("enable")){
+        this.enabled = configFile.getBoolean("enable", false);
+
+        if (this.enabled){
             plugin.getLogger().info("§eLoading BetterSurvival addon: §3"+name);
             Server.getInstance().getPluginManager().registerEvents(this, plugin);
 
