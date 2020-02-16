@@ -15,6 +15,8 @@ import cn.nukkit.level.GameRule;
 import cn.nukkit.level.GameRules;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Location;
+import cn.nukkit.math.Vector3;
+import cn.nukkit.network.protocol.SpawnParticleEffectPacket;
 import cn.nukkit.potion.Effect;
 
 import java.util.ArrayList;
@@ -71,6 +73,10 @@ public class MoreVanilla extends Addon{
             configFile.set("permission-near", "bettersurvival.near");
             configFile.set("nearMessage", "§6»§7Players near you: §6{players}!");
 
+            configFile.set("permission-jump", "bettersurvival.jump");
+            configFile.set("jumpMessage", "§6Woosh!");
+            configFile.set("jumpPower", 1.5);
+
             configFile.set("showCoordinates", true);
             configFile.set("doImmediateRespawn", true);
             configFile.save();
@@ -79,14 +85,13 @@ public class MoreVanilla extends Addon{
 
     @Override
     public void registerCommands() {
-        if (configFile.getBoolean("enable", true)){
-            plugin.getServer().getCommandMap().register("tpa", new TpaCommand("tpa", this));
-            plugin.getServer().getCommandMap().register("fly", new FlyCommand("fly", this));
-            plugin.getServer().getCommandMap().register("heal", new HealCommand("heal", this));
-            plugin.getServer().getCommandMap().register("feed", new FeedCommand("feed", this));
-            plugin.getServer().getCommandMap().register("back", new BackCommand("back", this));
-            plugin.getServer().getCommandMap().register("near", new NearCommand("near", this));
-        }
+        plugin.getServer().getCommandMap().register("tpa", new TpaCommand("tpa", this));
+        plugin.getServer().getCommandMap().register("fly", new FlyCommand("fly", this));
+        plugin.getServer().getCommandMap().register("heal", new HealCommand("heal", this));
+        plugin.getServer().getCommandMap().register("feed", new FeedCommand("feed", this));
+        plugin.getServer().getCommandMap().register("back", new BackCommand("back", this));
+        plugin.getServer().getCommandMap().register("near", new NearCommand("near", this));
+        plugin.getServer().getCommandMap().register("jump", new JumpCommand("jump", this));
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -287,6 +292,48 @@ public class MoreVanilla extends Addon{
             }
         }
         return players.stream().distinct().collect(Collectors.toList());
+    }
+
+    public void jump(Player player){
+        if (!player.hasPermission(configFile.getString("permission-jump"))){
+            player.sendMessage("§cYou dont have permission to jump!");
+            return;
+        }
+
+        int power = configFile.getInt("jumpPower");
+        int x = 0;
+        int z = 0;
+
+        switch (player.getDirection().getIndex()){
+            case 2:
+                z = -power;
+                break;
+            case 3:
+                z = +power;
+                break;
+            case 4:
+                x = -power;
+                break;
+            case 5:
+                x = +power;
+                break;
+        }
+        Vector3 motion = new Vector3(x, power, z);
+
+
+        SpawnParticleEffectPacket packet = new SpawnParticleEffectPacket();
+        packet.position = player.asVector3f();
+        packet.dimensionId = player.getLevel().getDimension();
+        packet.identifier = "minecraft:water_evaporation_bucket_emitter";
+        for (Player pplayer : player.getLevel().getPlayers().values()) pplayer.dataPacket(packet);
+
+
+        player.addEffect(Effect.getEffect(Effect.DAMAGE_RESISTANCE).setAmplifier(100).setDuration(20*5).setVisible(false));
+        player.setMotion(motion);
+
+        String message = configFile.getString("jumpMessage");
+        message = message.replace("{player}", "");
+        player.sendMessage(message);
     }
 
 

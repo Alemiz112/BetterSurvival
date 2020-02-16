@@ -39,11 +39,11 @@ public abstract class Addon implements Listener{
         loadConfig();
 
         if (configFile.getBoolean("enable")){
-           plugin.getLogger().info("§eLoading BetterSurvival addon: §3"+name);
+            plugin.getLogger().info("§eLoading BetterSurvival addon: §3"+name);
             Server.getInstance().getPluginManager().registerEvents(this, plugin);
-        }
 
-        registerCommands();
+            registerCommands();
+        }
     }
 
     public abstract void loadConfig();

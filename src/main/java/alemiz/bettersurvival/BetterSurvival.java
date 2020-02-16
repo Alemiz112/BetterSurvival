@@ -4,6 +4,7 @@ import alemiz.bettersurvival.addons.CubeBridge;
 import alemiz.bettersurvival.addons.Home;
 import alemiz.bettersurvival.addons.BetterLobby;
 import alemiz.bettersurvival.addons.MoreVanilla;
+import alemiz.bettersurvival.addons.Troller;
 import alemiz.bettersurvival.addons.myland.MyLandProtect;
 import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.ConfigManager;
@@ -44,5 +45,6 @@ public class BetterSurvival extends PluginBase implements Listener {
         Addon.loadAddon(new MyLandProtect("my_land_protect.yml"));
         Addon.loadAddon(new CubeBridge("cube_bridge.yml"));
         Addon.loadAddon(new BetterLobby("better_lobby.yml"));
+        Addon.loadAddon(new Troller("troll_addon.yml"));
     }
 }
