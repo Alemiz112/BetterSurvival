@@ -50,6 +50,7 @@ public class CubeBridge extends Addon {
             //Subscriber Features
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-feed"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-near"));
+            perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-jump"));
         }
 
         if (player.hasPermission(PLUS_PERM) || isStaff){
@@ -57,18 +58,23 @@ public class CubeBridge extends Addon {
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-feed"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-heal"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-near"));
+            perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-jump"));
         }
 
         if (player.hasPermission(VIP_PERM) || isStaff){
             //VIP Perms
-            perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-fly"));
-            perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-heal"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-feed"));
+            perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-heal"));
+            perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-near"));
+            perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-jump"));
+            perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-fly"));
+
             perms.add(Addon.getAddon("mylandprotect").configFile.getString("landsVipPermission"));
         }
 
         if (player.hasPermission(STAFF_PERM)){
             //STAFF Perms here
+            perms.add(Addon.getAddon("troller").configFile.getString("permission-vanish"));
         }
 
         for (String perm : perms){
