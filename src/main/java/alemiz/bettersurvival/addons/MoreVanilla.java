@@ -71,7 +71,7 @@ public class MoreVanilla extends Addon{
             configFile.set("feedMessage", "§6»§7Your feed level has been increased to {state}!");
 
             configFile.set("permission-near", "bettersurvival.near");
-            configFile.set("nearMessage", "§6»§7Players near you: §6{players}!");
+            configFile.set("nearMessage", "§6»§7Players near you: §6{players}§7!");
 
             configFile.set("permission-jump", "bettersurvival.jump");
             configFile.set("jumpMessage", "§6Woosh!");
@@ -269,7 +269,7 @@ public class MoreVanilla extends Addon{
         Location location = this.back.get(player.getName());
         if (location == null){
             String message = configFile.getString("backPosNotFound");
-            message = message.replace("{player}", "");
+            message = message.replace("{player}", player.getName());
             player.sendMessage(message);
             return;
         }
@@ -278,7 +278,7 @@ public class MoreVanilla extends Addon{
         player.teleport(location);
 
         String message = configFile.getString("backMessage");
-        message = message.replace("{player}", "");
+        message = message.replace("{player}", player.getName());
         player.sendMessage(message);
     }
 
@@ -332,7 +332,7 @@ public class MoreVanilla extends Addon{
         player.setMotion(motion);
 
         String message = configFile.getString("jumpMessage");
-        message = message.replace("{player}", "");
+        message = message.replace("{player}", player.getName());
         player.sendMessage(message);
     }
 
@@ -341,7 +341,7 @@ public class MoreVanilla extends Addon{
         if (player == null){
             if (pexecutor != null){
                 String message = configFile.getString("playerNotFound");
-                message = message.replace("{player}", "");
+                message = message.replace("{player}", player.getName());
                 pexecutor.sendMessage(message);
             }
             return false;
