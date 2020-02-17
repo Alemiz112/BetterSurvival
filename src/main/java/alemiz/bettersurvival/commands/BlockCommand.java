@@ -21,7 +21,7 @@ public class BlockCommand extends Command {
         this.commandParameters.clear();
         this.commandParameters.put("default", new CommandParameter[]{
                 new CommandParameter("player", CommandParamType.TARGET,false),
-                new CommandParameter("block", CommandParamType.INT, false)
+                new CommandParameter("block", CommandParamType.TEXT, false)
         });
 
         this.setPermission(loader.configFile.getString("permission-block"));
@@ -44,14 +44,7 @@ public class BlockCommand extends Command {
             return true;
         }
 
-        int blockId = 0;
-        try {
-            blockId = Integer.parseInt(args[1]);
-        }catch (Exception e){
-            sender.sendMessage("§cPlease enter numerical block id!");
-            return true;
-        }
-        this.loader.block((Player) sender, args[0], blockId);
+        this.loader.block((Player) sender, args[0], args[1]);
         return true;
     }
 }

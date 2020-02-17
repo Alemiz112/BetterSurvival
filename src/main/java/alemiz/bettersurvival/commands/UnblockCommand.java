@@ -17,13 +17,13 @@ public class UnblockCommand extends Command {
     public Troller loader;
 
     public UnblockCommand(String name, Troller loader) {
-        super(name, "Unblock command", usage);
+        super(name, "Unblock command", usage, new String[]{"free"});
         this.commandParameters.clear();
         this.commandParameters.put("default", new CommandParameter[]{
                 new CommandParameter("player", CommandParamType.TARGET, false),
         });
 
-        this.setAliases(new String[]{"free"});
+
         this.setPermission(loader.configFile.getString("permission-block"));
         this.loader = loader;
     }
