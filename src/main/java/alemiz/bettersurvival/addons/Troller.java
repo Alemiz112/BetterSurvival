@@ -223,7 +223,7 @@ public class Troller extends Addon {
                     updateBlockPacket.z = (int) z;
                     updateBlockPacket.flags = 0;
                     try {
-                        updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(block.getFullId());
+                        updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(player.protocol, block.getFullId());
                     } catch (NoSuchElementException var18) {
                         throw new IllegalStateException("Unable to create BlockUpdatePacket at (" + x + ", " + y + ", " + z + ") in " + block.getName(), var18);
                     }
