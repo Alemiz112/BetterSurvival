@@ -9,15 +9,20 @@ import cn.nukkit.block.Block;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.event.player.PlayerQuitEvent;
+import cn.nukkit.item.Item;
+import cn.nukkit.level.Level;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.DummyBossBar;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Troller extends Addon {
 
     protected List<String> vanishPlayers = new ArrayList<>();
+    protected Map<String, List<Block>> blocksBefore = new HashMap<>();
 
     public Troller(String path){
         super("troller", path);
@@ -147,7 +152,7 @@ public class Troller extends Addon {
         player.sendMessage(message);
     }
 
-    public void setBlocksArround(Player player, Block block){
+    public List<Block> setBlocksArround(Player player, Block block){
         Vector3 base = player.clone();
         List<Vector3> positions = new ArrayList<Vector3>(){{
             add(base.add(0, -1, 0));
@@ -164,12 +169,25 @@ public class Troller extends Addon {
             add(base.add(0, 1, -1));
         }};
 
+        List<Block> blocksBefore = new ArrayList<>();
         for (Vector3 position : positions){
+            blocksBefore.add(player.level.getBlock(position));
             player.getLevel().setBlock(position, block, true, true);
+        }
+
+        return blocksBefore;
+    }
+
+    public void replaceBlocks(List<Block> replaceWith){
+        for (Block block : replaceWith){
+            Level level = block.getLevel();
+            if (level == null) continue;
+
+            level.setBlock(new Vector3(block.x, block.y, block.z), block, true, true);
         }
     }
 
-    public void block(Player player, String victim, int blockId){
+    public void block(Player player, String victim, String blockString){
         if (!player.hasPermission(configFile.getString("permission-block"))){
             player.sendMessage("§cYou dont have permission to block player!");
             return;
@@ -178,16 +196,19 @@ public class Troller extends Addon {
         Player pvictim = plugin.getServer().getPlayer(victim);
         if (!checkForPlayer(pvictim, player)) return;
 
-        Block block = Block.get(blockId);
+        Block block = null;
+        Item item = Item.fromString(blockString);
+        if (item != null) block = item.getBlock();
+
         if (block == null){
             String message = configFile.getString("blockNotFound");
-            message = message.replace("{id}", String.valueOf(blockId));
+            message = message.replace("{id}", blockString);
             message = message.replace("{player}", player.getName());
             player.sendMessage(message);
             return;
         }
 
-        setBlocksArround(pvictim, block);
+        this.blocksBefore.put(pvictim.getName(), setBlocksArround(pvictim, block));
 
         String message = configFile.getString("blockMessage");
         message = message.replace("{victim}", pvictim.getName());
@@ -204,8 +225,13 @@ public class Troller extends Addon {
         Player pvictim = plugin.getServer().getPlayer(victim);
         if (!checkForPlayer(pvictim, player)) return;
 
-        Block block = Block.get(Block.AIR);
-        setBlocksArround(pvictim, block);
+        List<Block> blocksBefore = this.blocksBefore.get(pvictim.getName());
+        if (blocksBefore != null){
+            replaceBlocks(blocksBefore);
+        }else {
+            Block block = Block.get(Block.AIR);
+            setBlocksArround(pvictim, block);
+        }
 
         String message = configFile.getString("unblockMessage");
         message = message.replace("{victim}", pvictim.getName());
