@@ -19,7 +19,7 @@
     <dependencies>
         <dependency>
             <groupId>cn.nukkit</groupId>
-            <artifactId>nukkit</artifactId>
+            <artifactId>Nukkit</artifactId>
             <version>PM1E</version>
             <scope>provided</scope>
         </dependency>
