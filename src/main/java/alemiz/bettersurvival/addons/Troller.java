@@ -122,8 +122,16 @@ public class Troller extends Addon {
 
         for (Player pplayer : plugin.getServer().getOnlinePlayers().values()){
             if (hidden){
+                if (this.vanishPlayers.contains(pplayer.getName())){
+                    player.hidePlayer(pplayer);
+                    continue;
+                }
                 pplayer.showPlayer(player);
             }else{
+                if (this.vanishPlayers.contains(pplayer.getName())){
+                    player.showPlayer(pplayer);
+                    continue;
+                }
                 pplayer.hidePlayer(player);
             }
         }
