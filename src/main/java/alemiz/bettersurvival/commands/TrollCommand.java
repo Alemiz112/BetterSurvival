@@ -17,7 +17,8 @@ public class TrollCommand extends Command {
             "§7/unblock <player> : Release player from spawned blocks\n" +
             "§7/troll anvil <player> : Now who could have put that up there?\n" +
             "§7/troll chat <player> <message> : Chat or run a command as a player using their own permissions\n" +
-            "§7/troll rainbow <player> : Spawn chaotic wool around player!";
+            "§7/troll rainbow <player> : Spawn chaotic wool around player!\n" +
+            "§7/troll lava <player> : Learn your friend to swim in lava!";
 
 
     public Troller loader;
@@ -73,6 +74,13 @@ public class TrollCommand extends Command {
                     break;
                 }
                 this.loader.rainbowFloor(player, args[1]);
+                break;
+            case "lava":
+                if (args.length < 2){
+                    player.sendMessage("§7/troll lava <player> : Learn your friend to swim in lava!");
+                    break;
+                }
+                this.loader.fakeLavaHole(player, args[1]);
                 break;
             default:
                 sender.sendMessage(usage);

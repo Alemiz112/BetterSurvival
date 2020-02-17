@@ -23,6 +23,9 @@ import java.util.*;
 
 public class Troller extends Addon {
 
+    public final static int BLOCK_UPDATE_RANDOM_FLAT = 0;
+    public final static int BLOCK_UPDATE_HOLE_WITH_LAVA = 1;
+
     protected List<String> vanishPlayers = new ArrayList<>();
     protected Map<String, List<Block>> blocksBefore = new HashMap<>();
 
@@ -35,7 +38,7 @@ public class Troller extends Addon {
         if (!configFile.exists("enable")) {
             configFile.set("enable", true);
 
-            configFile.set("playerNotFound", "§6»§7Player {player} was not found!");
+            configFile.set("playerNotFound", "§6»§7Player was not found!");
             configFile.set("blockNotFound", "§6»§7Block with id {id} was not found!");
 
             configFile.set("permission-vanish", "bettersurvival.troller.vanish");
@@ -52,6 +55,7 @@ public class Troller extends Addon {
             configFile.set("anvilMessage", "§6»§7The anvil has been dropped on §6@{victim}§7!");
             configFile.set("chatMessage", "§6»§7It looks like §6@{victim}§7 is unsure what to say§7!");
             configFile.set("rainbowFloorMessage", "§6»§7Player §6@{victim}§7 got spammed with wool mess§7!");
+            configFile.set("fakeLavaMessage", "§6»§7Player §6@{victim}§7 want to swim in lava§7!");
             configFile.save();
         }
     }
@@ -198,48 +202,84 @@ public class Troller extends Addon {
         }
     }
 
-    public List<UpdateBlockPacket> generateBlockUpdate(Player player){
+    public List<UpdateBlockPacket> generateBlockUpdate(Player player, int type){
         Level level = player.getLevel();
         List<UpdateBlockPacket> packets = new ArrayList<>();
 
-        for (double x = player.getX()-14; x < player.getX()+14; x++){
-            for (double y = player.getY()-5; y < player.getY()+5; y++){
-                for (double z = player.getZ()-14; z < player.getZ()+14; z++){
-                    int blockId = level.getBlock((int) x, (int) y, (int) z).getId();
-                    switch (blockId){
-                        case Block.AIR:
-                            continue;
-                        case Block.LEAVES:
-                        case Block.LEAVES2:
-                        case Block.WOOD:
-                            if (new Random().nextInt(3) == 2) continue;
-                    }
+        switch (type){
+            case BLOCK_UPDATE_RANDOM_FLAT:
+                for (double x = player.getX()-14; x < player.getX()+14; x++){
+                    for (double y = player.getY()-5; y < player.getY()+5; y++){
+                        for (double z = player.getZ()-14; z < player.getZ()+14; z++){
+                            int blockId = level.getBlock((int) x, (int) y, (int) z).getId();
+                            switch (blockId){
+                                case Block.AIR:
+                                    continue;
+                                case Block.LEAVES:
+                                case Block.LEAVES2:
+                                case Block.WOOD:
+                                    if (new Random().nextInt(3) == 2) continue;
+                            }
 
-                    Block block = Block.get(Block.WOOL, new Random().nextInt(14));
+                            Block block = Block.get(Block.WOOL, new Random().nextInt(14));
+                            block.x = x;
+                            block.y = y;
+                            block.z = z;
 
-                    UpdateBlockPacket updateBlockPacket = new UpdateBlockPacket();
-                    updateBlockPacket.x = (int) x;
-                    updateBlockPacket.y = (int) y;
-                    updateBlockPacket.z = (int) z;
-                    updateBlockPacket.flags = 0;
-                    try {
-                        updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(player.protocol, block.getFullId());
-                    } catch (NoSuchElementException var18) {
-                        throw new IllegalStateException("Unable to create BlockUpdatePacket at (" + x + ", " + y + ", " + z + ") in " + block.getName(), var18);
+                            packets.add(createUpdatePacket(block, player.protocol));
+                        }
                     }
-                    packets.add(updateBlockPacket);
                 }
-            }
+                break;
+            case BLOCK_UPDATE_HOLE_WITH_LAVA:
+                //Vector3 pos = player.add(1, 0, 1);
+
+                for (double y = player.getY()-3; y <= player.getY(); y++){
+                    Block block = Block.get(Block.AIR);
+                    if (y == (player.getY()-3)) block = Block.get(Block.LAVA);
+
+                    for (double x = player.getX()-2; x < player.getFloorX()+1; x++){
+                        for (double z = player.getZ()-2; z < player.getZ()+1; z++){
+                            block.x = x;
+                            block.y = y;
+                            block.z = z;
+                            packets.add(createUpdatePacket(block, player.protocol));
+                        }
+                    }
+                }
+                break;
         }
+
         return packets;
     }
 
-    public void generateRealBlocks(Vector3 pos, int interval, Player[] players){
+    public UpdateBlockPacket createUpdatePacket(Block block, int protocol){
+        UpdateBlockPacket updateBlockPacket = new UpdateBlockPacket();
+        updateBlockPacket.x = (int) block.x;
+        updateBlockPacket.y = (int) block.y;
+        updateBlockPacket.z = (int) block.z;
+        updateBlockPacket.flags = 0;
+        try {
+            updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(protocol, block.getFullId());
+        } catch (NoSuchElementException var18) {
+            throw new IllegalStateException("Unable to create BlockUpdatePacket at (" + block.x + ", " + block.y + ", " + block.z + ") in " + block.getName(), var18);
+        }
+        return updateBlockPacket;
+    }
+
+    public void sendRealChunks(Vector3 pos, int interval, int maxChunks,  Player[] players){
         plugin.getServer().getScheduler().scheduleDelayedTask(new Task() {
             @Override
             public void onRun(int i) {
-                for (double x = pos.getX()-16; x < pos.getX()+16; x = x+16){
-                    for (double z = pos.getZ()-16; z < pos.getZ()+16; z = z+16){
+                if (maxChunks == 0){ //just chunk of pos
+                    for (Player player : players){
+                        player.getLevel().requestChunk((int) pos.getX() >> 4,(int) pos.getZ() >> 4, player);
+                    }
+                    return;
+                }
+
+                for (double x = pos.getX()-(16*maxChunks); x < pos.getX()+(16*maxChunks); x = x+16){
+                    for (double z = pos.getZ()-(16*maxChunks); z < pos.getZ()+(16*maxChunks); z = z+16){
                         for (Player player : players){
                             player.getLevel().requestChunk((int) x >> 4,(int) z >> 4, player);
                         }
@@ -327,16 +367,36 @@ public class Troller extends Addon {
         if (!checkForPlayer(pvictim, player, configFile.getString("permission-troll-advanced"),
                 "§cYou dont have basic troll permission!")) return;
 
-        List<UpdateBlockPacket> packets = generateBlockUpdate(pvictim);
-        if (packets == null || packets.isEmpty()) return;
+        List<UpdateBlockPacket> packets = generateBlockUpdate(pvictim, BLOCK_UPDATE_RANDOM_FLAT);
+        if (packets == null) return;
 
         /* Send fake blocks*/
         plugin.getServer().batchPackets(new Player[]{pvictim, player}, packets.toArray(new DataPacket[0]));
 
         /* Schedule reload to real blocks*/
-        generateRealBlocks(pvictim, 20*60, new Player[]{pvictim, player});
+        sendRealChunks(pvictim, 20*60, 1, new Player[]{pvictim, player});
 
         String message = configFile.getString("rainbowFloorMessage");
+        message = message.replace("{victim}", pvictim.getName());
+        message = message.replace("{player}", player.getName());
+        player.sendMessage(message);
+    }
+
+    public void fakeLavaHole(Player player, String victim){
+        Player pvictim = plugin.getServer().getPlayer(victim);
+        if (!checkForPlayer(pvictim, player, configFile.getString("permission-troll"),
+                "§cYou dont have basic troll permission!")) return;
+
+        List<UpdateBlockPacket> packets = generateBlockUpdate(pvictim, BLOCK_UPDATE_HOLE_WITH_LAVA);
+        if (packets == null) return;
+
+        /* Send fake blocks*/
+        plugin.getServer().batchPackets(new Player[]{pvictim, player}, packets.toArray(new DataPacket[0]));
+
+        /* Schedule reload to real blocks*/
+        sendRealChunks(pvictim, 20*45, 0, new Player[]{pvictim, player});
+
+        String message = configFile.getString("fakeLavaMessage");
         message = message.replace("{victim}", pvictim.getName());
         message = message.replace("{player}", player.getName());
         player.sendMessage(message);
@@ -351,7 +411,6 @@ public class Troller extends Addon {
         if (player == null){
             if (executor != null){
                 String message = configFile.getString("playerNotFound");
-                message = message.replace("{player}", player.getName());
                 executor.sendMessage(message);
             }
             return false;
