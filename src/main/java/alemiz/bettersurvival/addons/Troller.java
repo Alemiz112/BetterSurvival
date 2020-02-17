@@ -1,6 +1,7 @@
 package alemiz.bettersurvival.addons;
 
 import alemiz.bettersurvival.commands.BlockCommand;
+import alemiz.bettersurvival.commands.TrollCommand;
 import alemiz.bettersurvival.commands.UnblockCommand;
 import alemiz.bettersurvival.commands.VanishCommand;
 import alemiz.bettersurvival.utils.Addon;
@@ -10,14 +11,15 @@ import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.event.player.PlayerQuitEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.Vector3;
+import cn.nukkit.network.protocol.DataPacket;
+import cn.nukkit.network.protocol.UpdateBlockPacket;
+import cn.nukkit.scheduler.Task;
 import cn.nukkit.utils.DummyBossBar;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Troller extends Addon {
 
@@ -42,6 +44,14 @@ public class Troller extends Addon {
             configFile.set("permission-block", "bettersurvival.troller.block");
             configFile.set("blockMessage", "§6»§7Some blocks spawned around §6@{victim}§7!");
             configFile.set("unblockMessage", "§6»@{victim}§7 was freed!");
+
+            configFile.set("permission-troll", "bettersurvival.troller.basic");
+            configFile.set("permission-troll-advanced", "bettersurvival.troller.advanced");
+
+            /*Basic Troll commands*/
+            configFile.set("anvilMessage", "§6»§7The anvil has been dropped on §6@{victim}§7!");
+            configFile.set("chatMessage", "§6»§7It looks like §6@{victim}§7 is unsure what to say§7!");
+            configFile.set("rainbowFloorMessage", "§6»§7Player §6@{victim}§7 got spammed with wool mess§7!");
             configFile.save();
         }
     }
@@ -51,6 +61,7 @@ public class Troller extends Addon {
         plugin.getServer().getCommandMap().register("vanish", new VanishCommand("vanish", this));
         plugin.getServer().getCommandMap().register("block", new BlockCommand("block", this));
         plugin.getServer().getCommandMap().register("unblock", new UnblockCommand("unblock", this));
+        plugin.getServer().getCommandMap().register("troll", new TrollCommand("troll", this));
     }
 
     @EventHandler
@@ -187,14 +198,61 @@ public class Troller extends Addon {
         }
     }
 
-    public void block(Player player, String victim, String blockString){
-        if (!player.hasPermission(configFile.getString("permission-block"))){
-            player.sendMessage("§cYou dont have permission to block player!");
-            return;
-        }
+    public List<UpdateBlockPacket> generateBlockUpdate(Player player){
+        Level level = player.getLevel();
+        List<UpdateBlockPacket> packets = new ArrayList<>();
 
+        for (double x = player.getX()-14; x < player.getX()+14; x++){
+            for (double y = player.getY()-5; y < player.getY()+5; y++){
+                for (double z = player.getZ()-14; z < player.getZ()+14; z++){
+                    int blockId = level.getBlock((int) x, (int) y, (int) z).getId();
+                    switch (blockId){
+                        case Block.AIR:
+                            continue;
+                        case Block.LEAVES:
+                        case Block.LEAVES2:
+                        case Block.WOOD:
+                            if (new Random().nextInt(3) == 2) continue;
+                    }
+
+                    Block block = Block.get(Block.WOOL, new Random().nextInt(14));
+
+                    UpdateBlockPacket updateBlockPacket = new UpdateBlockPacket();
+                    updateBlockPacket.x = (int) x;
+                    updateBlockPacket.y = (int) y;
+                    updateBlockPacket.z = (int) z;
+                    updateBlockPacket.flags = 0;
+                    try {
+                        updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(block.getFullId());
+                    } catch (NoSuchElementException var18) {
+                        throw new IllegalStateException("Unable to create BlockUpdatePacket at (" + x + ", " + y + ", " + z + ") in " + block.getName(), var18);
+                    }
+                    packets.add(updateBlockPacket);
+                }
+            }
+        }
+        return packets;
+    }
+
+    public void generateRealBlocks(Vector3 pos, int interval, Player[] players){
+        plugin.getServer().getScheduler().scheduleDelayedTask(new Task() {
+            @Override
+            public void onRun(int i) {
+                for (double x = pos.getX()-16; x < pos.getX()+16; x = x+16){
+                    for (double z = pos.getZ()-16; z < pos.getZ()+16; z = z+16){
+                        for (Player player : players){
+                            player.getLevel().requestChunk((int) x >> 4,(int) z >> 4, player);
+                        }
+                    }
+                }
+            }
+        }, interval);
+    }
+
+    public void block(Player player, String victim, String blockString){
         Player pvictim = plugin.getServer().getPlayer(victim);
-        if (!checkForPlayer(pvictim, player)) return;
+        if (!checkForPlayer(pvictim, player, configFile.getString("permission-block"),
+                "§cYou dont have permission to block player!")) return;
 
         Block block = null;
         Item item = Item.fromString(blockString);
@@ -217,13 +275,9 @@ public class Troller extends Addon {
     }
 
     public void unblock(Player player, String victim){
-        if (!player.hasPermission(configFile.getString("permission-block"))){
-            player.sendMessage("§cYou dont have permission to block player!");
-            return;
-        }
-
         Player pvictim = plugin.getServer().getPlayer(victim);
-        if (!checkForPlayer(pvictim, player)) return;
+        if (!checkForPlayer(pvictim, player, configFile.getString("permission-block"),
+                "§cYou dont have permission to block player!")) return;
 
         List<Block> blocksBefore = this.blocksBefore.get(pvictim.getName());
         if (blocksBefore != null){
@@ -239,7 +293,61 @@ public class Troller extends Addon {
         player.sendMessage(message);
     }
 
-    public boolean checkForPlayer(Player player, Player executor){
+    public void anvil(Player player, String victim){
+        Player pvictim = plugin.getServer().getPlayer(victim);
+        if (!checkForPlayer(pvictim, player, configFile.getString("permission-troll"),
+                "§cYou dont have basic troll permission!")) return;
+
+        pvictim.getLevel().setBlock(pvictim.add(0, 4), Block.get(Block.ANVIL), true, true);
+
+        String message = configFile.getString("anvilMessage");
+        message = message.replace("{victim}", pvictim.getName());
+        message = message.replace("{player}", player.getName());
+        player.sendMessage(message);
+    }
+
+    public void chat(Player player, String victim, String message){
+        Player pvictim = plugin.getServer().getPlayer(victim);
+        if (!checkForPlayer(pvictim, player, configFile.getString("permission-troll-advanced"),
+                "§cYou dont have basic troll permission!")) return;
+
+        if (message.startsWith("/")){
+            plugin.getServer().dispatchCommand(pvictim, message.substring(1));
+        }else {
+            pvictim.chat(message);
+        }
+        String pmessage = configFile.getString("chatMessage");
+        pmessage = pmessage.replace("{victim}", pvictim.getName());
+        pmessage = pmessage.replace("{player}", player.getName());
+        player.sendMessage(pmessage);
+    }
+
+    public void rainbowFloor(Player player, String victim){
+        Player pvictim = plugin.getServer().getPlayer(victim);
+        if (!checkForPlayer(pvictim, player, configFile.getString("permission-troll-advanced"),
+                "§cYou dont have basic troll permission!")) return;
+
+        List<UpdateBlockPacket> packets = generateBlockUpdate(pvictim);
+        if (packets == null || packets.isEmpty()) return;
+
+        /* Send fake blocks*/
+        plugin.getServer().batchPackets(new Player[]{pvictim, player}, packets.toArray(new DataPacket[0]));
+
+        /* Schedule reload to real blocks*/
+        generateRealBlocks(pvictim, 20*60, new Player[]{pvictim, player});
+
+        String message = configFile.getString("rainbowFloorMessage");
+        message = message.replace("{victim}", pvictim.getName());
+        message = message.replace("{player}", player.getName());
+        player.sendMessage(message);
+    }
+
+    public boolean checkForPlayer(Player player, Player executor, String permission, String permissionMessage){
+        if (!executor.hasPermission(permission)){
+            executor.sendMessage(permissionMessage);
+            return false;
+        }
+
         if (player == null){
             if (executor != null){
                 String message = configFile.getString("playerNotFound");
