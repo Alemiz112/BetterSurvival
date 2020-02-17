@@ -394,7 +394,7 @@ public class Troller extends Addon {
         plugin.getServer().batchPackets(new Player[]{pvictim, player}, packets.toArray(new DataPacket[0]));
 
         /* Schedule reload to real blocks*/
-        sendRealChunks(pvictim, 20*45, 1, new Player[]{pvictim, player});
+        sendRealChunks(pvictim, 20*45, 0, new Player[]{pvictim, player});
 
         String message = configFile.getString("fakeLavaMessage");
         message = message.replace("{victim}", pvictim.getName());
