@@ -2,22 +2,21 @@ package alemiz.bettersurvival.commands;
 
 import alemiz.bettersurvival.addons.Troller;
 import cn.nukkit.Player;
-import cn.nukkit.command.Command;
+import alemiz.bettersurvival.utils.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 
 public class UnblockCommand extends Command {
 
-    protected static final String usage = "§6Unblock Command:\n" +
-            "§7/unblock <player> : Release player from spawned blocks\n"+
-            "§7/block <player> <block id>: Troll player and spawn blocks around him";
-
-
     public Troller loader;
 
     public UnblockCommand(String name, Troller loader) {
-        super(name, "Unblock command", usage, new String[]{"free"});
+        super(name, "Release player from spawned blocks", "", new String[]{"free"});
+
+        this.usage = "§7/unblock <player> : Release player from spawned blocks";
+        this.setUsage(getUsageMessage());
+
         this.commandParameters.clear();
         this.commandParameters.put("default", new CommandParameter[]{
                 new CommandParameter("player", CommandParamType.TARGET, false),
@@ -40,7 +39,7 @@ public class UnblockCommand extends Command {
         }
 
         if (args.length < 1){
-            sender.sendMessage(usage);
+            sender.sendMessage(getUsageMessage());
             return true;
         }
 

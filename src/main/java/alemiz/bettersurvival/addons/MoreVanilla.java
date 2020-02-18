@@ -85,13 +85,13 @@ public class MoreVanilla extends Addon{
 
     @Override
     public void registerCommands() {
-        plugin.getServer().getCommandMap().register("tpa", new TpaCommand("tpa", this));
-        plugin.getServer().getCommandMap().register("fly", new FlyCommand("fly", this));
-        plugin.getServer().getCommandMap().register("heal", new HealCommand("heal", this));
-        plugin.getServer().getCommandMap().register("feed", new FeedCommand("feed", this));
-        plugin.getServer().getCommandMap().register("back", new BackCommand("back", this));
-        plugin.getServer().getCommandMap().register("near", new NearCommand("near", this));
-        plugin.getServer().getCommandMap().register("jump", new JumpCommand("jump", this));
+        registerCommand("tpa", new TpaCommand("tpa", this));
+        registerCommand("fly", new FlyCommand("fly", this));
+        registerCommand("heal", new HealCommand("heal", this));
+        registerCommand("feed", new FeedCommand("feed", this));
+        registerCommand("back", new BackCommand("back", this));
+        registerCommand("near", new NearCommand("near", this));
+        registerCommand("jump", new JumpCommand("jump", this));
     }
 
     @EventHandler(priority = EventPriority.LOW)

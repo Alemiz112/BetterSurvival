@@ -2,22 +2,21 @@ package alemiz.bettersurvival.commands;
 
 import alemiz.bettersurvival.addons.Home;
 import cn.nukkit.Player;
-import cn.nukkit.command.Command;
+import alemiz.bettersurvival.utils.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
 
 
 public class HomeCommand extends Command {
 
-    protected static final String usage = "§6Home Command:\n"+
-            "§7/home <home - optional> : Teleport to your home";
-
-
     public Home loader;
 
     public HomeCommand(String name, Home loader) {
-        super(name, "Teleport to home", usage);
+        super(name, "Teleport to your home", "");
         this.commandParameters.clear();
+
+        this.usage = "§7/home <home - optional> : Teleport to your home";
+        this.setUsage(getUsageMessage());
 
         this.commandParameters.put("default", new CommandParameter[]{
                 new CommandParameter("home", true)

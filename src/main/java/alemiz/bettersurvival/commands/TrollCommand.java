@@ -2,7 +2,7 @@ package alemiz.bettersurvival.commands;
 
 import alemiz.bettersurvival.addons.Troller;
 import cn.nukkit.Player;
-import cn.nukkit.command.Command;
+import alemiz.bettersurvival.utils.Command;
 import cn.nukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -11,22 +11,21 @@ import java.util.List;
 
 public class TrollCommand extends Command {
 
-    protected static final String usage = "§6Troll Command:\n" +
-            "§7/vanish : Allows the player to vanish\n"+
-            "§7/block <player> <block id>: Troll player and spawn blocks around him\n" +
-            "§7/unblock <player> : Release player from spawned blocks\n" +
-            "§7/troll anvil <player> : Now who could have put that up there?\n" +
-            "§7/troll chat <player> <message> : Chat or run a command as a player using their own permissions\n" +
-            "§7/troll rainbow <player> : Spawn chaotic wool around player!\n" +
-            "§7/troll lava <player> : Learn your friend to swim in lava!";
-
-
     public Troller loader;
 
     public TrollCommand(String name, Troller loader) {
-        super(name, "Collection of troll commands", usage);
-        this.commandParameters.clear();
+        super(name, "Collection of troll commands", "");
 
+        this.usage = "§7/vanish : Allows the player to vanish\n"+
+                "§7/block <player> <block id>: Troll player and spawn blocks around him\n" +
+                "§7/unblock <player> : Release player from spawned blocks\n" +
+                "§7/troll anvil <player> : Now who could have put that up there?\n" +
+                "§7/troll chat <player> <message> : Chat or run a command as a player using their own permissions\n" +
+                "§7/troll rainbow <player> : Spawn chaotic wool around player!\n" +
+                "§7/troll lava <player> : Learn your friend to swim in lava!";
+        this.setUsage(getUsageMessage());
+
+        this.commandParameters.clear();
         this.setPermission(loader.configFile.getString("permission-troll"));
         this.loader = loader;
     }
@@ -43,7 +42,7 @@ public class TrollCommand extends Command {
         }
 
         if (args.length < 1){
-            sender.sendMessage(usage);
+            sender.sendMessage(getUsageMessage());
             return true;
         }
 
@@ -83,7 +82,7 @@ public class TrollCommand extends Command {
                 this.loader.fakeLavaHole(player, args[1]);
                 break;
             default:
-                sender.sendMessage(usage);
+                sender.sendMessage(getUsageMessage());
                 break;
         }
         return true;

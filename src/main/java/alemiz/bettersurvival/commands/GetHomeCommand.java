@@ -2,7 +2,7 @@ package alemiz.bettersurvival.commands;
 
 import alemiz.bettersurvival.addons.Home;
 import cn.nukkit.Player;
-import cn.nukkit.command.Command;
+import alemiz.bettersurvival.utils.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
 
@@ -10,22 +10,19 @@ import java.util.Set;
 
 public class GetHomeCommand extends Command {
 
-    protected static final String usage = "§6Get Home:\n"+
-            "§7/gethome: Prints your homes";
-
-
-
     public Home loader;
 
     public GetHomeCommand(String name, Home loader) {
-        super(name, "Prints your homes", usage);
+        super(name, "Prints your homes", "", new String[]{"listhome"});
         this.commandParameters.clear();
+
+        this.usage = "§7/gethome: Prints your homes";
+        this.setUsage(getUsageMessage());
 
         this.commandParameters.put("default", new CommandParameter[]{
                 new CommandParameter("home", true)
         });
 
-        setAliases(new String[]{"listhome"});
         this.loader = loader;
     }
 

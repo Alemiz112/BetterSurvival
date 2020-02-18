@@ -11,7 +11,8 @@ import java.util.Map;
 public abstract class Addon implements Listener{
     public String PATH = null;
     public Config configFile = null;
-    public boolean enabled = false;
+    protected boolean enabled = false;
+    protected Map<String, Command> commands = new HashMap<>();
 
     protected static Map<String, Addon> addons = new HashMap<>();
 
@@ -53,5 +54,19 @@ public abstract class Addon implements Listener{
 
     public void registerCommands(){
         //Should be implemented
+    }
+
+    public void registerCommand(String fallbackPrefix, Command command){
+        plugin.getServer().getCommandMap().register(fallbackPrefix, command);
+        this.commands.put(fallbackPrefix, command);
+    }
+
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public Map<String, Command> getCommands() {
+        return commands;
     }
 }

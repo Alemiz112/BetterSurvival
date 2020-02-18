@@ -1,6 +1,7 @@
 package alemiz.bettersurvival.addons;
 
 import alemiz.bettersurvival.utils.Addon;
+import alemiz.bettersurvival.utils.Command;
 import alemiz.bettersurvival.utils.LevelDecoration;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
@@ -9,6 +10,8 @@ import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.event.player.PlayerQuitEvent;
 import cn.nukkit.event.server.DataPacketReceiveEvent;
+import cn.nukkit.level.particle.FloatingTextParticle;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.LevelEventPacket;
 import cn.nukkit.network.protocol.SetLocalPlayerAsInitializedPacket;
@@ -28,12 +31,15 @@ public class BetterLobby extends Addon {
     private int nextMessage = 0;
 
     private Map<String, Long> bossBars = new HashMap<>();
+    private List<FloatingTextParticle> particles = new ArrayList<>();
 
     public BetterLobby(String path){
         super("betterlobby", path);
 
         loadConfig();
         loadBroadcaster();
+
+        this.particles = createHelpParticles();
     }
 
     @Override
@@ -41,14 +47,19 @@ public class BetterLobby extends Addon {
         if (!configFile.exists("enable")){
             configFile.set("enable", true);
 
-            configFile.set("broadcast", Arrays.asList("§eDid you find hacker? Use §b/report§e to report him!", "§eDo people actually read these?", "§aCheck out our youtube channel §cCubeMC Official§a!", "§bVote for us and get §eSubscriber §brank!"));
-            configFile.set("broadcastInterval", 1200);
+            configFile.set("broadcast", Arrays.asList("§eDid you find hacker? Use §b/report§e to report him!", "§eDo people actually read these?", "§aCheck out our youtube channel §cCubeMC Official§a!", "§bVote for us and get §eSubscriber §brank!", "§2Tips for commands can be found on §a/spawn§2!"));
+            configFile.set("broadcastInterval", 1800);
             configFile.set("joinMessage", "§6»§7Be careful, §6@{player}§7 joined!");
             configFile.set("quitMessage", "§6»§7Oops §6@{player}§7 left!");
 
             configFile.set("bossBar", true);
             configFile.set("bossBarText", "§bCube§eMC §cSurvival");
             configFile.set("bossBarSize", 50);
+
+            configFile.set("helpParticlePos", new ArrayList<>());
+            configFile.set("helpParticleMaxLines", 10);
+            configFile.set("helpParticleTitle", "§d<-- §5Available Commands §d-->");
+            configFile.set("helpParticleIncludedCommands", Arrays.asList("§7/kill : Kill yourself", "§7/lobby : Go back to server lobby", "§7/spawn : Go to spawn"));
             configFile.save();
         }
 
@@ -124,6 +135,8 @@ public class BetterLobby extends Addon {
         if (configFile.getBoolean("bossBar")){
             player.createBossBar(buildBossBar(player));
         }
+
+        sendParticles(player);
     }
 
     public DummyBossBar buildBossBar(Player player){
@@ -139,6 +152,59 @@ public class BetterLobby extends Addon {
         DummyBossBar bossBar = builder.build();
         this.bossBars.put(player.getName(), bossBar.getBossBarId());
         return bossBar;
+    }
+
+    public void setHelpParticlesCoords(List<String> positions){
+        this.configFile.set("helpParticlePos", positions);
+        this.configFile.save();
+    }
+
+    public List<String> generateHelpParticleTexts(){
+        List<String> commands = new ArrayList<>(this.configFile.getStringList("helpParticleIncludedCommands"));
+
+        for (Addon addon : Addon.getAddons().values()){
+            for (Command command : addon.getCommands().values()){
+                commands.addAll(Arrays.asList(command.usage.split("\n")));
+            }
+        }
+        return commands;
+    }
+
+    public List<FloatingTextParticle> createHelpParticles(){
+        List<Vector3> positions = new ArrayList<>();
+        for (String pos : this.configFile.getStringList("helpParticlePos")){
+            String[] data = pos.split(",");
+            positions.add(new Vector3(Integer.parseInt(data[0]), Integer.parseInt(data[1]), Integer.parseInt(data[2])));
+        }
+
+        List<String> helptexts = generateHelpParticleTexts();
+        int maxLines = this.configFile.getInt("helpParticleMaxLines", 10);
+        String title = this.configFile.getString("helpParticleTitle");
+
+        List<FloatingTextParticle> particles = new ArrayList<FloatingTextParticle>();
+        int lastLine = 0;
+
+        for (Vector3 pos : positions){
+            FloatingTextParticle particle = new FloatingTextParticle(pos, title);
+
+            List<String> particleText = new ArrayList<>();
+            for (int i = ((lastLine == 0)?0 : lastLine+1); i <= (lastLine+maxLines); i++){
+                particleText.add(helptexts.get(i));
+            }
+            lastLine = lastLine+10;
+
+            particle.setText(String.join("\n", particleText));
+            particles.add(particle);
+        }
+        return particles;
+    }
+
+    public void sendParticles(Player player){
+        if (player == null) return;
+
+        for (FloatingTextParticle particle : this.particles){
+            player.getLevel().addParticle(particle, player);
+        }
     }
 
 

@@ -13,6 +13,9 @@ import cn.nukkit.event.player.PlayerQuitEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.level.Level;
+import cn.nukkit.level.Sound;
+import cn.nukkit.level.particle.ExplodeParticle;
+import cn.nukkit.level.particle.HugeExplodeParticle;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.UpdateBlockPacket;
@@ -62,10 +65,10 @@ public class Troller extends Addon {
 
     @Override
     public void registerCommands() {
-        plugin.getServer().getCommandMap().register("vanish", new VanishCommand("vanish", this));
-        plugin.getServer().getCommandMap().register("block", new BlockCommand("block", this));
-        plugin.getServer().getCommandMap().register("unblock", new UnblockCommand("unblock", this));
-        plugin.getServer().getCommandMap().register("troll", new TrollCommand("troll", this));
+        registerCommand("vanish", new VanishCommand("vanish", this));
+        registerCommand("block", new BlockCommand("block", this));
+        registerCommand("unblock", new UnblockCommand("unblock", this));
+        registerCommand("troll", new TrollCommand("troll", this));
     }
 
     @EventHandler
@@ -125,7 +128,7 @@ public class Troller extends Addon {
 
         DummyBossBar bossBar = null;
         long bossBarId = 0;
-        if (Addon.getAddon("betterlobby") != null && Addon.getAddon("betterlobby").enabled){
+        if (Addon.getAddon("betterlobby") != null && Addon.getAddon("betterlobby").isEnabled()){
             bossBarId = ((BetterLobby) Addon.getAddon("betterlobby")).getBossBars().get(player.getName());
             bossBar = ((BetterLobby) Addon.getAddon("betterlobby")).buildBossBar(player);
         }
@@ -232,14 +235,12 @@ public class Troller extends Addon {
                 }
                 break;
             case BLOCK_UPDATE_HOLE_WITH_LAVA:
-                //Vector3 pos = player.add(1, 0, 1);
-
                 for (double y = player.getY()-3; y <= player.getY(); y++){
                     Block block = Block.get(Block.AIR);
                     if (y == (player.getY()-3)) block = Block.get(Block.LAVA);
 
-                    for (double x = player.getX()-2; x < player.getFloorX()+1; x++){
-                        for (double z = player.getZ()-2; z < player.getZ()+1; z++){
+                    for (double x = player.getX()-2; x < (player.getX()+1); x++){
+                        for (double z = player.getZ()-2; z < (player.getZ()+1); z++){
                             block.x = x;
                             block.y = y;
                             block.z = z;
@@ -247,6 +248,7 @@ public class Troller extends Addon {
                         }
                     }
                 }
+
                 break;
         }
 
@@ -280,6 +282,21 @@ public class Troller extends Addon {
 
                 for (double x = pos.getX()-(16*maxChunks); x < pos.getX()+(16*maxChunks); x = x+16){
                     for (double z = pos.getZ()-(16*maxChunks); z < pos.getZ()+(16*maxChunks); z = z+16){
+                        for (Player player : players){
+                            player.getLevel().requestChunk((int) x >> 4,(int) z >> 4, player);
+                        }
+                    }
+                }
+            }
+        }, interval);
+    }
+
+    public void generateRealBlocks(Vector3 pos, int interval, Player[] players){
+        plugin.getServer().getScheduler().scheduleDelayedTask(new Task() {
+            @Override
+            public void onRun(int i) {
+                for (double x = pos.getX()-16; x < pos.getX()+16; x = x+16){
+                    for (double z = pos.getZ()-16; z < pos.getZ()+16; z = z+16){
                         for (Player player : players){
                             player.getLevel().requestChunk((int) x >> 4,(int) z >> 4, player);
                         }
@@ -390,11 +407,12 @@ public class Troller extends Addon {
         List<UpdateBlockPacket> packets = generateBlockUpdate(pvictim, BLOCK_UPDATE_HOLE_WITH_LAVA);
         if (packets == null) return;
 
-        /* Send fake blocks*/
+        player.getLevel().addParticle(new HugeExplodeParticle(pvictim.clone()));
+        player.getLevel().addSound(pvictim.clone(), Sound.RANDOM_EXPLODE);
         plugin.getServer().batchPackets(new Player[]{pvictim, player}, packets.toArray(new DataPacket[0]));
 
         /* Schedule reload to real blocks*/
-        sendRealChunks(pvictim, 20*45, 0, new Player[]{pvictim, player});
+        sendRealChunks(pvictim, 20*45, 1, new Player[]{pvictim, player});
 
         String message = configFile.getString("fakeLavaMessage");
         message = message.replace("{victim}", pvictim.getName());

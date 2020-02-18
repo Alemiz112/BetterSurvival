@@ -2,20 +2,19 @@ package alemiz.bettersurvival.commands;
 
 import alemiz.bettersurvival.addons.MoreVanilla;
 import cn.nukkit.Player;
-import cn.nukkit.command.Command;
+import alemiz.bettersurvival.utils.Command;
 import cn.nukkit.command.CommandSender;
 
 public class JumpCommand extends Command {
 
-    protected static final String usage = "§6Jump Command:\n"+
-            "§7/jump : Super power jump";
-
-
     public MoreVanilla loader;
 
     public JumpCommand(String name, MoreVanilla loader) {
-        super(name, "Jump command", usage);
+        super(name, "Super power jump", "");
         this.commandParameters.clear();
+
+        this.usage = "§7/jump : Super power jump";
+        this.setUsage(getUsageMessage());
 
         this.setPermission(loader.configFile.getString("permission-jump"));
         this.loader = loader;

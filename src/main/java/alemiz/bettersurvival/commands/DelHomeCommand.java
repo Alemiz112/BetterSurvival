@@ -2,23 +2,21 @@ package alemiz.bettersurvival.commands;
 
 import alemiz.bettersurvival.addons.Home;
 import cn.nukkit.Player;
-import cn.nukkit.command.Command;
+import alemiz.bettersurvival.utils.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
 
 public class DelHomeCommand extends Command {
 
-    protected static final String usage = "§6Delete Home:\n"+
-            "§7/delhome <home - optional> : Remove your home";
-
-
-
     public Home loader;
 
     public DelHomeCommand(String name, Home loader) {
-        super(name, "Remove your home", usage);
-        this.commandParameters.clear();
+        super(name, "Remove your home", "");
 
+        this.usage = "§7/delhome <home - optional> : Remove your home";
+        this.setUsage(getUsageMessage());
+
+        this.commandParameters.clear();
         this.commandParameters.put("default", new CommandParameter[]{
                 new CommandParameter("home", true)
         });
