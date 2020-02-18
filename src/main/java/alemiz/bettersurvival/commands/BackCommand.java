@@ -1,22 +1,20 @@
 package alemiz.bettersurvival.commands;
 
 import alemiz.bettersurvival.addons.MoreVanilla;
+import alemiz.bettersurvival.utils.Command;
 import cn.nukkit.Player;
-import cn.nukkit.Server;
-import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
-import cn.nukkit.command.data.CommandParameter;
 
 public class BackCommand extends Command {
-
-    protected static final String usage = "§6Back Command:\n"+
-            "§7/back : Teleports to your death point";
-
 
     public MoreVanilla loader;
 
     public BackCommand(String name, MoreVanilla loader) {
-        super(name, "Back command", usage);
+        super(name, "Teleports to your death point", "");
+
+        this.usage = "§7/back : Teleports to your death point";
+        this.setUsage(getUsageMessage());
+
         this.commandParameters.clear();
 
         this.setPermission(loader.configFile.getString("permission-back"));

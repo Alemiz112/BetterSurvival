@@ -2,22 +2,21 @@ package alemiz.bettersurvival.commands;
 
 import alemiz.bettersurvival.addons.MoreVanilla;
 import cn.nukkit.Player;
-import cn.nukkit.command.Command;
+import alemiz.bettersurvival.utils.Command;
 import cn.nukkit.command.CommandSender;
 
 import java.util.List;
 
 public class NearCommand extends Command {
 
-    protected static final String usage = "§6Near Command:\n"+
-            "§7/near <radius - optional>: List players who are nearby";
-
-
     public MoreVanilla loader;
 
     public NearCommand(String name, MoreVanilla loader) {
-        super(name, "Near command", usage);
+        super(name, "List players who are nearby", "");
         this.commandParameters.clear();
+
+        this.usage = "§7/near <radius - optional>: List players who are nearby";
+        this.setUsage(getUsageMessage());
 
         this.setPermission(loader.configFile.getString("permission-near"));
         this.loader = loader;

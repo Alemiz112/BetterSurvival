@@ -128,7 +128,7 @@ public class Troller extends Addon {
 
         DummyBossBar bossBar = null;
         long bossBarId = 0;
-        if (Addon.getAddon("betterlobby") != null && Addon.getAddon("betterlobby").enabled){
+        if (Addon.getAddon("betterlobby") != null && Addon.getAddon("betterlobby").isEnabled()){
             bossBarId = ((BetterLobby) Addon.getAddon("betterlobby")).getBossBars().get(player.getName());
             bossBar = ((BetterLobby) Addon.getAddon("betterlobby")).buildBossBar(player);
         }

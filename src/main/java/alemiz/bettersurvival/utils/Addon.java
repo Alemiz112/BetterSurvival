@@ -1,9 +1,8 @@
 package alemiz.bettersurvival.utils;
 
 import alemiz.bettersurvival.BetterSurvival;
-import alemiz.bettersurvival.commands.HomeCommand;
 import cn.nukkit.Server;
-import cn.nukkit.command.Command;
+import alemiz.bettersurvival.utils.Command;
 import cn.nukkit.event.Listener;
 import cn.nukkit.utils.Config;
 

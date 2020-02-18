@@ -3,20 +3,20 @@ package alemiz.bettersurvival.commands;
 import alemiz.bettersurvival.addons.MoreVanilla;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
-import cn.nukkit.command.Command;
+import alemiz.bettersurvival.utils.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
 
 public class FeedCommand extends Command {
 
-    protected static final String usage = "§6Feed Command:\n"+
-            "§7/feed <player - optional> : Load full food bar";
-
-
     public MoreVanilla loader;
 
     public FeedCommand(String name, MoreVanilla loader) {
-        super(name, "Feed command", usage);
+        super(name, "Load full food bar", "");
+
+        this.usage = "§7/feed <player - optional> : Load full food bar";
+        this.setUsage(getUsageMessage());
+
         this.commandParameters.clear();
         this.commandParameters.put("default", new CommandParameter[]{
                 new CommandParameter("player", true)
@@ -40,7 +40,7 @@ public class FeedCommand extends Command {
 
         if (!(sender instanceof Player)){
             if (args.length < 1){
-                sender.sendMessage(usage);
+                sender.sendMessage(getUsageMessage());
                 return true;
             }
 

@@ -2,7 +2,7 @@ package alemiz.bettersurvival.commands;
 
 import alemiz.bettersurvival.addons.MoreVanilla;
 import cn.nukkit.Server;
-import cn.nukkit.command.Command;
+import alemiz.bettersurvival.utils.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
@@ -10,14 +10,14 @@ import cn.nukkit.Player;
 
 public class FlyCommand extends Command {
 
-    protected static final String usage = "§6Fly Command:\n"+
-            "§7/fly <player - optional> : Turn fly mode on/off";
-
-
     public MoreVanilla loader;
 
     public FlyCommand(String name, MoreVanilla loader) {
-        super(name, "Fly command", usage);
+        super(name, "Turn fly mode on/off", "");
+
+        this.usage = "§7/fly <player - optional> : Turn fly mode on/off";
+        this.setUsage(getUsageMessage());
+
         this.commandParameters.clear();
         this.commandParameters.put("default", new CommandParameter[]{
                 new CommandParameter("player", CommandParamType.TARGET, true)
