@@ -13,6 +13,9 @@ import cn.nukkit.event.player.PlayerQuitEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.level.Level;
+import cn.nukkit.level.Sound;
+import cn.nukkit.level.particle.ExplodeParticle;
+import cn.nukkit.level.particle.HugeExplodeParticle;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.UpdateBlockPacket;
@@ -389,7 +392,8 @@ public class Troller extends Addon {
         List<UpdateBlockPacket> packets = generateBlockUpdate(pvictim, BLOCK_UPDATE_HOLE_WITH_LAVA);
         if (packets == null) return;
 
-        /* Send fake blocks*/
+        player.getLevel().addParticle(new HugeExplodeParticle(pvictim.clone()));
+        player.getLevel().addSound(pvictim.clone(), Sound.RANDOM_EXPLODE);
         plugin.getServer().batchPackets(new Player[]{pvictim, player}, packets.toArray(new DataPacket[0]));
 
         /* Schedule reload to real blocks*/
