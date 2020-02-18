@@ -232,14 +232,12 @@ public class Troller extends Addon {
                 }
                 break;
             case BLOCK_UPDATE_HOLE_WITH_LAVA:
-                //Vector3 pos = player.add(1, 0, 1);
-
                 for (double y = player.getY()-3; y <= player.getY(); y++){
                     Block block = Block.get(Block.AIR);
                     if (y == (player.getY()-3)) block = Block.get(Block.LAVA);
 
-                    for (double x = player.getX()-2; x < player.getFloorX()+1; x++){
-                        for (double z = player.getZ()-2; z < player.getZ()+1; z++){
+                    for (double x = player.getX()-2; x < (player.getX()+1); x++){
+                        for (double z = player.getZ()-2; z < (player.getZ()+1); z++){
                             block.x = x;
                             block.y = y;
                             block.z = z;
@@ -247,6 +245,7 @@ public class Troller extends Addon {
                         }
                     }
                 }
+
                 break;
         }
 
@@ -394,7 +393,7 @@ public class Troller extends Addon {
         plugin.getServer().batchPackets(new Player[]{pvictim, player}, packets.toArray(new DataPacket[0]));
 
         /* Schedule reload to real blocks*/
-        sendRealChunks(pvictim, 20*45, 0, new Player[]{pvictim, player});
+        sendRealChunks(pvictim, 20*45, 1, new Player[]{pvictim, player});
 
         String message = configFile.getString("fakeLavaMessage");
         message = message.replace("{victim}", pvictim.getName());
