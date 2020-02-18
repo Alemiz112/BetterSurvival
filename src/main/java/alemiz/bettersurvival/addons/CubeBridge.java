@@ -76,6 +76,8 @@ public class CubeBridge extends Addon {
             //STAFF Perms here
             perms.add(Addon.getAddon("troller").configFile.getString("permission-vanish"));
             perms.add(Addon.getAddon("troller").configFile.getString("permission-block"));
+            perms.add(Addon.getAddon("troller").configFile.getString("permission-troll"));
+            perms.add(Addon.getAddon("troller").configFile.getString("permission-troll-advanced"));
         }
 
         for (String perm : perms){
