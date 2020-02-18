@@ -76,7 +76,7 @@ public class MyLandProtect extends Addon {
     @Override
     public void registerCommands() {
         if (configFile.getBoolean("enable", true)){
-            plugin.getServer().getCommandMap().register("land", new LandCommand("land", this));
+            registerCommand("land", new LandCommand("land", this));
         }
     }
 

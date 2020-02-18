@@ -35,10 +35,10 @@ public class Home extends Addon {
     @Override
     public void registerCommands() {
         if (configFile.getBoolean("enable", true)){
-            plugin.getServer().getCommandMap().register("home", new HomeCommand("home", this));
-            plugin.getServer().getCommandMap().register("sethome", new SetHomeCommand("sethome", this));
-            plugin.getServer().getCommandMap().register("gethome", new GetHomeCommand("gethome", this));
-            plugin.getServer().getCommandMap().register("delhome", new DelHomeCommand("delhome", this));
+            registerCommand("home", new HomeCommand("home", this));
+            registerCommand("sethome", new SetHomeCommand("sethome", this));
+            registerCommand("gethome", new GetHomeCommand("gethome", this));
+            registerCommand("delhome", new DelHomeCommand("delhome", this));
         }
     }
 

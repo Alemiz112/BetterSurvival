@@ -65,10 +65,10 @@ public class Troller extends Addon {
 
     @Override
     public void registerCommands() {
-        plugin.getServer().getCommandMap().register("vanish", new VanishCommand("vanish", this));
-        plugin.getServer().getCommandMap().register("block", new BlockCommand("block", this));
-        plugin.getServer().getCommandMap().register("unblock", new UnblockCommand("unblock", this));
-        plugin.getServer().getCommandMap().register("troll", new TrollCommand("troll", this));
+        registerCommand("vanish", new VanishCommand("vanish", this));
+        registerCommand("block", new BlockCommand("block", this));
+        registerCommand("unblock", new UnblockCommand("unblock", this));
+        registerCommand("troll", new TrollCommand("troll", this));
     }
 
     @EventHandler
