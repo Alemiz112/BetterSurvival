@@ -2,7 +2,6 @@ package alemiz.bettersurvival.utils;
 
 import alemiz.bettersurvival.BetterSurvival;
 import cn.nukkit.Server;
-import alemiz.bettersurvival.utils.Command;
 import cn.nukkit.event.Listener;
 import cn.nukkit.utils.Config;
 

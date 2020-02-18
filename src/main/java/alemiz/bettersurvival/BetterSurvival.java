@@ -42,7 +42,9 @@ public class BetterSurvival extends PluginBase implements Listener {
         Addon.loadAddon(new Home("homes.yml"));
         Addon.loadAddon(new MoreVanilla("more_vanilla.yml"));
         Addon.loadAddon(new MyLandProtect("my_land_protect.yml"));
-        Addon.loadAddon(new BetterLobby("better_lobby.yml"));
         Addon.loadAddon(new Troller("troll_addon.yml"));
+
+        //This must be last addon loaded
+        Addon.loadAddon(new BetterLobby("better_lobby.yml"));
     }
 }
