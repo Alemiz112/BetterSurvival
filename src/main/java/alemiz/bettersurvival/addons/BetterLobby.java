@@ -36,9 +36,13 @@ public class BetterLobby extends Addon {
     public BetterLobby(String path){
         super("betterlobby", path);
 
-        loadBroadcaster();
+        this.broadcastMessages = configFile.getStringList("broadcast");
+        this.broadcastInterval = configFile.getInt("broadcastInterval");
+        this.joinMessage = configFile.getString("joinMessage");
+        this.quitMessage = configFile.getString("quitMessage");
 
         this.particles = createHelpParticles();
+        loadBroadcaster();
     }
 
     @Override
@@ -61,11 +65,6 @@ public class BetterLobby extends Addon {
             configFile.set("helpParticleIncludedCommands", Arrays.asList("§7/kill : Kill yourself", "§7/lobby : Go back to server lobby", "§7/spawn : Go to spawn"));
             configFile.save();
         }
-
-        this.broadcastMessages = configFile.getStringList("broadcast");
-        this.broadcastInterval = configFile.getInt("broadcastInterval");
-        this.joinMessage = configFile.getString("joinMessage");
-        this.quitMessage = configFile.getString("quitMessage");
     }
     public void loadBroadcaster(){
         Task task = new Task() {
