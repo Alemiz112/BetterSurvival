@@ -1,9 +1,6 @@
 package alemiz.bettersurvival;
 
-import alemiz.bettersurvival.addons.Home;
-import alemiz.bettersurvival.addons.BetterLobby;
-import alemiz.bettersurvival.addons.MoreVanilla;
-import alemiz.bettersurvival.addons.Troller;
+import alemiz.bettersurvival.addons.*;
 import alemiz.bettersurvival.addons.myland.MyLandProtect;
 import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.ConfigManager;
@@ -43,6 +40,7 @@ public class BetterSurvival extends PluginBase implements Listener {
         Addon.loadAddon(new MoreVanilla("more_vanilla.yml"));
         Addon.loadAddon(new MyLandProtect("my_land_protect.yml"));
         Addon.loadAddon(new Troller("troll_addon.yml"));
+        Addon.loadAddon(new BetterVoting("better_voting.yml"));
 
         //This must be last addon loaded
         Addon.loadAddon(new BetterLobby("better_lobby.yml"));
