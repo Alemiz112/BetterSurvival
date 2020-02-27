@@ -36,7 +36,6 @@ public class BetterLobby extends Addon {
     public BetterLobby(String path){
         super("betterlobby", path);
 
-        loadConfig();
         loadBroadcaster();
 
         this.particles = createHelpParticles();
