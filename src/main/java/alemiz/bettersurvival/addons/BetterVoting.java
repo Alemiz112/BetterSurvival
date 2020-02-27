@@ -7,6 +7,9 @@ import cn.nukkit.item.Item;
 import io.pocketvote.event.VoteDispatchEvent;
 import io.pocketvote.event.VoteEvent;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class BetterVoting extends Addon {
 
     /*TODO: Implement multi-server voting system using MySql database and one server with PocketVote
@@ -24,7 +27,7 @@ public class BetterVoting extends Addon {
             //configFile.set("usePocketVote", true);
 
             //configFile.set("rewardPermissions", new String[]{"bettersurvival.feed", "bettersurvival.jump", "bettersurvival.land.vip"});
-            configFile.set("rewardItems", new String[]{"265:0:5", "322:0:1"});
+            configFile.set("rewardItems", Arrays.asList("265:0:5", "322:0:1"));
             configFile.set("voteMessage", "§b@{player} §3has voted for this awesome server!");
             configFile.set("playerVoteMessage", "§6»@{player} thanks for voting! You received reward!");
 
@@ -53,7 +56,7 @@ public class BetterVoting extends Addon {
 
         if (player == null) return;
 
-        String[] rewards = (String[]) this.configFile.get("rewardItems");
+        List<String> rewards = this.configFile.getStringList("rewardItems");
         for (String reward : rewards){
             Item item = Item.fromString(reward.substring(0, reward.lastIndexOf(":")));
             item.setCount(Integer.parseInt(reward.substring(reward.lastIndexOf(":"))));
