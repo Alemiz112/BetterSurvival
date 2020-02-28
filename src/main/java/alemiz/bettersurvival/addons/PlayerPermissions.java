@@ -47,7 +47,7 @@ public class PlayerPermissions extends Addon {
         if (player == null) return;
 
         Config config = ConfigManager.getInstance().loadPlayer(player);
-        if (config == null) return;
+        if (config == null || (config.get("expired-permissions") instanceof ArrayList)) return;
 
         ConfigSection permissions = config.getSection("expired-permissions");
         permissions.getAllMap().forEach((String permission, Object expiry)->{

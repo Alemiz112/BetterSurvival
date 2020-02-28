@@ -1,9 +1,12 @@
 package alemiz.bettersurvival.addons;
 
 import alemiz.bettersurvival.utils.Addon;
+import alemiz.bettersurvival.utils.Geometry;
 import cn.nukkit.Player;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.item.Item;
+import cn.nukkit.level.particle.HeartParticle;
+import cn.nukkit.math.Vector3;
 import io.pocketvote.event.VoteDispatchEvent;
 import io.pocketvote.event.VoteEvent;
 
@@ -30,7 +33,7 @@ public class BetterVoting extends Addon {
 
             //configFile.set("usePocketVote", true);
 
-            configFile.set("rewardPermissions", new String[]{"bettersurvival.feed", "bettersurvival.jump", "bettersurvival.land.vip"});
+            configFile.set("rewardPermissions", Arrays.asList("bettersurvival.feed", "bettersurvival.jump", "bettersurvival.land.vip"));
             configFile.set("permissionsExpiry", 3); //days
 
             configFile.set("rewardItems", Arrays.asList("265:0:5", "322:0:1"));
@@ -57,39 +60,47 @@ public class BetterVoting extends Addon {
         event.setCancelled();
     }
 
-    public void voteReceive(String username){
+    public boolean voteReceive(String username){
         Player player = this.plugin.getServer().getPlayer(username);
+        if (player == null) return false;
 
-        if (player == null) return;
+        try {
+            List<String> rewards = this.configFile.getStringList("rewardItems");
+            for (String reward : rewards){
+                Item item = Item.fromString(reward.substring(0, reward.lastIndexOf(":")));
+                item.setCount(Integer.parseInt(reward.substring(reward.lastIndexOf(":")+1)));
 
-        List<String> rewards = this.configFile.getStringList("rewardItems");
-        for (String reward : rewards){
-            Item item = Item.fromString(reward.substring(0, reward.lastIndexOf(":")));
-            item.setCount(Integer.parseInt(reward.substring(reward.lastIndexOf(":")+1)));
-
-            player.getInventory().addItem(item);
-        }
-
-        if (Addon.getAddon("playerpermissions") != null && (Addon.getAddon("playerpermissions") instanceof PlayerPermissions)){
-            List<String> permissions = this.configFile.getStringList("rewardPermissions");
-            int expiry = this.configFile.getInt("permissionsExpiry");
-
-            LocalDateTime date = LocalDateTime.from(new Date().toInstant().atZone(ZoneId.of("UTC"))).plusDays(expiry);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-            for (String permission : permissions){
-                ((PlayerPermissions) Addon.getAddon("playerpermissions")).addPermission(player, permission, date.format(formatter));
+                player.getInventory().addItem(item);
             }
+
+            if (Addon.getAddon("playerpermissions") != null && (Addon.getAddon("playerpermissions") instanceof PlayerPermissions)){
+                List<String> permissions = this.configFile.getStringList("rewardPermissions");
+                int expiry = this.configFile.getInt("permissionsExpiry");
+
+                LocalDateTime date = LocalDateTime.from(new Date().toInstant().atZone(ZoneId.of("UTC"))).plusDays(expiry);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+                for (String permission : permissions){
+                    ((PlayerPermissions) Addon.getAddon("playerpermissions")).addPermission(player, permission, date.format(formatter));
+                }
+            }
+
+            List<Vector3> positions = Geometry.circle(player, 1, 10);
+            for (Vector3 pos : positions){
+                player.getLevel().addParticle(new HeartParticle(pos));
+            }
+
+            String message = this.configFile.getString("playerVoteMessage");
+            message = message.replace("{player}", player.getName());
+            player.sendMessage(message);
+
+            message = this.configFile.getString("voteMessage");
+            message = message.replace("{player}", player.getName());
+            plugin.getServer().broadcastMessage(message);
+        }catch (Exception e){
+            return false;
         }
-
-
-        String message = this.configFile.getString("playerVoteMessage");
-        message = message.replace("{player}", player.getName());
-        player.sendMessage(message);
-
-        message = this.configFile.getString("voteMessage");
-        message = message.replace("{player}", player.getName());
-        plugin.getServer().broadcastMessage(message);
+        return true;
     }
 
 }

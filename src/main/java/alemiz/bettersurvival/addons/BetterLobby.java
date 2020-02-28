@@ -5,11 +5,14 @@ import alemiz.bettersurvival.utils.Command;
 import alemiz.bettersurvival.utils.LevelDecoration;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.EventHandler;
+import cn.nukkit.event.entity.EntityExplodeEvent;
 import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.event.player.PlayerQuitEvent;
 import cn.nukkit.event.server.DataPacketReceiveEvent;
+import cn.nukkit.level.Position;
 import cn.nukkit.level.particle.FloatingTextParticle;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.AddEntityPacket;
@@ -33,6 +36,8 @@ public class BetterLobby extends Addon {
     private Map<String, Long> bossBars = new HashMap<>();
     private List<FloatingTextParticle> particles = new ArrayList<>();
 
+    private boolean protectSpawn = true;
+
     public BetterLobby(String path){
         super("betterlobby", path);
 
@@ -40,6 +45,8 @@ public class BetterLobby extends Addon {
         this.broadcastInterval = configFile.getInt("broadcastInterval");
         this.joinMessage = configFile.getString("joinMessage");
         this.quitMessage = configFile.getString("quitMessage");
+
+        this.protectSpawn = configFile.getBoolean("safeSpawn", true);
 
         this.particles = createHelpParticles();
         loadBroadcaster();
@@ -63,6 +70,8 @@ public class BetterLobby extends Addon {
             configFile.set("helpParticleMaxLines", 10);
             configFile.set("helpParticleTitle", "§d<-- §5Available Commands §d-->");
             configFile.set("helpParticleIncludedCommands", Arrays.asList("§7/kill : Kill yourself", "§7/lobby : Go back to server lobby", "§7/spawn : Go to spawn"));
+
+            configFile.set("safeSpawn", true);
             configFile.save();
         }
     }
@@ -116,7 +125,6 @@ public class BetterLobby extends Addon {
         LevelDecoration.sendDecoration(decorations, player.getLevel().getPlayers());
 
 
-
         if (configFile.getBoolean("bossBar")){
             this.bossBars.remove(player.getName());
         }
@@ -135,6 +143,26 @@ public class BetterLobby extends Addon {
         }
 
         sendParticles(player);
+    }
+
+    @EventHandler
+    public void onExplode(EntityExplodeEvent event){
+        if (this.protectSpawn){
+            Position explodePos = event.getEntity().getPosition();
+            if (!isSafeSpawn(explodePos)) return;
+
+            event.setBlockList(new ArrayList<Block>());
+        }
+    }
+
+    public boolean isSafeSpawn(Position position){
+        if (position.level != plugin.getServer().getDefaultLevel()) return false;
+
+        Position spawn = plugin.getServer().getDefaultLevel().getSpawnLocation();
+        int radius = plugin.getServer().getSpawnRadius();
+
+        return position.x >= (spawn.x - radius) && position.x <= (spawn.x + radius) &&
+                position.z >= (spawn.z - radius) && position.z <= (spawn.z + radius);
     }
 
     public DummyBossBar buildBossBar(Player player){
