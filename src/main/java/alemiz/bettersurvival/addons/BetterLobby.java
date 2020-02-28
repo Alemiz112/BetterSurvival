@@ -157,12 +157,7 @@ public class BetterLobby extends Addon {
 
     public boolean isSafeSpawn(Position position){
         if (position.level != plugin.getServer().getDefaultLevel()) return false;
-
-        Position spawn = plugin.getServer().getDefaultLevel().getSpawnLocation();
-        int radius = plugin.getServer().getSpawnRadius();
-
-        return position.x >= (spawn.x - radius) && position.x <= (spawn.x + radius) &&
-                position.z >= (spawn.z - radius) && position.z <= (spawn.z + radius);
+        return plugin.getServer().getDefaultLevel().isInSpawnRadius(position);
     }
 
     public DummyBossBar buildBossBar(Player player){

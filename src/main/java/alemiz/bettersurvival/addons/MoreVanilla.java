@@ -6,11 +6,10 @@ import cn.nukkit.AdventureSettings;
 import cn.nukkit.Server;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.EventPriority;
-import cn.nukkit.event.player.PlayerChatEvent;
-import cn.nukkit.event.player.PlayerDeathEvent;
-import cn.nukkit.event.player.PlayerJoinEvent;
+import cn.nukkit.event.player.*;
 import cn.nukkit.Player;
-import cn.nukkit.event.player.PlayerQuitEvent;
+import cn.nukkit.inventory.PlayerInventory;
+import cn.nukkit.item.Item;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.GameRules;
 import cn.nukkit.level.Level;
@@ -124,6 +123,47 @@ public class MoreVanilla extends Addon{
     public void onDeath(PlayerDeathEvent event){
         Player player = event.getEntity();
         this.back.put(player.getName(), player.clone());
+    }
+
+    @EventHandler
+    public void onInteract(PlayerInteractEvent event){
+        Player player = event.getPlayer();
+        Item item = event.getItem();
+
+        if (event.getAction() != PlayerInteractEvent.Action.RIGHT_CLICK_AIR) return;
+
+        if (item.isArmor()){
+            changeArmor(player, item);
+        }
+    }
+
+    public void changeArmor(Player player, Item item){
+        if (!item.isArmor()) return;
+
+        PlayerInventory inv = player.getInventory();
+        Item changed = null;
+
+        inv.remove(item);
+
+        if (item.isHelmet()){
+            changed = inv.getHelmet();
+            inv.setHelmet(item);
+
+        }else if (item.isChestplate()){
+            changed = inv.getChestplate();
+            inv.setChestplate(item);
+
+        }else if (item.isLeggings()){
+            inv.setLeggings(item);
+
+        }else if (item.isBoots()){
+            changed = inv.getBoots();
+            inv.setBoots(item);
+        }
+
+        if (changed != null && changed.getId() != Item.AIR){
+            inv.addItem(changed);
+        }
     }
 
     public void tpa(Player executor, String player){
