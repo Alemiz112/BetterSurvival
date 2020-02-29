@@ -59,7 +59,10 @@ public class PlayerPermissions extends Addon {
                 plugin.getLogger().alert("Error while parsing date in permissions module! Date: "+expiry+" Right format: yyyy-MM-dd");
                 return;
             }
+
+            permission = permission.replace("-", ".");
             removePermission(player, permission);
+            removeFromExpiryList(player, permission);
         });
     }
 
@@ -110,7 +113,7 @@ public class PlayerPermissions extends Addon {
         permissions.add(permission);
 
         if (expiry != null && !expiry.equals("")){
-            config.set("expired-permissions."+"'"+permission+"'", expiry);
+            config.set("expired-permissions."+permission.replace(".", "-"), expiry);
         }
 
         config.set("permissions", permissions);
@@ -150,7 +153,7 @@ public class PlayerPermissions extends Addon {
         Config config = ConfigManager.getInstance().loadPlayer(player);
         if (config == null) return;
 
-        config.set("expired-permissions."+"'"+permission+"'", date);
+        config.set("expired-permissions."+permission.replace(".", "-"), date);
         config.save();
     }
 
@@ -164,7 +167,7 @@ public class PlayerPermissions extends Addon {
         Config config = ConfigManager.getInstance().loadPlayer(player);
         if (config == null) return;
 
-        config.remove(permission);
+        config.remove("expired-permissions."+permission.replace(".", "-"));
         config.save();
     }
 }
