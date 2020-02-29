@@ -60,7 +60,7 @@ public class BetterVoting extends Addon {
 
             //configFile.set("usePocketVote", true);
 
-            configFile.set("rewardPermissions", Arrays.asList("bettersurvival.feed", "bettersurvival.jump", "bettersurvival.land.vip"));
+            configFile.set("rewardPermissions", Arrays.asList("bettersurvival.feed", "bettersurvival.jump", "bettersurvival.near"));
             configFile.set("permissionsExpiry", 3); //days
 
             configFile.set("rewardItems", Arrays.asList("265:0:5", "322:0:1"));
@@ -246,6 +246,11 @@ public class BetterVoting extends Addon {
                 for (String permission : permissions){
                     ((PlayerPermissions) Addon.getAddon("playerpermissions")).addPermission(player, permission, date.format(formatter));
                 }
+            }
+
+            if (this.enableVoteCrate){
+                Item item = this.voteKey;
+                player.getInventory().addItem(item);
             }
 
             List<Vector3> positions = Geometry.circle(player, 1, 10);
