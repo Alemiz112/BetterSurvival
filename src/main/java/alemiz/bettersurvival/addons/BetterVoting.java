@@ -123,6 +123,14 @@ public class BetterVoting extends Addon {
         Item item = event.getItem();
         Block block = event.getBlock();
 
+        if (event.getAction() == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK){
+            if (block == null || !this.setters.contains(player.getName())) return;
+            this.setters.remove(player.getName());
+
+            player.sendMessage("§6»§7You selected block at §6"+block.x +"§7, §6"+ block.y +"§7, §6"+ block.z+"§7.");
+            return;
+        }
+
         if (this.enableVoteCrate && block != null && block.getId() == Block.CHEST){
             if (!block.equals(this.voteCratePos)) return;
             event.setCancelled();
@@ -132,14 +140,6 @@ public class BetterVoting extends Addon {
                 return;
             }
             FakeInventoryManager.createInventory(player, "Vote Chest", prepareItems());
-            return;
-        }
-
-        if (event.getAction() == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK){
-            if (block == null || !this.setters.contains(player.getName())) return;
-            this.setters.remove(player.getName());
-
-            player.sendMessage("§6»§7You selected block at §6"+block.x +"§7, §6"+ block.y +"§7, §6"+ block.z+"§7.");
         }
     }
 
