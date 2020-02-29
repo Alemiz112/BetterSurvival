@@ -63,7 +63,7 @@ public class MyLandProtect extends Addon {
 
             configFile.set("landCreate", "§6»§7You have created new land §6{land}§7!");
             configFile.set("landRemove", "§6»§7You have removed your land §6{land}§7!");
-            configFile.set("landSetPos", "§6»§7Break 2 blocks with wand to select border positions§7!");
+            configFile.set("landSetPos", "§6»§7Touch 2 blocks with wand to select border positions§7!");
             configFile.set("landWhitelist", "§6»§7Whitelist for §6{land}§7 saved§7!");
             configFile.set("landWhitelistList", "§6»{land}§7 access: {players}");
             configFile.set("landHere", "§6»§7The land §6{land}§7 is owned by §6{owner}§7!");

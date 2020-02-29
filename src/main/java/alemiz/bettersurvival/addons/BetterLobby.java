@@ -185,6 +185,7 @@ public class BetterLobby extends Addon {
 
         for (Addon addon : Addon.getAddons().values()){
             for (Command command : addon.getCommands().values()){
+                if (command.ignoreInHelpTexts) continue;
                 commands.addAll(Arrays.asList(command.usage.split("\n")));
             }
         }
@@ -210,6 +211,8 @@ public class BetterLobby extends Addon {
 
             List<String> particleText = new ArrayList<>();
             for (int i = ((lastLine == 0)?0 : lastLine+1); i <= (lastLine+maxLines); i++){
+                if (i >= helptexts.size()) continue;
+
                 particleText.add(helptexts.get(i));
             }
             lastLine = lastLine+10;

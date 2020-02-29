@@ -132,13 +132,14 @@ public class MoreVanilla extends Addon{
 
         if (event.getAction() != PlayerInteractEvent.Action.RIGHT_CLICK_AIR) return;
 
-        if (item.isArmor()){
-            changeArmor(player, item);
+        if (changeArmor(player, item)){
+            event.setCancelled();
         }
     }
 
-    public void changeArmor(Player player, Item item){
-        if (!item.isArmor()) return;
+    public boolean changeArmor(Player player, Item item){
+        if (!item.isArmor()) return false;
+        if (item.getId() == Item.SKULL) return false;
 
         PlayerInventory inv = player.getInventory();
         Item changed = null;
@@ -164,6 +165,7 @@ public class MoreVanilla extends Addon{
         if (changed != null && changed.getId() != Item.AIR){
             inv.addItem(changed);
         }
+        return true;
     }
 
     public void tpa(Player executor, String player){

@@ -7,6 +7,8 @@ public abstract class Command extends cn.nukkit.command.Command {
     public String usageTitle= "";
     public String usage = "";
 
+    public boolean ignoreInHelpTexts = false;
+
     public Command(String name) {
         super(name);
     }

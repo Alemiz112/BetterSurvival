@@ -110,7 +110,7 @@ public class PlayerPermissions extends Addon {
         permissions.add(permission);
 
         if (expiry != null && !expiry.equals("")){
-            config.set("expired-permissions."+permission, expiry);
+            config.set("expired-permissions."+"'"+permission+"'", expiry);
         }
 
         config.set("permissions", permissions);
@@ -150,7 +150,7 @@ public class PlayerPermissions extends Addon {
         Config config = ConfigManager.getInstance().loadPlayer(player);
         if (config == null) return;
 
-        config.set("expired-permissions."+permission, date);
+        config.set("expired-permissions."+"'"+permission+"'", date);
         config.save();
     }
 
