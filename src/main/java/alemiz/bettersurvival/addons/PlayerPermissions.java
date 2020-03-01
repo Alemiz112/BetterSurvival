@@ -110,7 +110,7 @@ public class PlayerPermissions extends Addon {
         if (config == null) return;
 
         List<String> permissions = config.getStringList("permissions");
-        permissions.add(permission);
+        if (!permissions.contains(permission)) permissions.add(permission);
 
         if (expiry != null && !expiry.equals("")){
             config.set("expired-permissions."+permission.replace(".", "-"), expiry);

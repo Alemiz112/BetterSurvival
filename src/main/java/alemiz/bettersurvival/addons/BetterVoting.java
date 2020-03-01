@@ -72,6 +72,7 @@ public class BetterVoting extends Addon {
             configFile.set("voteCrateKey", "388:0:§aVote key");
             configFile.set("voteCrateItems", Arrays.asList("261:0:1","354:00:1","264:0:2","368:0:1","401:0:16","373:7:1","229:9:1","397:4:1","353:0:4","438:15:1","388:0:5"));
             configFile.set("voteCrateTitle", "§6Vote §eCrate");
+            configFile.set("voteCrateText", "§7Open using vote key");
 
             configFile.set("permission-crateCommand", "bettersurvival.cratemanage");
             configFile.set("crateKeyGiveMessageAuthor", "§6»§7Successfully sent key to §6@{target}!");
@@ -123,8 +124,8 @@ public class BetterVoting extends Addon {
         Item item = event.getItem();
         Block block = event.getBlock();
 
-        if (event.getAction() == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK){
-            if (block == null || !this.setters.contains(player.getName())) return;
+        if (event.getAction() == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK && this.setters.contains(player.getName())){
+            if (block == null) return;
             this.setters.remove(player.getName());
 
             player.sendMessage("§6»§7You selected block at §6"+block.x +"§7, §6"+ block.y +"§7, §6"+ block.z+"§7.");
@@ -165,13 +166,14 @@ public class BetterVoting extends Addon {
                 int slot = player.getInventory().first(this.voteKey);
                 Item item = player.getInventory().getItem(slot);
 
-                if (item.getCount() <= 1){
-                    player.getInventory().remove(item);
-                }else {
-                    item.count--;
-                    player.getInventory().setItem(slot, item);
+                player.getInventory().remove(item);
+
+                if (item.getCount() > 1){
+                    Item item1 = this.voteKey.clone();
+                    item1.setCount(item.getCount()-1);
+
+                    player.getInventory().setItem(slot, item1);
                 }
-                player.getInventory().addItem(action.getSourceItem());
             }
 
             FakeInventoryManager.removeInventory(player);
@@ -220,7 +222,7 @@ public class BetterVoting extends Addon {
         }, 20);
 
         return new FloatingTextParticle(this.voteCratePos.add(0.5, 1.7, 0.5),
-               configFile.getString("voteCrateTitle"));
+               configFile.getString("voteCrateTitle"), configFile.getString("voteCrateText", (String) null));
     }
 
     public boolean voteReceive(String username){
