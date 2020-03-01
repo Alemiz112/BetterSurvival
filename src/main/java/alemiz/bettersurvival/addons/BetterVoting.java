@@ -14,6 +14,7 @@ import cn.nukkit.event.inventory.InventoryCloseEvent;
 import cn.nukkit.event.inventory.InventoryTransactionEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerJoinEvent;
+import cn.nukkit.inventory.Inventory;
 import cn.nukkit.inventory.transaction.action.InventoryAction;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.particle.FloatingTextParticle;
@@ -162,18 +163,24 @@ public class BetterVoting extends Addon {
                 if (action.getSourceItem().getNamedTagEntry(FakeInventoryManager.IS_INVENTORY_ITEM) == null) continue;
                 if (action.getSourceItem().getId() == Item.VINES) continue;
 
+                Inventory inv = player.getInventory();
 
-                int slot = player.getInventory().first(this.voteKey);
-                Item item = player.getInventory().getItem(slot);
+                for (Integer slot : inv.getContents().keySet()){
+                    Item item = inv.getContents().get(slot);
 
-                player.getInventory().remove(item);
+                    if (!item.getCustomName().equals(this.voteKey.getCustomName()) ||
+                            item.getId() != this.voteKey.getId()) continue;
 
-                if (item.getCount() > 1){
-                    Item item1 = this.voteKey.clone();
-                    item1.setCount(item.getCount()-1);
+                    if (item.count <= 1){
+                        item = Item.get(Item.AIR, 0, 1);
+                    }else {
+                        item.setCount(item.count - 1);
+                    }
 
-                    player.getInventory().setItem(slot, item1);
+                    inv.setItem(slot, item, true);
+                    break;
                 }
+                player.getInventory().addItem(action.getSourceItem());
             }
 
             FakeInventoryManager.removeInventory(player);
