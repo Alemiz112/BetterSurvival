@@ -8,6 +8,7 @@ import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.EventHandler;
+import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityExplodeEvent;
 import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.event.player.PlayerQuitEvent;
@@ -152,6 +153,18 @@ public class BetterLobby extends Addon {
             if (!isSafeSpawn(explodePos)) return;
 
             event.setBlockList(new ArrayList<Block>());
+        }
+    }
+
+    @EventHandler
+    public void onDamage(EntityDamageEvent event){
+        if (!(event.getEntity() instanceof Player)) return;
+
+        if (this.protectSpawn){
+            Player player = (Player) event.getEntity();
+            if (!isSafeSpawn(player.clone())) return;
+
+            event.setCancelled();
         }
     }
 
