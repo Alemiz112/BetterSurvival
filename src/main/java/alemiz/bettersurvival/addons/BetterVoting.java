@@ -61,7 +61,7 @@ public class BetterVoting extends Addon {
 
             //configFile.set("usePocketVote", true);
 
-            configFile.set("rewardPermissions", Arrays.asList("bettersurvival.feed", "bettersurvival.jump", "bettersurvival.near"));
+            configFile.set("rewardPermissions", Arrays.asList("bettersurvival.feed", "bettersurvival.jump", "bettersurvival.near", "bettersurvival.vote.normal"));
             configFile.set("permissionsExpiry", 3); //days
 
             configFile.set("rewardItems", Arrays.asList("265:0:5", "322:0:1"));
