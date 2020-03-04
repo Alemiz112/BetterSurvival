@@ -29,7 +29,7 @@ public class LevelVote extends Addon {
             configFile.set("permission-vote", "bettersurvival.vote.normal");
             configFile.set("voteCooldown", 120);
 
-            configFile.set("newVote", "§a»Player §6@{player}§7 started new vote about §6{vote}§7!");
+            configFile.set("newVote", "§a»§7Player §6@{player}§7 started new vote about §6{vote}§7!");
             configFile.set("voteMessage", "§6»§7Thanks for voting! You will see vote result of §6{vote}§7 soon...");
             configFile.set("alreadyVoted", "§c»§7You have already voted for §6{vote}§7!");
             configFile.set("voteTopicNotFound", "§c»§7Topic §6{vote}§7 does not exists!");
@@ -167,7 +167,10 @@ public class LevelVote extends Addon {
                 }
             }, 20*configFile.getInt("voteCooldown"));
 
-            this.plugin.getServer().broadcastMessage(configFile.getString("newVote"));
+            String message = configFile.getString("newVote");
+            message = message.replace("{vote}", key);
+            message = message.replace("{player}", player.getName());
+            this.plugin.getServer().broadcastMessage(message);
         }
 
         String message = configFile.getString("voteMessage");
