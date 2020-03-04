@@ -54,8 +54,8 @@ public class TpaCommand extends Command {
             if (players.isEmpty()){
                 form.setContent("§7All players are offline!");
             }else {
-                for (Player ignored : players)
-                    form.addButton(new ElementButton("§5"+player.getName()+"\n§7»Click to teleport"));
+                for (Player pplayer : players)
+                    form.addButton(new ElementButton("§5"+pplayer.getName()+"\n§7»Click to teleport"));
             }
 
             player.showFormWindow(form);
