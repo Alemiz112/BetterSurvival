@@ -5,6 +5,11 @@ import cn.nukkit.Player;
 import alemiz.bettersurvival.utils.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
+import cn.nukkit.form.element.ElementButton;
+import cn.nukkit.form.window.FormWindowSimple;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TpaCommand extends Command {
 
@@ -41,7 +46,19 @@ public class TpaCommand extends Command {
         Player player = (Player) sender;
 
         if (args.length < 1){
-            player.sendMessage(getUsageMessage());
+
+            FormWindowSimple form = new FormWindowSimple("Player Teleport", "");
+            List<Player> players = new ArrayList<>(this.loader.plugin.getServer().getOnlinePlayers().values());
+            players.remove(player);
+
+            if (players.isEmpty()){
+                form.setContent("§7All players are offline!");
+            }else {
+                for (Player ignored : players)
+                    form.addButton(new ElementButton("§5"+player.getName()+"\n§7»Click to teleport"));
+            }
+
+            player.showFormWindow(form);
             return true;
         }
 

@@ -4,6 +4,10 @@ import alemiz.bettersurvival.addons.LevelVote;
 import alemiz.bettersurvival.utils.Command;
 import cn.nukkit.Player;
 import cn.nukkit.command.CommandSender;
+import cn.nukkit.form.element.ElementDropdown;
+import cn.nukkit.form.element.ElementInput;
+import cn.nukkit.form.element.ElementLabel;
+import cn.nukkit.form.window.FormWindowCustom;
 
 public class LevelVoteCommand extends Command {
 
@@ -34,7 +38,10 @@ public class LevelVoteCommand extends Command {
         Player player = (Player) sender;
 
         if (args.length < 2){
-            player.sendMessage(getUsageMessage());
+            FormWindowCustom form = new FormWindowCustom("Level Vote");
+            form.addElement(new ElementDropdown("§7Choose vote Topic", this.loader.voteTopics, 0));
+            form.addElement(new ElementInput("§7Choose vote value"));
+            player.showFormWindow(form);
             return true;
         }
 
