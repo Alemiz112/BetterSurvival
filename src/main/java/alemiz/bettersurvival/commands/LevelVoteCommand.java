@@ -11,9 +11,7 @@ public class LevelVoteCommand extends Command {
 
     public LevelVoteCommand(String name, LevelVote loader, String usage) {
         super(name, "Vote for level events", "");
-
-        System.out.println(usage);
-
+        
         this.usage = usage;
         this.setUsage(getUsageMessage());
 
