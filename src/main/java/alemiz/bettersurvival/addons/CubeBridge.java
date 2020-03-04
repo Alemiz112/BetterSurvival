@@ -51,6 +51,7 @@ public class CubeBridge extends Addon {
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-feed"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-near"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-jump"));
+            perms.add(Addon.getAddon("levelvote").configFile.getString("permission-vote"));
         }
 
         if (player.hasPermission(PLUS_PERM) || isStaff){
