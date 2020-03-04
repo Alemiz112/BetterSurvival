@@ -5,7 +5,9 @@ import alemiz.bettersurvival.utils.Addon;
 import cn.nukkit.Player;
 import cn.nukkit.command.ConsoleCommandSender;
 import cn.nukkit.event.EventHandler;
+import cn.nukkit.event.player.PlayerFormRespondedEvent;
 import cn.nukkit.event.player.PlayerJoinEvent;
+import cn.nukkit.form.window.FormWindowCustom;
 import cn.nukkit.scheduler.Task;
 
 import java.util.*;
@@ -30,6 +32,7 @@ public class LevelVote extends Addon {
             configFile.set("voteCooldown", 120);
 
             configFile.set("newVote", "§a»§7Player §6@{player}§7 started new vote about §6{vote}§7!");
+            configFile.set("vote", "§a»§7Player §6@{player}§7 voted for §6{state}§7 in §6{vote}§7!");
             configFile.set("voteMessage", "§6»§7Thanks for voting! You will see vote result of §6{vote}§7 soon...");
             configFile.set("alreadyVoted", "§c»§7You have already voted for §6{vote}§7!");
             configFile.set("voteTopicNotFound", "§c»§7Topic §6{vote}§7 does not exists!");
@@ -72,6 +75,26 @@ public class LevelVote extends Addon {
             }else {
                 player.addAttachment(plugin, configFile.getString("permission-vote"), true);
             }
+        }
+    }
+
+    @EventHandler
+    public void onForm(PlayerFormRespondedEvent event){
+        if (!(event.getWindow() instanceof FormWindowCustom) || event.getResponse() == null) return;
+
+        FormWindowCustom form = (FormWindowCustom) event.getWindow();
+        Player player = event.getPlayer();
+
+        if (form.getTitle().equals("Level Vote")){
+            String topic = form.getResponse().getDropdownResponse(0).getElementContent();
+            String value = form.getResponse().getInputResponse(1);
+
+           if (topic.equals("") || value.equals("")){
+               player.sendMessage("§c»§7Please fill form completely!");
+               return;
+           }
+
+           vote(player, topic, value);
         }
     }
 
@@ -159,6 +182,9 @@ public class LevelVote extends Addon {
         this.votes.put(key, voteData);
         this.votedPlayers.add(key.toLowerCase()+"_"+player.getName().toLowerCase());
 
+        List<Player> players = new ArrayList<>(this.plugin.getServer().getOnlinePlayers().values());
+        players.remove(player);
+
         if (newVote){
             this.plugin.getServer().getScheduler().scheduleDelayedTask(new Task() {
                 @Override
@@ -170,7 +196,13 @@ public class LevelVote extends Addon {
             String message = configFile.getString("newVote");
             message = message.replace("{vote}", key);
             message = message.replace("{player}", player.getName());
-            this.plugin.getServer().broadcastMessage(message);
+            this.plugin.getServer().broadcastMessage(message, players);
+        }else {
+            String message = configFile.getString("vote");
+            message = message.replace("{vote}", key);
+            message = message.replace("{state}", value);
+            message = message.replace("{player}", player.getName());
+            this.plugin.getServer().broadcastMessage(message, players);
         }
 
         String message = configFile.getString("voteMessage");

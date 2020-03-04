@@ -8,6 +8,7 @@ import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.EventPriority;
 import cn.nukkit.event.player.*;
 import cn.nukkit.Player;
+import cn.nukkit.form.window.FormWindowSimple;
 import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.GameRule;
@@ -134,6 +135,21 @@ public class MoreVanilla extends Addon{
 
         if (changeArmor(player, item)){
             event.setCancelled();
+        }
+    }
+
+    @EventHandler
+    public void onForm(PlayerFormRespondedEvent event){
+        if (!(event.getWindow() instanceof FormWindowSimple) || event.getResponse() == null) return;
+
+        FormWindowSimple form = (FormWindowSimple) event.getWindow();
+        Player player = event.getPlayer();
+
+        if (form.getTitle().equals("Player Teleport")){
+            String response = form.getResponse().getClickedButton().getText();
+            response = response.substring(2, response.indexOf("\n"));
+
+            tpa(player, response);
         }
     }
 
