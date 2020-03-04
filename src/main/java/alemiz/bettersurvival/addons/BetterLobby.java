@@ -57,6 +57,7 @@ public class BetterLobby extends Addon {
     public void loadConfig() {
         if (!configFile.exists("enable")){
             configFile.set("enable", true);
+            configFile.set("motd", "§bCube§6Mc §3Survival");
 
             configFile.set("broadcast", Arrays.asList("§eDid you find hacker? Use §b/report§e to report him!", "§eDo people actually read these?", "§aCheck out our youtube channel §cCubeMC Official§a!", "§bVote for us and get §eSubscriber §brank!", "§2Tips for commands can be found on §a/spawn§2!"));
             configFile.set("broadcastInterval", 1800);
@@ -92,6 +93,14 @@ public class BetterLobby extends Addon {
             }
         };
         plugin.getServer().getScheduler().scheduleRepeatingTask(task, broadcastInterval);
+    }
+
+    @Override
+    public void postLoad() {
+        String motd = configFile.getString("motd");
+        if (!motd.equals("")){
+            plugin.getServer().getNetwork().setName(motd);
+        }
     }
 
     @EventHandler

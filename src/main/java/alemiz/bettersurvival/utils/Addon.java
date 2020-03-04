@@ -42,13 +42,14 @@ public abstract class Addon implements Listener{
 
         this.enabled = configFile.getBoolean("enable", false);
 
-        if (this.enabled){
+        if (this.enabled && preLoad()){
             plugin.getLogger().info("§eLoading BetterSurvival addon: §3"+name);
             Server.getInstance().getPluginManager().registerEvents(this, plugin);
 
             loadListeners();
             registerCommands();
         }
+        postLoad();
     }
 
     public abstract void loadConfig();
@@ -63,6 +64,17 @@ public abstract class Addon implements Listener{
     }
 
     public void loadListeners(){
+        //Implemented by parent
+    }
+
+
+    public boolean preLoad(){
+        //Implemented by parent
+        //true = load
+        return true;
+    }
+
+    public void postLoad(){
         //Implemented by parent
     }
 
