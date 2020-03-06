@@ -19,10 +19,7 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.SpawnParticleEffectPacket;
 import cn.nukkit.potion.Effect;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class MoreVanilla extends Addon{
@@ -77,6 +74,9 @@ public class MoreVanilla extends Addon{
             configFile.set("jumpMessage", "§6Woosh!");
             configFile.set("jumpPower", 1.5);
 
+            configFile.set("permission-randtp", "bettersurvival.randtp");
+            configFile.set("randtpMessage", "§6»§7You was teleported to random location!");
+
             configFile.set("showCoordinates", true);
             configFile.set("doImmediateRespawn", true);
             configFile.save();
@@ -92,6 +92,7 @@ public class MoreVanilla extends Addon{
         registerCommand("back", new BackCommand("back", this));
         registerCommand("near", new NearCommand("near", this));
         registerCommand("jump", new JumpCommand("jump", this));
+        registerCommand("rand", new RandCommand("rand", this));
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -390,6 +391,24 @@ public class MoreVanilla extends Addon{
         player.setMotion(motion);
 
         String message = configFile.getString("jumpMessage");
+        message = message.replace("{player}", player.getName());
+        player.sendMessage(message);
+    }
+
+    public void randomTp(Player player){
+        if (!player.hasPermission(configFile.getString("permission-randtp"))){
+            player.sendMessage("§cYou dont have permission to teleport randomly!");
+            return;
+        }
+
+        Random rnd = new Random();
+        int x = rnd.nextInt(1500) + 50;
+        int z = rnd.nextInt(1500) + 50;
+        int y = 70;
+
+        player.teleport(new Location(x, y, z, player.getLevel()));
+
+        String message = configFile.getString("randtpMessage");
         message = message.replace("{player}", player.getName());
         player.sendMessage(message);
     }

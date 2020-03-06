@@ -1,6 +1,7 @@
 package alemiz.bettersurvival.addons;
 
 import alemiz.bettersurvival.commands.CrateCommand;
+import alemiz.bettersurvival.commands.VoteCommand;
 import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.CustomListener;
 import alemiz.bettersurvival.utils.Geometry;
@@ -28,6 +29,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+
 
 public class BetterVoting extends Addon {
 
@@ -60,6 +62,8 @@ public class BetterVoting extends Addon {
             configFile.set("enable", true);
 
             //configFile.set("usePocketVote", true);
+            configFile.set("customVoteCommand", true);
+            configFile.set("customVoteCommandLink", "https://cubedmc.eu/vote");
 
             configFile.set("rewardPermissions", Arrays.asList("bettersurvival.feed", "bettersurvival.jump", "bettersurvival.near", "bettersurvival.vote.normal"));
             configFile.set("permissionsExpiry", 3); //days
@@ -86,6 +90,11 @@ public class BetterVoting extends Addon {
     @Override
     public void registerCommands() {
         registerCommand("crate", new CrateCommand("crate", this));
+
+        if (configFile.getBoolean("customVoteCommand") &&
+                plugin.getServer().getPluginManager().getPlugin("PocketVote") != null){
+            registerCommand("vote", new VoteCommand("vote", this), false);
+        }
     }
 
     @Override
@@ -180,7 +189,7 @@ public class BetterVoting extends Addon {
                     inv.setItem(slot, item, true);
                     break;
                 }
-                player.getInventory().addItem(action.getSourceItem());
+                player.getInventory().addItem(action.getSourceItem().clearNamedTag());
             }
 
             FakeInventoryManager.removeInventory(player);
