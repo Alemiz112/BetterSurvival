@@ -59,8 +59,13 @@ public abstract class Addon implements Listener{
     }
 
     public void registerCommand(String fallbackPrefix, Command command){
+        registerCommand(fallbackPrefix, command, true);
+    }
+
+    public void registerCommand(String fallbackPrefix, Command command, boolean map){
         plugin.getServer().getCommandMap().register(fallbackPrefix, command);
-        this.commands.put(fallbackPrefix, command);
+
+        if (map) this.commands.put(fallbackPrefix, command);
     }
 
     public void loadListeners(){
