@@ -6,6 +6,8 @@ import alemiz.bettersurvival.commands.HomeCommand;
 import alemiz.bettersurvival.commands.SetHomeCommand;
 import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.ConfigManager;
+import cn.nukkit.level.Level;
+import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.Player;
 import cn.nukkit.utils.Config;
@@ -56,7 +58,8 @@ public class Home extends Addon {
         }
 
         Double[] pos = {player.getX(), player.getY(), player.getZ()};
-        config.set("home."+home.toLowerCase(), pos);
+        config.set("home."+home.toLowerCase()+".pos", pos);
+        config.set("home."+home.toLowerCase()+".level", player.getLevel().getFolderName());
         config.save();
 
         String message = configFile.getString("homeSet");
@@ -100,12 +103,15 @@ public class Home extends Addon {
             return;
         }
 
-        List<Integer> data = config.getIntegerList("home."+home.toLowerCase());
+        List<Integer> data = config.getIntegerList("home."+home.toLowerCase()+".pos");
         if (data == null || data.size() < 3){
             player.sendMessage("§eError occurs while teleporting to home!");
             return;
         }
-        player.teleport(new Vector3(data.get(0), data.get(1), data.get(2)));
+        Level level = this.plugin.getServer().getLevelByName(config.getString("home."+home.toLowerCase()+".level"));
+        level = (level == null)? this.plugin.getServer().getDefaultLevel() : level;
+
+        player.teleport(new Position(data.get(0), data.get(1), data.get(2), level));
 
         String message = configFile.getString("homeTeleport");
         message = message.replace("{player}", player.getName());
