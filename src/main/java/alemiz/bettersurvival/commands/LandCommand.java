@@ -24,7 +24,6 @@ public class LandCommand extends Command {
         this.setUsage(getUsageMessage());
 
         this.commandParameters.clear();
-        this.setPermission(loader.configFile.getString("landsCommandPermission"));
         this.loader = loader;
     }
 
