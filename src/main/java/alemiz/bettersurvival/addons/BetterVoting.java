@@ -15,6 +15,7 @@ import cn.nukkit.event.inventory.InventoryCloseEvent;
 import cn.nukkit.event.inventory.InventoryTransactionEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerJoinEvent;
+import cn.nukkit.event.plugin.PluginEnableEvent;
 import cn.nukkit.inventory.Inventory;
 import cn.nukkit.inventory.transaction.action.InventoryAction;
 import cn.nukkit.item.Item;
@@ -22,6 +23,7 @@ import cn.nukkit.level.particle.FloatingTextParticle;
 import cn.nukkit.level.particle.HeartParticle;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.scheduler.Task;
+import io.pocketvote.PocketVote;
 import io.pocketvote.event.VoteDispatchEvent;
 import io.pocketvote.event.VoteEvent;
 
@@ -75,7 +77,7 @@ public class BetterVoting extends Addon {
             configFile.set("voteCrate", true);
             configFile.set("voteCratePos", "0,0,0");
             configFile.set("voteCrateKey", "388:0:§aVote key");
-            configFile.set("voteCrateItems", Arrays.asList("261:0:1","354:00:1","264:0:2","368:0:1","401:0:16","373:7:1","229:9:1","397:4:1","353:0:4","438:15:1","388:0:5"));
+            configFile.set("voteCrateItems", Arrays.asList("261:0:1","354:00:1","264:0:2","368:0:1","401:0:16","373:7:1","229:9:1","397:4:1","353:0:4","438:15:1","388:0:5","351:15:10","369:0:2","341:0:9","297:0:5","440:0:15","338:0:7","360:0:6","6:3:3","19:0:2","30:0:5","351:1:7"));
             configFile.set("voteCrateTitle", "§6Vote §eCrate");
             configFile.set("voteCrateText", "§7Open using vote key");
 
@@ -91,8 +93,8 @@ public class BetterVoting extends Addon {
     public void registerCommands() {
         registerCommand("crate", new CrateCommand("crate", this));
 
-        if (configFile.getBoolean("customVoteCommand") &&
-                plugin.getServer().getPluginManager().getPlugin("PocketVote") != null){
+        //TODO: depend on "usePocketVote"
+        if (configFile.getBoolean("customVoteCommand")){
             registerCommand("vote", new VoteCommand("vote", this), false);
         }
     }
@@ -204,7 +206,7 @@ public class BetterVoting extends Addon {
             Item item = Item.get(Item.VINES);
 
             if (new Random().nextInt(3) == 2 && !crateItems.isEmpty()){
-                String itemString = crateItems.iterator().next();
+                String itemString = crateItems.get(new Random().nextInt(crateItems.size()));
                 crateItems.remove(itemString);
 
                 item = Item.fromString(itemString);

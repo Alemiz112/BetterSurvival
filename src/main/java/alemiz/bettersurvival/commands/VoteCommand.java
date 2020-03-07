@@ -3,11 +3,15 @@ package alemiz.bettersurvival.commands;
 import alemiz.bettersurvival.addons.BetterVoting;
 import alemiz.bettersurvival.utils.Command;
 import cn.nukkit.command.CommandSender;
+import cn.nukkit.command.PluginIdentifiableCommand;
+import cn.nukkit.plugin.Plugin;
 import cn.nukkit.utils.TextFormat;
 import io.pocketvote.PocketVote;
 import io.pocketvote.task.TopVoterTask;
 
-public class VoteCommand extends Command {
+public class VoteCommand extends Command implements PluginIdentifiableCommand {
+
+    /* TODO: Implement vote command without PocketVote command*/
 
     public BetterVoting loader;
     private PocketVote plugin;
@@ -31,7 +35,7 @@ public class VoteCommand extends Command {
             this.plugin.getServer().getScheduler().scheduleAsyncTask(this.plugin, new TopVoterTask(this.plugin, sender.getName()));
             return true;
         } else {
-            String link = this.loader.configFile.getString("customVoteLink");
+            String link = this.loader.configFile.getString("customVoteCommandLink");
             if (link == null) {
                 if (sender.hasPermission("pocketvote.admin")) {
                     sender.sendMessage(TextFormat.YELLOW + "You can add a link by typing /guadd");
@@ -50,5 +54,10 @@ public class VoteCommand extends Command {
                 return true;
             }
         }
+    }
+
+    @Override
+    public Plugin getPlugin() {
+        return this.plugin;
     }
 }

@@ -9,8 +9,10 @@ import cn.nukkit.block.Block;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.block.BlockBreakEvent;
 import cn.nukkit.event.block.BlockPlaceEvent;
+import cn.nukkit.event.entity.EntityExplodeEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
-import cn.nukkit.event.player.PlayerJoinEvent;
+import cn.nukkit.level.Level;
+import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3f;
 import cn.nukkit.utils.Config;
 
@@ -49,7 +51,6 @@ public class MyLandProtect extends Addon {
             configFile.set("landsLimitSize", 50);
             configFile.set("landsLimitSizeVip", 100);
 
-            configFile.set("landsCommandPermission", "bettersurvival.land.vip");
             configFile.set("landsVipPermission", "bettersurvival.land.vip");
             configFile.set("landsAccessPermission", "bettersurvival.land.access");
 
@@ -83,12 +84,6 @@ public class MyLandProtect extends Addon {
     }
 
     @EventHandler
-    public void onJoin(PlayerJoinEvent event){
-        /* Set Default Permissions*/
-        event.getPlayer().addAttachment(plugin, configFile.getString("landsCommandPermission"), true);
-    }
-
-    @EventHandler
     public void onBlockTouch(PlayerInteractEvent event){
         Player player = event.getPlayer();
 
@@ -114,7 +109,7 @@ public class MyLandProtect extends Addon {
             event.setCancelled();
         }
 
-        LandRegion region = getLandByBlock(event.getBlock());
+        LandRegion region = getLandByPos(event.getBlock());
         if (!interact(player, region)) event.setCancelled();
     }
 
@@ -123,7 +118,7 @@ public class MyLandProtect extends Addon {
         Block block = event.getBlock();
         Player player = event.getPlayer();
 
-        LandRegion region = getLandByBlock(block);
+        LandRegion region = getLandByPos(block);
         if (!interact(player, region)){
             event.setCancelled();
         }
@@ -134,9 +129,17 @@ public class MyLandProtect extends Addon {
         Block block = event.getBlock();
         Player player = event.getPlayer();
 
-        LandRegion region = getLandByBlock(block);
+        LandRegion region = getLandByPos(block);
         if (!interact(player, region)){
             event.setCancelled();
+        }
+    }
+
+    @EventHandler
+    public void onExplode(EntityExplodeEvent event){
+        Position explodePos = event.getEntity().getPosition();
+        if (getLandByPos(explodePos) != null){
+            event.setBlockList(new ArrayList<Block>());
         }
     }
 
@@ -153,13 +156,16 @@ public class MyLandProtect extends Addon {
         return false;
     }
 
-    public LandRegion getLandByBlock(Block block){
+    public LandRegion getLandByPos(Position position){
         for (LandRegion region : this.lands.values()){
-            if (block.x >= Math.min(region.pos1.x, region.pos2.x) && block.x <= Math.max(region.pos1.x, region.pos2.x)
-                    && block.y >= Math.min(region.pos1.y, region.pos2.y) && block.y <= Math.max(region.pos1.y, region.pos2.y)
-                    && block.z >= Math.min(region.pos1.z, region.pos2.z) && block.z <= Math.max(region.pos1.z, region.pos2.z))
+            if (position.getLevel() != null && !region.level.getFolderName().equals(position.getLevel().getFolderName())) continue;
+
+            if (position.x >= Math.min(region.pos1.x, region.pos2.x) && position.x <= Math.max(region.pos1.x, region.pos2.x)
+                    && position.y >= Math.min(region.pos1.y, region.pos2.y) && position.y <= Math.max(region.pos1.y, region.pos2.y)
+                    && position.z >= Math.min(region.pos1.z, region.pos2.z) && position.z <= Math.max(region.pos1.z, region.pos2.z))
                 return region;
         }
+
         return null;
     }
 
@@ -214,7 +220,8 @@ public class MyLandProtect extends Addon {
        String owner = config.getName().substring(0, config.getName().lastIndexOf("."));
 
        for (String land : config.getSection("land").getKeys(false)){
-           LandRegion region = new LandRegion(owner, land);
+           Level level = this.plugin.getServer().getLevelByName(config.getString("land."+land+"level"));
+           LandRegion region = new LandRegion(owner, land, level);
 
            List<Integer> data = config.getIntegerList("land."+land+".pos0");
            region.pos1 = new Vector3f(data.get(0), data.get(1), data.get(2));
@@ -224,6 +231,8 @@ public class MyLandProtect extends Addon {
 
            region.whitelist = config.getStringList("land."+land+".whitelist");
            this.lands.put(owner.toLowerCase()+"-"+land, region);
+
+           region.save();
        }
     }
 
@@ -277,7 +286,7 @@ public class MyLandProtect extends Addon {
         this.selectors.remove(player.getName().toLowerCase());
         config.save();
 
-        LandRegion region = new LandRegion(player.getName().toLowerCase(), land.toLowerCase());
+        LandRegion region = new LandRegion(player.getName().toLowerCase(), land.toLowerCase(), player.getLevel());
         region.pos1 = blocks.get(0).asVector3f();
         region.pos2 = blocks.get(1).asVector3f();
         this.lands.put(player.getName().toLowerCase()+"-"+land.toLowerCase(), region);
@@ -309,10 +318,10 @@ public class MyLandProtect extends Addon {
     }
 
     public void findLand(Player player){
-        Block block = player.getLevel().getBlock(player.add(0, -1));
+        Block block = player.getLevel().getBlock(player.clone());
         LandRegion land = null;
 
-        if (block != null && (land = getLandByBlock(block)) != null){
+        if (block != null && (land = getLandByPos(block)) != null){
             String message = configFile.getString("landHere");
             message = message.replace("{owner}", land.owner);
             message = message.replace("{land}", land.land);
