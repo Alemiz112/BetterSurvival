@@ -15,6 +15,7 @@ import cn.nukkit.event.inventory.InventoryCloseEvent;
 import cn.nukkit.event.inventory.InventoryTransactionEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerJoinEvent;
+import cn.nukkit.event.plugin.PluginEnableEvent;
 import cn.nukkit.inventory.Inventory;
 import cn.nukkit.inventory.transaction.action.InventoryAction;
 import cn.nukkit.item.Item;
@@ -22,6 +23,7 @@ import cn.nukkit.level.particle.FloatingTextParticle;
 import cn.nukkit.level.particle.HeartParticle;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.scheduler.Task;
+import io.pocketvote.PocketVote;
 import io.pocketvote.event.VoteDispatchEvent;
 import io.pocketvote.event.VoteEvent;
 
@@ -91,8 +93,8 @@ public class BetterVoting extends Addon {
     public void registerCommands() {
         registerCommand("crate", new CrateCommand("crate", this));
 
-        if (configFile.getBoolean("customVoteCommand") &&
-                plugin.getServer().getPluginManager().getPlugin("PocketVote") != null){
+        //TODO: depend on "usePocketVote"
+        if (configFile.getBoolean("customVoteCommand")){
             registerCommand("vote", new VoteCommand("vote", this), false);
         }
     }
