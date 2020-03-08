@@ -25,6 +25,8 @@ public class TrollCommand extends Command {
                 "§7/troll lava <player> : Learn your friend to swim in lava!";
         this.setUsage(getUsageMessage());
 
+        this.ignoreInHelpTexts = true;
+
         this.commandParameters.clear();
         this.setPermission(loader.configFile.getString("permission-troll"));
         this.loader = loader;
