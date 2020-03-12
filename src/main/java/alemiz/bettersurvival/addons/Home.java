@@ -6,6 +6,7 @@ import alemiz.bettersurvival.commands.HomeCommand;
 import alemiz.bettersurvival.commands.SetHomeCommand;
 import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.ConfigManager;
+import alemiz.bettersurvival.utils.SuperConfig;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3;
