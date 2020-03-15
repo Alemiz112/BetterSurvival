@@ -1,5 +1,6 @@
 package alemiz.bettersurvival.addons;
 
+import alemiz.bettersurvival.commands.EventCommand;
 import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.Command;
 import alemiz.bettersurvival.utils.LevelDecoration;
@@ -77,6 +78,12 @@ public class BetterLobby extends Addon {
             configFile.save();
         }
     }
+
+    @Override
+    public void registerCommands() {
+        registerCommand("event", new EventCommand("event", this));
+    }
+
     public void loadBroadcaster(){
         Task task = new Task() {
             @Override
