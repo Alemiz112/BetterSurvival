@@ -243,7 +243,7 @@ public class MyLandProtect extends Addon {
         if (config == null) return;
         int limit = configFile.getInt("landsLimit");
 
-        Set<String> lands = config.getSection("land").getKeys();
+        Set<String> lands = config.getSection("land").getKeys(false);
         if (lands != null && lands.size() >= limit && !player.isOp()){
             String message = configFile.getString("landLimitWarn");
             message = message.replace("{land}", land);

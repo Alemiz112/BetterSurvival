@@ -52,7 +52,7 @@ public class Home extends Addon {
         if (config == null) return;
         int limit = configFile.getInt("homeLimit");
 
-        Set<String> homes = config.getSection("home").getKeys();
+        Set<String> homes = config.getSection("home").getKeys(false);
         if (homes != null && homes.size() >= limit && !player.isOp()){
             player.sendMessage("§6»§7Home limit reached!");
             return;
