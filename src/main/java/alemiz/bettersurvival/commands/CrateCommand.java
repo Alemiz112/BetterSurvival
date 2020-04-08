@@ -18,6 +18,8 @@ public class CrateCommand extends Command {
                 "§7/crate set: Touch crate chest to get coords\n";
         this.setUsage(getUsageMessage());
 
+        this.ignoreInHelpTexts = true;
+
         this.commandParameters.clear();
 
         this.setPermission(loader.configFile.getString("permission-crateCommand"));

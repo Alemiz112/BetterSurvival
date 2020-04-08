@@ -6,6 +6,7 @@ import alemiz.bettersurvival.commands.HomeCommand;
 import alemiz.bettersurvival.commands.SetHomeCommand;
 import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.ConfigManager;
+import alemiz.bettersurvival.utils.SuperConfig;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3;
@@ -51,7 +52,7 @@ public class Home extends Addon {
         if (config == null) return;
         int limit = configFile.getInt("homeLimit");
 
-        Set<String> homes = config.getSection("home").getKeys();
+        Set<String> homes = config.getSection("home").getKeys(false);
         if (homes != null && homes.size() >= limit && !player.isOp()){
             player.sendMessage("§6»§7Home limit reached!");
             return;

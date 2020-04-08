@@ -15,6 +15,8 @@ public class VanishCommand extends Command {
         this.usage = "§7/vanish : Turn on/off ";
         this.setUsage(getUsageMessage());
 
+        this.ignoreInHelpTexts = true;
+
         this.commandParameters.clear();
         this.setPermission(loader.configFile.getString("permission-vanish"));
         this.loader = loader;

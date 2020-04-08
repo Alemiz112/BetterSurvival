@@ -17,6 +17,8 @@ public class BlockCommand extends Command {
         this.usage = "§7/block <player> <block id>: Troll player and spawn blocks around him";
         this.setUsage(getUsageMessage());
 
+        this.ignoreInHelpTexts = true;
+
         this.commandParameters.clear();
         this.commandParameters.put("default", new CommandParameter[]{
                 new CommandParameter("player", CommandParamType.TARGET,false),

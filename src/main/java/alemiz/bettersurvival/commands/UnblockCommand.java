@@ -17,6 +17,8 @@ public class UnblockCommand extends Command {
         this.usage = "§7/unblock <player> : Release player from spawned blocks";
         this.setUsage(getUsageMessage());
 
+        this.ignoreInHelpTexts = true;
+
         this.commandParameters.clear();
         this.commandParameters.put("default", new CommandParameter[]{
                 new CommandParameter("player", CommandParamType.TARGET, false),
