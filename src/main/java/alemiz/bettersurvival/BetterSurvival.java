@@ -45,6 +45,7 @@ public class BetterSurvival extends PluginBase implements Listener {
         Addon.loadAddon(new Troller("troll_addon.yml"));
         Addon.loadAddon(new BetterVoting("better_voting.yml"));
         Addon.loadAddon(new LevelVote("level_vote.yml"));
+        Addon.loadAddon(new EasterAddon("easter_addon.yml"));
 
         //This must be last addon loaded
         Addon.loadAddon(new CubeBridge("cube_bridge.yml"));
