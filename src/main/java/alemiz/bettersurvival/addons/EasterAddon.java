@@ -5,6 +5,7 @@ import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.ConfigManager;
 import alemiz.bettersurvival.utils.SuperConfig;
 import cn.nukkit.Player;
+import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.FloatEntityData;
 import cn.nukkit.entity.data.Skin;
@@ -173,7 +174,10 @@ public class EasterAddon extends Addon {
 
         Entity entity = NpcModule.getInstance().createCustomEntity(player, skin, geometryName, name);
         if (pos != null){
+            pos = pos.add(0.5, 0, 0.5);
+
             entity.setPosition(pos);
+            entity.getLevel().setBlock(pos, Block.get(Block.INVISIBLE_BEDROCK));
         }
 
         entity.setNameTagAlwaysVisible(false);
