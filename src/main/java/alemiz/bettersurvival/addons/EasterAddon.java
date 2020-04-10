@@ -208,6 +208,8 @@ public class EasterAddon extends Addon {
 
             if (entity == null || !this.isEasterEgg(entity)) continue;
             this.eggs.remove(entityId);
+
+            entity.getLevel().setBlock(entity, Block.get(Block.AIR));
             entity.close();
         }
 
