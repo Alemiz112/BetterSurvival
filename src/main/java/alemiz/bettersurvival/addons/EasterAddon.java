@@ -10,6 +10,7 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.FloatEntityData;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.event.EventHandler;
+import cn.nukkit.event.EventPriority;
 import cn.nukkit.event.block.BlockPlaceEvent;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDespawnEvent;
@@ -75,12 +76,13 @@ public class EasterAddon extends Addon {
         registerCommand("egg", new EggCommand("egg", this), false);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onEntitySpawn(EntitySpawnEvent event){
         Entity entity = event.getEntity();
 
-        if (!this.isEasterEgg(entity) && !this.eggs.contains(entity.getId())) return;
+        if (!this.isEasterEgg(entity) || this.eggs.contains(entity.getId())) return;
         this.eggs.add(entity.getId());
+        entity.setNameTagAlwaysVisible(false);
     }
 
     @EventHandler
@@ -174,10 +176,7 @@ public class EasterAddon extends Addon {
 
         Entity entity = NpcModule.getInstance().createCustomEntity(player, skin, geometryName, name);
         if (pos != null){
-            pos = pos.add(0.5, 0, 0.5);
-
-            entity.setPosition(pos);
-            entity.getLevel().setBlock(pos, Block.get(Block.INVISIBLE_BEDROCK));
+            entity.teleport(pos);
         }
 
         entity.setNameTagAlwaysVisible(false);
@@ -221,7 +220,7 @@ public class EasterAddon extends Addon {
     public void addToList(Player player, Entity entity){
         if (player == null || entity == null || !this.isEasterEgg(entity)) return;
 
-        String eggHash = this.generateEggHash(entity);
+        String eggHash = this.getEggHash(entity);
         Config config = ConfigManager.getInstance().loadPlayer(player);
         if (config == null) return;
 
@@ -298,14 +297,14 @@ public class EasterAddon extends Addon {
         player.sendMessage(message);
     }
 
-    public String generateEggHash(Entity entity){
+    public String getEggHash(Entity entity){
         if (!this.isEasterEgg(entity)) return null;
         return entity.namedTag.getString("eggHash");
     }
 
 
     public boolean isEasterEgg(Entity entity){
-        return entity.namedTag.getBoolean("easterEgg");
+        return entity.namedTag.contains("easterEgg");
     }
 
 }

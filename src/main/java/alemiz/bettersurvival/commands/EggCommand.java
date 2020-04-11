@@ -58,7 +58,7 @@ public class EggCommand extends Command {
                 }
 
                 this.loader.clearFoundEggs();
-                sender.sendMessage("§6»§7All  found Easter Eggs were removed!");
+                sender.sendMessage("§6»§7All found Easter Eggs were removed!");
                 break;
             default:
                 sender.sendMessage(getUsageMessage());
