@@ -80,7 +80,7 @@ public class EasterAddon extends Addon {
     public void onEntitySpawn(EntitySpawnEvent event){
         Entity entity = event.getEntity();
 
-        if (!this.isEasterEgg(entity) || this.eggs.contains(entity.getId())) return;
+        if (entity == null || !this.isEasterEgg(entity) || this.eggs.contains(entity.getId())) return;
         this.eggs.add(entity.getId());
         entity.setNameTagAlwaysVisible(false);
     }
@@ -89,7 +89,7 @@ public class EasterAddon extends Addon {
     public void onEntityDespawn(EntityDespawnEvent event){
         Entity entity = event.getEntity();
 
-        if (!this.isEasterEgg(entity)) return;
+        if (entity == null || !this.isEasterEgg(entity)) return;
         this.eggs.remove(entity.getId());
     }
 
@@ -176,7 +176,7 @@ public class EasterAddon extends Addon {
 
         Entity entity = NpcModule.getInstance().createCustomEntity(player, skin, geometryName, name);
         if (pos != null){
-            entity.teleport(pos);
+            entity.teleport(pos.add(0.5, 0, 0.5));
         }
 
         entity.setNameTagAlwaysVisible(false);

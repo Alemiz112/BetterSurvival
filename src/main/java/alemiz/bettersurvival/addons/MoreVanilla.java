@@ -18,6 +18,9 @@ import cn.nukkit.level.Location;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.SpawnParticleEffectPacket;
 import cn.nukkit.potion.Effect;
+import cubemc.nukkit.cubeanticheat.CubeAntiCheat;
+import cubemc.nukkit.cubeanticheat.listeners.SpeedListener;
+import cubemc.nukkit.cubeanticheat.utils.CheatListener;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -386,6 +389,11 @@ public class MoreVanilla extends Addon{
         packet.identifier = "minecraft:water_evaporation_bucket_emitter";
         for (Player pplayer : player.getLevel().getPlayers().values()) pplayer.dataPacket(packet);
 
+
+        if (this.plugin.getServer().getPluginManager().getPlugin("CubeAntiCheat") != null){
+            CheatListener listener = CubeAntiCheat.getInstance().getListeners().get("speed");
+            listener.addBypass(player, 20*5);
+        }
 
         player.addEffect(Effect.getEffect(Effect.DAMAGE_RESISTANCE).setAmplifier(100).setDuration(20*5).setVisible(false));
         player.setMotion(motion);

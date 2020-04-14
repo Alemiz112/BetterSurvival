@@ -1,9 +1,15 @@
 package alemiz.bettersurvival.addons;
 
 import alemiz.bettersurvival.utils.Addon;
+import alemiz.bettersurvival.utils.CustomListener;
 import cn.nukkit.Player;
 import cn.nukkit.event.EventHandler;
 import cubemc.nukkit.connector.events.CubePlayerJoinEvent;
+import cubemc.nukkit.connector.modules.staff.StaffManagePacket;
+import cubemc.nukkit.connector.modules.staff.StaffModule;
+import cubemc.nukkit.cubeanticheat.events.PlayerCheatActionEvent;
+import io.pocketvote.event.VoteDispatchEvent;
+import io.pocketvote.event.VoteEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +41,23 @@ public class CubeBridge extends Addon {
             configFile.set("subscriber-rank", "cube.subscriber");
             configFile.set("staff-rank", "cube.staff");
             configFile.save();
+        }
+    }
+
+    @Override
+    public void loadListeners() {
+        if (plugin.getServer().getPluginManager().getPlugin("CubeAntiCheat") != null){
+            CustomListener listener = new CustomListener(this){
+                @EventHandler
+                public void onCheatAction(PlayerCheatActionEvent event){
+                    if (event.getPlayer() == null) return;
+                    Player player = event.getPlayer();
+
+                    String message = "You was suspected from cheating! Hackers are no tolerated!";
+                    StaffModule.getInstance().operate("console", player.getName(), message, StaffManagePacket.STAFF_BAN);
+                }
+            };
+            plugin.getServer().getPluginManager().registerEvents(listener, plugin);
         }
     }
 
