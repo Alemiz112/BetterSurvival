@@ -44,23 +44,6 @@ public class CubeBridge extends Addon {
         }
     }
 
-    @Override
-    public void loadListeners() {
-        if (plugin.getServer().getPluginManager().getPlugin("CubeAntiCheat") != null){
-            CustomListener listener = new CustomListener(this){
-                @EventHandler
-                public void onCheatAction(PlayerCheatActionEvent event){
-                    if (event.getPlayer() == null) return;
-                    Player player = event.getPlayer();
-
-                    String message = "You was suspected from cheating! Hackers are no tolerated!";
-                    StaffModule.getInstance().operate("console", player.getName(), message, StaffManagePacket.STAFF_BAN);
-                }
-            };
-            plugin.getServer().getPluginManager().registerEvents(listener, plugin);
-        }
-    }
-
     @EventHandler
     public void onNetworkJoin(CubePlayerJoinEvent event){
         Player player = event.getPlayer();
