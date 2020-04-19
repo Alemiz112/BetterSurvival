@@ -3,8 +3,11 @@ package alemiz.bettersurvival.utils;
 import alemiz.bettersurvival.BetterSurvival;
 import cn.nukkit.Player;
 import cn.nukkit.utils.Config;
+import net.minidev.json.JSONObject;
+import net.minidev.json.parser.JSONParser;
 
 import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,5 +61,16 @@ public class ConfigManager {
             }
         }
         return configs;
+    }
+
+    public JSONObject loadJson(String path){
+        Object json;
+        try {
+            json = new JSONParser(JSONParser.DEFAULT_PERMISSIVE_MODE).parse(new FileReader(path));
+        }catch (Exception e){
+            return null;
+        }
+
+        return (JSONObject) json;
     }
 }

@@ -1,0 +1,21 @@
+{
+  "food": {
+    "carrot": {
+      "id": 391,
+      "count": 10,
+      "price": 50
+    },
+    "apple": {
+      "id": 260,
+      "count": 10,
+      "price": 100
+    }
+  },
+  "resources": {
+    "iron": {
+      "id": 265,
+      "count": 5,
+      "price": 375
+    }
+  }
+}

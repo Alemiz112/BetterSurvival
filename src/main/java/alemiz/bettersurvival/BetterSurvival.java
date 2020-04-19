@@ -2,6 +2,7 @@ package alemiz.bettersurvival;
 
 import alemiz.bettersurvival.addons.*;
 import alemiz.bettersurvival.addons.myland.MyLandProtect;
+import alemiz.bettersurvival.addons.shop.SurvivalShop;
 import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.ConfigManager;
 import cn.nukkit.event.Listener;
@@ -45,6 +46,9 @@ public class BetterSurvival extends PluginBase implements Listener {
         Addon.loadAddon(new Troller("troll_addon.yml"));
         Addon.loadAddon(new BetterVoting("better_voting.yml"));
         Addon.loadAddon(new LevelVote("level_vote.yml"));
+        Addon.loadAddon(new SurvivalShop("survival_shop.yml"));
+
+        //CubeMC addons
         Addon.loadAddon(new EasterAddon("easter_addon.yml"));
 
         //This must be last addon loaded
