@@ -23,7 +23,6 @@ public class ShopItem {
         if (player == null) return false;
         //TODO: implement with EconomyAPI
 
-
         player.getInventory().addItem(this.buildItem());
         return true;
     }

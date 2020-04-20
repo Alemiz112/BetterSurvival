@@ -1,5 +1,6 @@
 package alemiz.bettersurvival.addons.shop;
 
+import alemiz.bettersurvival.commands.ShopCommand;
 import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.ConfigManager;
 import cn.nukkit.Player;
@@ -87,6 +88,11 @@ public class SurvivalShop extends Addon {
         }catch (Exception e){
             this.plugin.getLogger().info("§eUnable to save shop.json from resources!");
         }
+    }
+
+    @Override
+    public void registerCommands() {
+        registerCommand("shop", new ShopCommand("shop", this));
     }
 
     @EventHandler
