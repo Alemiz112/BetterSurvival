@@ -4,7 +4,6 @@ import cn.nukkit.Player;
 import cn.nukkit.form.element.ElementButton;
 import cn.nukkit.form.element.ElementButtonImageData;
 import cn.nukkit.form.window.FormWindowSimple;
-import cn.nukkit.item.Item;
 import net.minidev.json.JSONObject;
 
 import java.util.ArrayList;
@@ -32,7 +31,7 @@ public class ShopCategory {
                     itemJson.getAsNumber("price").intValue());
 
             if (itemJson.containsKey("meta")) item.meta = itemJson.getAsNumber("meta").intValue();
-            if (itemJson.containsKey("image")) item.customImage = itemJson.getAsString("image");
+            if (itemJson.containsKey("image")) item.setCustomImage(itemJson.getAsString("image"));
             this.items.add(item);
         }
     }
@@ -46,19 +45,15 @@ public class ShopCategory {
             String nameFormat = item.getName().substring(0, 1).toUpperCase() + item.getName().substring(1);
             ElementButton button = new ElementButton("§5"+nameFormat+"\n§7Count: §8"+item.getCount()+" §7Price: §8"+item.getPrice()+"$");
 
-            String image = item.getCustomImage();
+            if (item.canUseImage()){
+                String image = item.getCustomImage();
+                if (image.equals("")){
+                    image = "textures/items/"+item.buildItem().getName().replace(" ", "_").toLowerCase();
+                }
 
-            switch (image){
-                case "":
-                    String texture = item.buildItem().getName().replace(" ", "_").toLowerCase();
-                    button.addImage(new ElementButtonImageData(ElementButtonImageData.IMAGE_DATA_TYPE_PATH, "textures/items/"+texture));
-                    break;
-                case "false":
-                    break;
-                default:
-                    button.addImage(new ElementButtonImageData(ElementButtonImageData.IMAGE_DATA_TYPE_URL, image));
-                    break;
+                button.addImage(new ElementButtonImageData(item.getImageType(), image));
             }
+
             form.addButton(button);
         }
 
