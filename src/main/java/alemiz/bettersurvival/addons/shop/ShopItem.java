@@ -20,6 +20,7 @@ public class ShopItem {
     }
 
     public boolean buyItem(Player player){
+        if (player == null) return false;
         //TODO: implement with EconomyAPI
 
 

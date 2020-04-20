@@ -167,6 +167,7 @@ public class SurvivalShop extends Addon {
 
         String message = this.messageFormat(player, (success? "messageSuccess" : "messageFail"));
         message = message.replace("{item}", item.getName());
+        message = message.replace("{money}", item.getName());
         player.sendMessage(message);
     }
 
