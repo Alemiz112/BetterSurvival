@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -46,10 +47,12 @@ public class SurvivalShop extends Addon {
 
         this.shopSpawn = this.plugin.getServer().getDefaultLevel().getSafeSpawn();
         if (configFile.exists("shopSpawn")){
+            System.out.println("loading");
+
             String[] data = configFile.getString("shopSpawn").split(",");
 
             Level level = this.plugin.getServer().getLevelByName(data[3]);
-            this.shopSpawn = new Position(Integer.parseInt(data[0]), Integer.parseInt(data[1]), Integer.parseInt(data[2]), level);
+            this.shopSpawn = new Position(Double.parseDouble(data[0]), Double.parseDouble(data[1]), Double.parseDouble(data[2]), level);
         }
     }
 
@@ -178,19 +181,22 @@ public class SurvivalShop extends Addon {
     }
 
     public void setShopSpawn(Position pos){
-        String[] data = new String[]{String.valueOf(pos.getX()), String.valueOf(pos.getY()), String.valueOf(pos.getZ()), pos.getLevel().getFolderName()};
-        this.shopSpawn = pos;
+        DecimalFormat format = new DecimalFormat("0.0");
+
+        String[] data = new String[]{format.format(pos.getX()), format.format(pos.getY()), format.format(pos.getZ()), pos.getLevel().getFolderName()};
+        this.shopSpawn = pos.clone();
 
         this.configFile.set("shopSpawn", String.join(",", data));
         this.configFile.save();
     }
 
     public Position getShopSpawn() {
-        return shopSpawn;
+        return this.shopSpawn;
     }
 
     public void teleportToSpawn(Player player){
         if (player == null) return;
+        player.teleport(this.shopSpawn.add(0, 0.5));
     }
 
     public boolean isShopSign(BlockEntitySign sign){
