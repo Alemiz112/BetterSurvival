@@ -1,13 +1,18 @@
 package alemiz.bettersurvival.addons.shop;
 
 import cn.nukkit.Player;
+import cn.nukkit.form.element.ElementButtonImageData;
 import cn.nukkit.item.Item;
 import cubemc.nukkit.connector.modules.Money;
 
 public class ShopItem {
 
     public String name;
+
     public String customImage = "";
+    public boolean useImage = true;
+    public String imageType = ElementButtonImageData.IMAGE_DATA_TYPE_PATH;
+
     public int itemId;
     public int count;
     public int price;
@@ -31,31 +36,54 @@ public class ShopItem {
         return true;
     }
 
+    public void setCustomImage(String customImage) {
+        if (customImage.equals("false")){
+            this.useImage = false;
+            return;
+        }
+
+        if (customImage.startsWith("blocks/")){
+            this.customImage = "textures/"+customImage;
+            return;
+        }
+
+        this.imageType = ElementButtonImageData.IMAGE_DATA_TYPE_URL;
+        this.customImage = customImage;
+    }
+
     public Item buildItem(){
         return Item.get(this.itemId, this.meta, this.count);
     }
 
     public String getName() {
-        return name;
+        return this.name;
+    }
+
+    public boolean canUseImage() {
+        return this.useImage;
     }
 
     public String getCustomImage() {
-        return customImage;
+        return this.customImage;
+    }
+
+    public String getImageType() {
+        return this.imageType;
     }
 
     public int getId() {
-        return itemId;
+        return this.itemId;
     }
 
     public int getMeta() {
-        return meta;
+        return this.meta;
     }
 
     public int getCount() {
-        return count;
+        return this.count;
     }
 
     public int getPrice() {
-        return price;
+        return this.price;
     }
 }

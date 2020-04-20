@@ -47,8 +47,6 @@ public class SurvivalShop extends Addon {
 
         this.shopSpawn = this.plugin.getServer().getDefaultLevel().getSafeSpawn();
         if (configFile.exists("shopSpawn")){
-            System.out.println("loading");
-
             String[] data = configFile.getString("shopSpawn").split(",");
 
             Level level = this.plugin.getServer().getLevelByName(data[3]);
