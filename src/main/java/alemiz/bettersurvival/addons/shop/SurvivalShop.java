@@ -127,8 +127,16 @@ public class SurvivalShop extends Addon {
         }
 
         String[] lines = new String[]{configFile.getString("signTitle"), "§e"+oldLines[1], "", ""};
-        if (oldLines[2].equals("vip")){
-            lines[2] = "§5VIP Only";
+
+        switch (oldLines[2]){
+            case "vip":
+                lines[2] = "§5VIP Only";
+                break;
+            case "":
+                break;
+            default:
+                //TODO: shop by rank
+                break;
         }
 
         event.setCancelled(true);

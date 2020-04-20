@@ -39,7 +39,7 @@ public class ShopCategory {
 
     public void sendForm(Player player){
         FormWindowSimple form = new FormWindowSimple("§l§8Shop "+this.category.substring(0, 1).toUpperCase()+this.category.substring(1), "");
-        form.setContent("§7Pickup item by your own choice. Your coins: §8"+ Money.getInstance().getMoney(player, false));
+        form.setContent("§7Pickup item by your own choice. Your coins: §8"+ Money.getInstance().getMoney(player, false)+"$");
 
 
         for (ShopItem item : this.items){
