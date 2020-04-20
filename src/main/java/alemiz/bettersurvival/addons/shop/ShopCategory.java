@@ -5,6 +5,7 @@ import cn.nukkit.form.element.ElementButton;
 import cn.nukkit.form.element.ElementButtonImageData;
 import cn.nukkit.form.window.FormWindowSimple;
 import cn.nukkit.item.Item;
+import cubemc.nukkit.connector.modules.Money;
 import net.minidev.json.JSONObject;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class ShopCategory {
 
     public void sendForm(Player player){
         FormWindowSimple form = new FormWindowSimple("§l§8Shop "+this.category.substring(0, 1).toUpperCase()+this.category.substring(1), "");
-        form.setContent("§7Pickup item by your own choice.");
+        form.setContent("§7Pickup item by your own choice. Your coins: §8"+ Money.getInstance().getMoney(player, false));
 
 
         for (ShopItem item : this.items){

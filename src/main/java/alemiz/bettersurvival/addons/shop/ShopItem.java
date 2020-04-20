@@ -2,6 +2,7 @@ package alemiz.bettersurvival.addons.shop;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
+import cubemc.nukkit.connector.modules.Money;
 
 public class ShopItem {
 
@@ -21,9 +22,11 @@ public class ShopItem {
 
     public boolean buyItem(Player player){
         if (player == null) return false;
-        //TODO: implement with EconomyAPI
 
+        int balance = Money.getInstance().getMoney(player, false);
+        if ((balance - this.price) < 1) return false;
 
+        Money.getInstance().reduceMoney(player, this.price);
         player.getInventory().addItem(this.buildItem());
         return true;
     }
