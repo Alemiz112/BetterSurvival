@@ -132,6 +132,8 @@ public class SurvivalShop extends Addon {
             case "vip":
                 lines[2] = "§5VIP Only";
                 break;
+            case "subscriber":
+                lines[2] = "§bSubscriber Only";
             case "":
                 break;
             default:
@@ -158,9 +160,15 @@ public class SurvivalShop extends Addon {
         if (!this.isShopSign(sign)) return;
 
         String[] lines = sign.getText();
-        if (lines[2].equals("§5VIP Only") && !player.hasPermission(configFile.getString("shopVipPermission"))){
-            player.sendMessage("§c»§7This shop is for VIP members only!");
-            return;
+        switch (lines[2]){
+            case "§5VIP Only":
+                if (player.hasPermission(configFile.getString("shopVipPermission"))) break;
+                player.sendMessage("§c»§7This shop is for VIP members only!");
+                return;
+            case "§bSubscriber Only":
+                if (player.hasPermission(configFile.getString("cube.subscriber"))) break;
+                player.sendMessage("§c»§7This shop is for Subscriber members only!");
+                return;
         }
 
         ShopCategory category = this.getCategory(lines[1].substring(2).toLowerCase());
