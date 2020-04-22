@@ -3,19 +3,220 @@
     "carrot": {
       "id": 391,
       "count": 10,
-      "price": 50
+      "price": 50,
+      "image": "items/carrot"
     },
     "apple": {
       "id": 260,
       "count": 10,
-      "price": 100
+      "price": 100,
+      "image": "items/apple"
+    },
+    "beef cooked": {
+      "id": 364,
+      "count": 16,
+      "price": 280,
+      "image": "items/beef_cooked"
+    },
+    "beetroot": {
+      "id": 457,
+      "count": 13,
+      "price": 180,
+      "image": "items/beetroot"
+    },
+    "porkchop cooked": {
+      "id": 320,
+      "count": 13,
+      "price": 580,
+      "image": "items/porkchop_cooked"
+    },
+    "potato baked": {
+      "id": 393,
+      "count": 12,
+      "price": 340,
+      "image": "items/potato_baked"
+    },
+    "sweet berries": {
+      "id": 477,
+      "count": 20,
+      "price": 440,
+      "image": false
+    },
+    "salmon cooked": {
+      "id": 463,
+      "count": 13,
+      "price": 240,
+      "image": false
+    },
+    "mutton cooked": {
+      "id": 424,
+      "count": 10,
+      "price": 280,
+      "image": "items/mutton_cooked"
+    },
+    "bread": {
+      "id": 297,
+      "count": 14,
+      "price": 120,
+      "image": "items/bread"
     }
   },
   "resources": {
     "iron": {
       "id": 265,
       "count": 5,
-      "price": 375
+      "price": 375,
+      "image": "items/iron_ingot"
+    },
+    "coal": {
+      "id": 263,
+      "count": 30,
+      "price": 290,
+      "image": "items/coal"
+    },
+    "gold": {
+      "id": 266,
+      "count": 5,
+      "price": 300,
+      "image": "items/gold_ingot"
+    },
+    "redstone dust": {
+      "id": 331,
+      "count": 32,
+      "price": 800,
+      "image": "items/redstone_dust"
+    }
+  },
+  "items": {
+    "slimeball": {
+      "id": 341,
+      "count": 16,
+      "price": 270,
+      "image": "items/slimeball"
+    },
+    "magma cream": {
+      "id": 378,
+      "count":  16,
+      "price": 300,
+      "image": "items/magma_cream"
+    },
+    "blaze powder": {
+      "id": 377,
+      "count": 20,
+      "price": 500,
+      "image": "items/blaze_powder"
+    },
+    "blaze rod": {
+      "id": 369,
+      "count": 20,
+      "price": 790,
+      "image": "items/blaze_rod"
+    },
+    "feather": {
+      "id": 288,
+      "count": 13,
+      "price": 110,
+      "image": "items/feather"
+    },
+    "paper": {
+      "id": 339,
+      "count": 64,
+      "price": 410,
+      "image": "items/paper"
+    }
+  },
+  "spawn eggs": {
+    "chicken spawn egg": {
+      "id": 383,
+      "count": 2,
+      "meta": 10,
+      "price": 250,
+      "image": "items/spawn_egg"
+    },
+    "cow spawn egg": {
+      "id": 383,
+      "count": 2,
+      "meta": 11,
+      "price": 250,
+      "image": "items/spawn_egg"
+    },
+    "pig spawn egg": {
+      "id": 383,
+      "count": 2,
+      "meta": 12,
+      "price": 250,
+      "image": "items/spawn_egg"
+    },
+    "sheep spawn egg": {
+      "id": 383,
+      "count": 2,
+      "meta": 13,
+      "price": 250,
+      "image": "items/spawn_egg"
+    }
+  },
+  "blocks": {
+    "grass block": {
+      "id": 2,
+      "count": 20,
+      "price": 370,
+      "image": false
+    },
+    "sea lantern": {
+      "id": 169,
+      "count": 15,
+      "price": 250,
+      "image": false
+    },
+    "ender chest": {
+      "id": 130,
+      "count": 1,
+      "price": 1200,
+      "image": false
+    },
+    "shulker box": {
+      "id": 218,
+      "count": 1,
+      "price": 1000,
+      "image": false
+    },
+    "beacon": {
+      "id": 138,
+      "count": 1,
+      "price": 1100,
+      "image": false
+    },
+    "magma": {
+      "id": 213,
+      "count": 2,
+      "price": 700,
+      "image": false
+    }
+  },
+  "vip": {
+    "trident": {
+      "id": 455,
+      "count": 1,
+      "price": 2000,
+      "image": false
+    },
+    "elytra": {
+      "id": 443,
+      "count": 1,
+      "price": 4000,
+      "image": "items/elytra"
+    },
+    "saddle": {
+      "id": 329,
+      "count": 1,
+      "price": 1800,
+      "image": "items/saddle"
+    },
+    "totem": {
+      "id": 450,
+      "count": 1,
+      "price": 3000,
+      "image": "items/totem"
     }
   }
 }
