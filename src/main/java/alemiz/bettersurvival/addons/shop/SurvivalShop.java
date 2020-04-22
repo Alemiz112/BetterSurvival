@@ -150,6 +150,11 @@ public class SurvivalShop extends Addon {
         if (!this.isShopSign(sign)) return;
 
         String[] lines = sign.getText();
+        if (lines[2].equals("§5VIP Only") && !player.hasPermission(configFile.getString("shopVipPermission"))){
+            player.sendMessage("§c»§7This shop is for VIP members only!");
+            return;
+        }
+
         ShopCategory category = this.getCategory(lines[1].substring(2).toLowerCase());
         if (category == null) return;
 
