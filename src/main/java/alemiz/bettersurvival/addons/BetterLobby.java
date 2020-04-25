@@ -8,6 +8,7 @@ import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.EventHandler;
+import cn.nukkit.event.block.ItemFrameDropItemEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityExplodeEvent;
 import cn.nukkit.event.player.PlayerJoinEvent;
@@ -39,6 +40,8 @@ public class BetterLobby extends Addon {
 
     private boolean protectSpawn = true;
 
+    private FloatingTextParticle rulesParticle = null;
+
     public BetterLobby(String path){
         super("betterlobby", path);
 
@@ -50,7 +53,11 @@ public class BetterLobby extends Addon {
         this.protectSpawn = configFile.getBoolean("safeSpawn", true);
 
         this.particles = createHelpParticles();
-        loadBroadcaster();
+        this.loadBroadcaster();
+
+        if (configFile.getBoolean("enableRules")){
+            this.rulesParticle = this.createRulesParticles();
+        }
     }
 
     @Override
@@ -72,6 +79,11 @@ public class BetterLobby extends Addon {
             configFile.set("helpParticleMaxLines", 10);
             configFile.set("helpParticleTitle", "§d<-- §5Available Commands §d-->");
             configFile.set("helpParticleIncludedCommands", Arrays.asList("§7/kill : Kill yourself", "§7/lobby : Go back to server lobby", "§7/spawn : Go to spawn"));
+
+            configFile.set("enableRules", true);
+            configFile.set("rulesPos", "0,0,0");
+            configFile.set("rulesTitle", "§d<-- §5Game Rules §d-->");
+            configFile.set("rulesText", new ArrayList<>());
 
             configFile.set("safeSpawn", true);
             configFile.save();
@@ -152,7 +164,7 @@ public class BetterLobby extends Addon {
             player.createBossBar(buildBossBar(player));
         }
 
-        sendParticles(player);
+        this.sendParticles(player);
     }
 
     @EventHandler
@@ -175,6 +187,12 @@ public class BetterLobby extends Addon {
 
             event.setCancelled();
         }
+    }
+
+    @EventHandler
+    public void onItemFrame(ItemFrameDropItemEvent event){
+        if (!this.protectSpawn || !isSafeSpawn(event.getItemFrame())) return;
+        event.setCancelled();
     }
 
     public boolean isSafeSpawn(Position position){
@@ -221,7 +239,7 @@ public class BetterLobby extends Addon {
             positions.add(new Vector3(Integer.parseInt(data[0]), Integer.parseInt(data[1]), Integer.parseInt(data[2])));
         }
 
-        List<String> helptexts = generateHelpParticleTexts();
+        List<String> helptexts = this.generateHelpParticleTexts();
         int maxLines = this.configFile.getInt("helpParticleMaxLines", 10);
         String title = this.configFile.getString("helpParticleTitle");
 
@@ -245,11 +263,33 @@ public class BetterLobby extends Addon {
         return particles;
     }
 
+    public FloatingTextParticle createRulesParticles(){
+        String[] pos = this.configFile.getString("rulesPos").split(",");
+        if (pos.length <= 1) return null;
+
+        List<String> rules = this.configFile.getStringList("rulesText");
+        if (rules.isEmpty()) return null;
+
+        String title = this.configFile.getString("rulesTitle");
+        Vector3 position = new Vector3(Double.parseDouble(pos[0]), Double.parseDouble(pos[1]), Double.parseDouble(pos[2]));
+
+        StringBuilder rulesText = new StringBuilder();
+        for (String rule : rules){
+            rulesText.append("§7- ").append(rule).append("\n");
+        }
+
+        return new FloatingTextParticle(position, title, rulesText.toString());
+    }
+
     public void sendParticles(Player player){
         if (player == null) return;
 
         for (FloatingTextParticle particle : this.particles){
             player.getLevel().addParticle(particle, player);
+        }
+
+        if (this.rulesParticle != null){
+            player.getLevel().addParticle(this.rulesParticle, player);
         }
     }
 

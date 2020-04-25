@@ -39,12 +39,10 @@ public class ShopItem {
         }
 
         if (customImage.startsWith("blocks/") || customImage.startsWith("items/")){
-            System.out.println("image block or item");
             this.customImage = "textures/"+customImage;
             return;
         }
 
-        System.out.println("custom: "+customImage);
         this.imageType = ElementButtonImageData.IMAGE_DATA_TYPE_URL;
         this.customImage = customImage;
     }
