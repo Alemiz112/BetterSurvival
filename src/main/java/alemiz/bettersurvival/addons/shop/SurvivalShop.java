@@ -16,7 +16,7 @@ import cn.nukkit.form.window.FormWindowCustom;
 import cn.nukkit.form.window.FormWindowSimple;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
-import me.onebone.economyapi.EconomyAPI;
+import cubemc.nukkit.connector.modules.Money;
 import net.minidev.json.JSONObject;
 
 import java.io.File;
@@ -265,7 +265,7 @@ public class SurvivalShop extends Addon {
 
         String message = configFile.getString(messageKey);
         message = message.replace("{player}", player.getName());
-        message = message.replace("{money}", String.valueOf(EconomyAPI.getInstance().myMoney(player)));
+        message = message.replace("{money}", String.valueOf(Money.getInstance().getMoney(player, false)));
         return message;
     }
 }
