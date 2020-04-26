@@ -53,7 +53,7 @@ public class ShopItem {
     }
 
     public Item getItemSample(){
-        return Item.get(this.itemId, this.count, this.meta);
+        return Item.get(this.itemId, this.meta, this.count);
     }
 
     public Item buildItem(){
