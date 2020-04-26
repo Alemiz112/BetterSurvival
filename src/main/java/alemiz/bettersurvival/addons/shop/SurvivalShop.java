@@ -177,7 +177,7 @@ public class SurvivalShop extends Addon {
                 player.sendMessage("§c»§7This shop is for VIP members only!");
                 return;
             case "§bSubscriber Only":
-                if (player.hasPermission(configFile.getString("cube.subscriber"))) break;
+                if (player.hasPermission("cube.subscriber")) break;
                 player.sendMessage("§c»§7This shop is for Subscriber members only!");
                 return;
         }
