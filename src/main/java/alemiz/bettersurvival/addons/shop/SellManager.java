@@ -77,6 +77,11 @@ public class SellManager {
         Item item = shopItem.getItemSample();
         item.setCount(count);
 
+        if (!player.getInventory().contains(item)){
+            player.sendMessage("§c»§7Unable to shell item. You do not own this item!");
+            return;
+        }
+
         player.getInventory().removeItem(item);
 
         EconomyAPI.getInstance().addMoney(player, count * shopItem.getSellPrice());
