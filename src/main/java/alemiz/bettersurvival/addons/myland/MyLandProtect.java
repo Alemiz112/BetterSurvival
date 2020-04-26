@@ -147,7 +147,10 @@ public class MyLandProtect extends Addon {
     @EventHandler
     public void onItemFrame(ItemFrameDropItemEvent event){
         Position pos = event.getItemFrame();
-        if (getLandByPos(pos) != null){
+        Player player = event.getPlayer();
+
+        LandRegion region = getLandByPos(pos);
+        if (!interact(player, region)){
             event.setCancelled();
         }
     }

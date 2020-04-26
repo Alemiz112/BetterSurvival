@@ -191,7 +191,7 @@ public class BetterLobby extends Addon {
 
     @EventHandler
     public void onItemFrame(ItemFrameDropItemEvent event){
-        if (!this.protectSpawn || !isSafeSpawn(event.getItemFrame())) return;
+        if (!this.protectSpawn || event.getPlayer().isOp() || !isSafeSpawn(event.getItemFrame())) return;
         event.setCancelled();
     }
 
