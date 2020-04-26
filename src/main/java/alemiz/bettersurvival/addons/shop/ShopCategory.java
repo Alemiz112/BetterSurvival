@@ -33,6 +33,7 @@ public class ShopCategory {
 
             if (itemJson.containsKey("meta")) item.meta = itemJson.getAsNumber("meta").intValue();
             if (itemJson.containsKey("image")) item.setCustomImage(itemJson.getAsString("image"));
+            if (itemJson.containsKey("sell")) item.sellPrice = itemJson.getAsNumber("sell").intValue();
             this.items.add(item);
         }
     }

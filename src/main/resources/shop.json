@@ -3,62 +3,12 @@
     "carrot": {
       "id": 391,
       "count": 10,
-      "price": 50,
-      "image": "items/carrot"
+      "price": 50
     },
     "apple": {
       "id": 260,
       "count": 10,
-      "price": 100,
-      "image": "items/apple"
-    },
-    "beef cooked": {
-      "id": 364,
-      "count": 16,
-      "price": 280,
-      "image": "items/beef_cooked"
-    },
-    "beetroot": {
-      "id": 457,
-      "count": 13,
-      "price": 180,
-      "image": "items/beetroot"
-    },
-    "porkchop cooked": {
-      "id": 320,
-      "count": 13,
-      "price": 580,
-      "image": "items/porkchop_cooked"
-    },
-    "potato baked": {
-      "id": 393,
-      "count": 12,
-      "price": 340,
-      "image": "items/potato_baked"
-    },
-    "sweet berries": {
-      "id": 477,
-      "count": 20,
-      "price": 440,
-      "image": false
-    },
-    "salmon cooked": {
-      "id": 463,
-      "count": 13,
-      "price": 240,
-      "image": false
-    },
-    "mutton cooked": {
-      "id": 424,
-      "count": 10,
-      "price": 280,
-      "image": "items/mutton_cooked"
-    },
-    "bread": {
-      "id": 297,
-      "count": 14,
-      "price": 120,
-      "image": "items/bread"
+      "price": 100
     }
   },
   "resources": {

@@ -33,7 +33,7 @@ public class ShopCommand extends Command {
         Player player = (Player) sender;
 
         if (args.length <= 0){
-            loader.teleportToSpawn(player);
+            this.loader.teleportToSpawn(player);
             player.sendMessage("§6»§7You was teleported to shop!");
             return true;
         }

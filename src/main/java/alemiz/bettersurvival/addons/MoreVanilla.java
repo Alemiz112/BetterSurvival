@@ -1,6 +1,7 @@
 package alemiz.bettersurvival.addons;
 
 import alemiz.bettersurvival.commands.*;
+import alemiz.bettersurvival.tasks.MuteCheckTask;
 import alemiz.bettersurvival.utils.Addon;
 import cn.nukkit.AdventureSettings;
 import cn.nukkit.Server;
@@ -27,6 +28,8 @@ public class MoreVanilla extends Addon{
     protected Map<String, String> tpa = new HashMap<>();
     protected Map<String, Location> back = new HashMap<>();
 
+    protected Map<String, Date> mutedPlayers = new HashMap<>();
+
     public MoreVanilla(String path){
         super("morevanilla", path);
 
@@ -36,6 +39,8 @@ public class MoreVanilla extends Addon{
                 configFile.getBoolean("showCoordinates", true));
         gameRules.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN,
                 configFile.getBoolean("doImmediateRespawn", true));
+
+        plugin.getServer().getScheduler().scheduleRepeatingTask(new MuteCheckTask(this), 20*60, true);
     }
 
     @Override
@@ -77,6 +82,11 @@ public class MoreVanilla extends Addon{
             configFile.set("permission-randtp", "bettersurvival.randtp");
             configFile.set("randtpMessage", "§6»§7You was teleported to random location!");
 
+            configFile.set("permission-mute", "bettersurvival.mute");
+            configFile.set("muteMessage", "§c»§7You was muted for {time} minutes!");
+            configFile.set("muteChatMessage", "§c»§7You was muted! You cant chat now!");
+            configFile.set("unmuteMessage", "§a»§7You was unmuted! Please respect rules to be not muted again :D");
+
             configFile.set("showCoordinates", true);
             configFile.set("doImmediateRespawn", true);
             configFile.save();
@@ -93,6 +103,8 @@ public class MoreVanilla extends Addon{
         registerCommand("near", new NearCommand("near", this));
         registerCommand("jump", new JumpCommand("jump", this));
         registerCommand("rand", new RandCommand("rand", this));
+        registerCommand("mute", new MuteCommand("mute", this));
+        registerCommand("unmute", new UnmuteCommand("unmute", this));
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -114,8 +126,17 @@ public class MoreVanilla extends Addon{
     @EventHandler
     public void onChat(PlayerChatEvent event){
         Player player = event.getPlayer();
-        String format = configFile.getString("chatFormat");
 
+        if (this.mutedPlayers.containsKey(player.getName())){
+            String message = configFile.getString("muteChatMessage");
+            message = message.replace("{player}", player.getName());
+
+            player.sendMessage(message);
+            event.setCancelled(true);
+            return;
+        }
+
+        String format = configFile.getString("chatFormat");
         format = format.replace("{player}", player.getName());
         format = format.replace("{message}", event.getMessage());
         event.setFormat(format);
@@ -412,6 +433,74 @@ public class MoreVanilla extends Addon{
         player.sendMessage(message);
     }
 
+    public void mute(Player player, String executor, String time){
+        Player pexecutor = Server.getInstance().getPlayer(executor);
+        if (!checkForPlayer(player, pexecutor)) return;
+
+        if (executor.equals(player.getName())){
+            player.sendMessage("§cYou cant mute yourself!");
+            return;
+        }
+
+        if (!executor.equals("console") && pexecutor != null && !pexecutor.hasPermission(configFile.getString("permission-mute"))){
+            pexecutor.sendMessage("§cYou dont have permission to mute player!");
+            return;
+        }
+
+        int minutes = 0;
+        int seconds = 0;
+
+        try {
+            String[] data = time.split(":");
+            minutes = Integer.parseInt(data[0]);
+
+            if (data.length > 1){
+                seconds = Integer.parseInt(data[1]);
+            }
+        }catch (Exception e){
+            if (pexecutor == null) return;
+            pexecutor.sendMessage("§c»§7Bad time parameter provided. Please use following format: §8mm:ss");
+            return;
+        }
+
+        if (pexecutor != null && !executor.equals(player.getName())){
+            pexecutor.sendMessage("§6»§7You muted §6@"+player.getName()+"§7 for §8"+time+"§7!");
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MINUTE, minutes);
+        calendar.add(Calendar.SECOND, seconds);
+
+        this.mutedPlayers.put(player.getName(), calendar.getTime());
+
+        String message = configFile.getString("muteMessage");
+        message = message.replace("{player}", player.getName());
+        message = message.replace("{time}", time);
+        player.sendMessage(message);
+    }
+
+    public void unmute(String playerName, String executor){
+        Player pexecutor = Server.getInstance().getPlayer(executor);
+        Player player = Server.getInstance().getPlayer(playerName);
+
+
+        if (!executor.equals("console") && pexecutor != null && !pexecutor.hasPermission(configFile.getString("permission-mute"))){
+            pexecutor.sendMessage("§cYou dont have permission to unmute player!");
+            return;
+        }
+
+        if (pexecutor != null && !executor.equals(player.getName())){
+            pexecutor.sendMessage("§6»§7You unmuted §6@"+player.getName()+"§7!");
+        }
+
+        this.mutedPlayers.remove(playerName);
+        if (player == null) return;
+
+        String message = configFile.getString("unmuteMessage");
+        message = message.replace("{player}", player.getName());
+        player.sendMessage(message);
+    }
+
 
     public boolean checkForPlayer(Player player, Player pexecutor){
         if (player == null){
@@ -423,5 +512,9 @@ public class MoreVanilla extends Addon{
             return false;
         }
         return true;
+    }
+
+    public Map<String, Date> getMutedPlayers() {
+        return mutedPlayers;
     }
 }

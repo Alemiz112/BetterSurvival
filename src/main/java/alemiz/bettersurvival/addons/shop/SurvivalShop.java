@@ -1,5 +1,6 @@
 package alemiz.bettersurvival.addons.shop;
 
+import alemiz.bettersurvival.commands.SellCommand;
 import alemiz.bettersurvival.commands.ShopCommand;
 import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.ConfigManager;
@@ -11,9 +12,11 @@ import cn.nukkit.event.block.BlockBreakEvent;
 import cn.nukkit.event.player.PlayerFormRespondedEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.form.response.FormResponseSimple;
+import cn.nukkit.form.window.FormWindowCustom;
 import cn.nukkit.form.window.FormWindowSimple;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
+import me.onebone.economyapi.EconomyAPI;
 import net.minidev.json.JSONObject;
 
 import java.io.File;
@@ -29,7 +32,9 @@ import java.util.Set;
 public class SurvivalShop extends Addon {
 
     public Map<String, ShopCategory> categories = new HashMap<>();
-    protected Position shopSpawn;
+
+    private Position shopSpawn;
+    private SellManager sellManager;
 
     public SurvivalShop(String path){
         super("survivalshop", path);
@@ -41,11 +46,12 @@ public class SurvivalShop extends Addon {
             if (!(shopData.get(category) instanceof JSONObject)) continue;
 
             ShopCategory shopCategory = new ShopCategory(category, (JSONObject) shopData.get(category), this);
-            this.categories.put(category, shopCategory);
+            this.categories.put(category.toLowerCase(), shopCategory);
         }
 
-
+        this.sellManager = new SellManager(this);
         this.shopSpawn = this.plugin.getServer().getDefaultLevel().getSafeSpawn();
+
         if (configFile.exists("shopSpawn")){
             String[] data = configFile.getString("shopSpawn").split(",");
 
@@ -73,12 +79,16 @@ public class SurvivalShop extends Addon {
             configFile.save();
         }
 
+        this.saveFromResources("shop.json");
+    }
+
+    private void saveFromResources(String fileName){
         try {
-            File shopFile = new File(ConfigManager.getInstance().ADDONS_PATH+"/shop.json");
+            File shopFile = new File(ConfigManager.getInstance().ADDONS_PATH+"/"+fileName);
             if (!shopFile.exists()){
                 shopFile.createNewFile();
 
-                InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("shop.json");
+                InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(fileName);
                 byte[] buffer = new byte[inputStream.available()];
                 inputStream.read(buffer);
 
@@ -87,13 +97,14 @@ public class SurvivalShop extends Addon {
                 inputStream.close();
             }
         }catch (Exception e){
-            this.plugin.getLogger().info("§eUnable to save shop.json from resources!");
+            this.plugin.getLogger().info("§eUnable to save "+fileName+" from resources!");
         }
     }
 
     @Override
     public void registerCommands() {
         registerCommand("shop", new ShopCommand("shop", this));
+        registerCommand("sell", new SellCommand("sell", this));
     }
 
     @EventHandler
@@ -179,11 +190,21 @@ public class SurvivalShop extends Addon {
 
     @EventHandler
     public void onForm(PlayerFormRespondedEvent event){
-        if (!(event.getWindow() instanceof FormWindowSimple) || !((FormWindowSimple) event.getWindow()).getTitle().startsWith("§l§8Shop")) return;
+        if ((event.getWindow() instanceof FormWindowCustom && ((FormWindowCustom) event.getWindow()).getTitle().startsWith("§l§8Sell"))){
+            this.sellManager.handleSellForm((FormWindowCustom) event.getWindow(), event.getPlayer());
+            return;
+        }
+
+        if (!(event.getWindow() instanceof FormWindowSimple)) return;
 
         Player player = event.getPlayer();
         FormWindowSimple form = (FormWindowSimple) event.getWindow();
         FormResponseSimple response = (FormResponseSimple) event.getResponse();
+
+        if (!form.getTitle().startsWith("§l§8Shop")){
+            if (form.getTitle().equals("§l§8Sell Items")) this.sellManager.handleForm(form, player);
+            return;
+        }
 
         if (response == null) return;
 
@@ -228,7 +249,15 @@ public class SurvivalShop extends Addon {
     }
 
     public ShopCategory getCategory(String category){
-        return this.categories.getOrDefault(category, null);
+        return this.categories.getOrDefault(category.toLowerCase(), null);
+    }
+
+    public Map<String, ShopCategory> getCategories() {
+        return this.categories;
+    }
+
+    public SellManager getSellManager() {
+        return this.sellManager;
     }
 
     private String messageFormat(Player player, String messageKey){
@@ -236,7 +265,7 @@ public class SurvivalShop extends Addon {
 
         String message = configFile.getString(messageKey);
         message = message.replace("{player}", player.getName());
-        message = message.replace("{money}", "0"); //TODO: use EconomyAPI
+        message = message.replace("{money}", String.valueOf(EconomyAPI.getInstance().myMoney(player)));
         return message;
     }
 }

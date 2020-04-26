@@ -9,6 +9,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.block.BlockBreakEvent;
 import cn.nukkit.event.block.BlockPlaceEvent;
+import cn.nukkit.event.block.ItemFrameDropItemEvent;
 import cn.nukkit.event.entity.EntityExplodeEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.level.Level;
@@ -140,6 +141,14 @@ public class MyLandProtect extends Addon {
         Position explodePos = event.getEntity().getPosition();
         if (getLandByPos(explodePos) != null){
             event.setBlockList(new ArrayList<Block>());
+        }
+    }
+
+    @EventHandler
+    public void onItemFrame(ItemFrameDropItemEvent event){
+        Position pos = event.getItemFrame();
+        if (getLandByPos(pos) != null){
+            event.setCancelled();
         }
     }
 
