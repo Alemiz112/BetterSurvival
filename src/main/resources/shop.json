@@ -3,12 +3,14 @@
     "carrot": {
       "id": 391,
       "count": 10,
-      "price": 50
+      "price": 50,
+      "sell": 40
     },
     "apple": {
       "id": 260,
       "count": 10,
-      "price": 100
+      "price": 100,
+      "sell": 80
     }
   },
   "resources": {

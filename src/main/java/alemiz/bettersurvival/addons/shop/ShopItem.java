@@ -3,6 +3,7 @@ package alemiz.bettersurvival.addons.shop;
 import cn.nukkit.Player;
 import cn.nukkit.form.element.ElementButtonImageData;
 import cn.nukkit.item.Item;
+import me.onebone.economyapi.EconomyAPI;
 
 public class ShopItem {
 
@@ -15,6 +16,7 @@ public class ShopItem {
     public int itemId;
     public int count;
     public int price;
+    public int sellPrice = 0;
     public int meta = 0;
 
     public ShopItem(String name, int itemID, int count, int price){
@@ -25,8 +27,7 @@ public class ShopItem {
     }
 
     public boolean buyItem(Player player){
-        if (player == null) return false;
-        //TODO: implement with EconomyAPI
+        if (player == null || EconomyAPI.getInstance().reduceMoney(player, this.count) < 1) return false;
 
         player.getInventory().addItem(this.buildItem());
         return true;
@@ -45,6 +46,10 @@ public class ShopItem {
 
         this.imageType = ElementButtonImageData.IMAGE_DATA_TYPE_URL;
         this.customImage = customImage;
+    }
+
+    public Item getItemSample(){
+        return Item.get(this.itemId, this.count, this.meta);
     }
 
     public Item buildItem(){
@@ -81,5 +86,9 @@ public class ShopItem {
 
     public int getPrice() {
         return this.price;
+    }
+
+    public int getSellPrice() {
+        return this.sellPrice == 0? this.price : this.sellPrice;
     }
 }
