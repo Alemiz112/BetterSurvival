@@ -3,13 +3,31 @@
     "carrot": {
       "id": 391,
       "count": 10,
-      "price": 50,
-      "sell": 4
+      "price": 100,
+      "sell": 5
     },
     "apple": {
       "id": 260,
       "count": 10,
-      "price": 100,
+      "price": 300,
+      "sell": 8
+    },
+    "potato": {
+      "id": 392,
+      "count": 10,
+      "price": 150,
+      "sell": 6
+    },
+    "bread": {
+      "id": 297,
+      "count": 10,
+      "price": 500,
+      "sell": 15
+    },
+    "cookie": {
+      "id": 357 ,
+      "count": 10,
+      "price": 300,
       "sell": 8
     }
   },
@@ -17,60 +35,74 @@
     "iron": {
       "id": 265,
       "count": 5,
-      "price": 375,
+      "price": 400,
       "image": "items/iron_ingot",
-      "sell": 60
+      "sell": 40
     },
     "coal": {
       "id": 263,
       "count": 30,
-      "price": 290,
+      "price": 300,
       "image": "items/coal",
-      "sell": 9
+      "sell": 5
     },
     "gold": {
       "id": 266,
       "count": 5,
       "price": 300,
       "image": "items/gold_ingot",
-      "sell": 50
+      "sell": 30
     },
     "redstone dust": {
       "id": 331,
       "count": 32,
-      "price": 800,
+      "price": 600,
       "image": "items/redstone_dust",
-      "sell": 20
+      "sell": 10
     }
   },
   "items": {
     "slimeball": {
       "id": 341,
       "count": 16,
-      "price": 270,
+      "price": 350,
       "image": "items/slimeball",
-      "sell": 15
+      "sell": 20
     },
     "magma cream": {
       "id": 378,
       "count":  16,
-      "price": 300,
+      "price": 200,
       "image": "items/magma_cream",
-      "sell": 255
+      "sell": 30
     },
     "blaze powder": {
       "id": 377,
       "count": 20,
-      "price": 500,
+      "price": 550,
       "image": "items/blaze_powder",
-      "sell": 15
+      "sell": 25
     },
     "blaze rod": {
       "id": 369,
       "count": 20,
-      "price": 790,
+      "price": 850,
       "image": "items/blaze_rod",
-      "sell": 30
+      "sell": 40
+    },
+    "fireworks": {
+      "id": 401,
+      "count": 20,
+      "price": 500,
+      "image": "items/fireworks",
+      "sell": 15
+    },
+    "blaze powder": {
+      "id": 377,
+      "count": 20,
+      "price": 550,
+      "image": "items/blaze_powder",
+      "sell": 25
     },
     "feather": {
       "id": 288,
@@ -84,7 +116,14 @@
       "count": 24,
       "price": 410,
       "image": "items/paper",
-      "sell": 15
+      "sell": 12
+    },
+    "string": {
+      "id": 287,
+      "count": 15,
+      "price": 200,
+      "image": "items/string",
+      "sell": 25
     }
   },
   "spawn eggs": {
@@ -129,63 +168,98 @@
       "image": false,
       "sell": 15
     },
+    "glass block": {
+      "id": 20,
+      "count": 25,
+      "price": 350,
+      "image": false,
+      "sell": 10
+    },
+    "ice": {
+      "id": 79,
+      "count": 15,
+      "price": 450,
+      "image": false,
+      "sell": 17
+    },
+    "glowstone": {
+      "id": 89,
+      "count": 15,
+      "price": 450,
+      "image": false,
+      "sell": 18
+    },
+    "wool": {
+      "id": 35,
+      "count": 10,
+      "price": 300,
+      "image": false,
+      "sell": 12
+    },
+    "book shelf": {
+      "id": 47,
+      "count": 5,
+      "price": 300,
+      "image": false,
+      "sell": 20
+    },
     "sea lantern": {
       "id": 169,
       "count": 15,
-      "price": 250,
+      "price": 300,
       "image": false,
-      "sell": 10
+      "sell": 12
     },
     "ender chest": {
       "id": 130,
       "count": 1,
       "price": 1200,
       "image": false,
-      "sell": 1000
+      "sell": 350
     },
     "shulker box": {
       "id": 218,
       "count": 1,
-      "price": 1000,
+      "price": 2000,
       "image": false,
-      "sell": 800
+      "sell": 1200
     },
     "beacon": {
       "id": 138,
       "count": 1,
-      "price": 1100,
+      "price": 6000,
       "image": false,
-      "sell": 850
+      "sell": 3000
     },
-    "magma": {
-      "id": 213,
-      "count": 2,
-      "price": 700,
+    "obsidian": {
+      "id": 49,
+      "count": 5,
+      "price": 300,
       "image": false,
-      "sell": 300
+      "sell": 15
     }
   },
   "vip": {
     "trident": {
       "id": 455,
       "count": 1,
-      "price": 2000,
+      "price": 1250,
       "image": false,
-      "sell": 1800
+      "sell": 800
     },
     "elytra": {
       "id": 444,
       "count": 1,
-      "price": 4000,
+      "price": 7500,
       "image": "items/elytra",
-      "sell": 3500
+      "sell": 4500
     },
     "saddle": {
       "id": 329,
       "count": 1,
-      "price": 1800,
+      "price": 1250,
       "image": "items/saddle",
-      "sell": 1650
+      "sell": 800
     },
     "totem": {
       "id": 450,
@@ -193,6 +267,14 @@
       "price": 8000,
       "image": "items/totem",
       "sell": 6500
+    },
+    "ender pearl": {
+      "id": 368,
+      "count": 3,
+      "price": 350,
+      "image": false,
+      "image": "items/ender_pearl",
+      "sell": 50
     }
   }
 }
