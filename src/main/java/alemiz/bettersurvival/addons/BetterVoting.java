@@ -13,6 +13,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.inventory.InventoryCloseEvent;
 import cn.nukkit.event.inventory.InventoryTransactionEvent;
+import cn.nukkit.event.player.PlayerDropItemEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.event.plugin.PluginEnableEvent;
@@ -196,6 +197,16 @@ public class BetterVoting extends Addon {
 
             FakeInventoryManager.removeInventory(player);
         }
+    }
+
+    @EventHandler
+    public void onDrop(PlayerDropItemEvent event){
+        if (!this.enableVoteCrate) return;
+        Player player = event.getPlayer();
+        Item item = event.getItem();
+
+        if (!FakeInventoryManager.hasWindow(player) || !item.getCustomName().equals(this.voteKey.getCustomName())) return;
+        event.setCancelled(true);
     }
 
     private Map<Integer, Item> prepareItems(){
