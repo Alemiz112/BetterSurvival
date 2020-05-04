@@ -138,9 +138,10 @@ public class MyLandProtect extends Addon {
 
     @EventHandler
     public void onExplode(EntityExplodeEvent event){
-        Position explodePos = event.getEntity().getPosition();
-        if (getLandByPos(explodePos) != null){
+        for (Position block : event.getBlockList()){
+            if (getLandByPos(block) == null) continue;
             event.setBlockList(new ArrayList<Block>());
+            return;
         }
     }
 

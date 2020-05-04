@@ -47,7 +47,6 @@ public class FakeInventoryManager {
         }
     }
 
-
     private static void removeRealChest(Player player, Vector3 pos){
         player.getLevel().sendBlocks(new Player[]{player}, new Vector3[]{pos});
     }
@@ -74,5 +73,9 @@ public class FakeInventoryManager {
         } catch (Exception e) {
         }
         player.dataPacket(pk2);
+    }
+
+    public static boolean hasWindow(Player player){
+        return inventories.containsKey(player.getName());
     }
 }
