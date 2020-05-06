@@ -4,31 +4,77 @@
       "id": 391,
       "count": 10,
       "price": 100,
-      "sell": 5
+      "sell": 3
     },
     "apple": {
       "id": 260,
       "count": 10,
       "price": 300,
-      "sell": 8
+      "sell": 7
     },
     "potato": {
       "id": 392,
       "count": 10,
       "price": 150,
-      "sell": 6
+      "sell": 4
     },
     "bread": {
       "id": 297,
       "count": 10,
       "price": 500,
-      "sell": 15
+      "sell": 10
     },
     "cookie": {
       "id": 357 ,
       "count": 10,
       "price": 300,
-      "sell": 8
+      "sell": 7
+    },
+    "cake": {
+      "id": 354 ,
+      "count": 1,
+      "price": 70,
+      "sell": 15
+    },
+    "melon": {
+      "id": 360 ,
+      "count": 10,
+      "price": 300,
+      "sell": 5
+    }
+  },
+  "ingredients": {
+    "wheat": {
+      "id": 296 ,
+      "count": 8,
+      "price": 125,
+      "sell": 5
+    },
+    "sugar": {
+      "id": 353 ,
+      "count": 8,
+      "price": 125,
+      "sell": 5
+    },
+    "egg": {
+      "id": 344 ,
+      "count": 8,
+      "price": 125,
+      "sell": 5
+    },
+    "cocoa beans": {
+      "id": 351 ,
+      "count": 8,
+      "price": 125,
+      "sell": 5,
+      "image": false
+    },
+    "pumpkin": {
+      "id": 86 ,
+      "count": 8,
+      "price": 125,
+      "sell": 5,
+      "image": "items/seeds_pumpkin"
     }
   },
   "resources": {
@@ -37,28 +83,35 @@
       "count": 5,
       "price": 400,
       "image": "items/iron_ingot",
-      "sell": 40
+      "sell": 20
     },
     "coal": {
       "id": 263,
       "count": 30,
       "price": 300,
       "image": "items/coal",
-      "sell": 5
+      "sell": 3
     },
     "gold": {
       "id": 266,
       "count": 5,
       "price": 300,
       "image": "items/gold_ingot",
-      "sell": 30
+      "sell": 15
     },
     "redstone dust": {
       "id": 331,
       "count": 32,
       "price": 600,
       "image": "items/redstone_dust",
-      "sell": 10
+      "sell": 4
+    },
+    "emerald": {
+      "id": 388,
+      "count": 5,
+      "price": 600,
+      "image": "items/emerald",
+      "sell": 15
     }
   },
   "items": {
@@ -67,63 +120,63 @@
       "count": 16,
       "price": 350,
       "image": "items/slimeball",
-      "sell": 20
+      "sell": 15
+    },
+    "snowball": {
+      "id": 332,
+      "count":  25,
+      "price": 250,
+      "image": "items/snowball",
+      "sell": 2
     },
     "magma cream": {
       "id": 378,
-      "count":  16,
+      "count":  5,
       "price": 200,
       "image": "items/magma_cream",
-      "sell": 30
-    },
-    "blaze powder": {
-      "id": 377,
-      "count": 20,
-      "price": 550,
-      "image": "items/blaze_powder",
-      "sell": 25
+      "sell": 10
     },
     "blaze rod": {
       "id": 369,
       "count": 20,
       "price": 850,
       "image": "items/blaze_rod",
-      "sell": 40
+      "sell": 15
     },
     "fireworks": {
       "id": 401,
       "count": 20,
       "price": 500,
       "image": "items/fireworks",
-      "sell": 15
-    },
-    "blaze powder": {
-      "id": 377,
-      "count": 20,
-      "price": 550,
-      "image": "items/blaze_powder",
-      "sell": 25
+      "sell": 10
     },
     "feather": {
       "id": 288,
       "count": 13,
       "price": 110,
       "image": "items/feather",
-      "sell": 6
+      "sell": 3
     },
     "paper": {
       "id": 339,
       "count": 24,
       "price": 410,
       "image": "items/paper",
-      "sell": 12
+      "sell": 4
     },
     "string": {
       "id": 287,
       "count": 15,
       "price": 200,
       "image": "items/string",
-      "sell": 25
+      "sell": 3
+    },
+    "leather": {
+      "id": 334,
+      "count": 5,
+      "price": 350,
+      "image": "items/leather",
+      "sell": 10
     }
   },
   "spawn eggs": {
@@ -160,83 +213,283 @@
       "sell": 100
     }
   },
+  "dyes": {
+    "red dye": {
+      "id": 351,
+      "count": 8,
+      "meta": 1,
+      "price": 150,
+      "image": "items/dye_powder_red",
+      "sell": 6
+    },
+    "green dye": {
+      "id": 351,
+      "count": 8,
+      "meta": 2,
+      "price": 150,
+      "image": "items/dye_powder_green",
+      "sell": 6
+    },
+    "purple dye": {
+      "id": 351,
+      "count": 8,
+      "meta": 5,
+      "price": 150,
+      "image": "items/dye_powder_purple",
+      "sell": 6
+    },
+    "cyan dye": {
+      "id": 351,
+      "count": 8,
+      "meta": 6,
+      "price": 150,
+      "image": "items/dye_powder_cyan",
+      "sell": 6
+    },
+    "light gray dye": {
+      "id": 351,
+      "count": 8,
+      "meta": 7,
+      "price": 150,
+      "image": "items/dye_powder_silver",
+      "sell": 6
+    },
+    "gray dye": {
+      "id": 351,
+      "count": 8,
+      "meta": 8,
+      "price": 150,
+      "image": "items/dye_powder_gray",
+      "sell": 6
+    },
+    "pink dye": {
+      "id": 351,
+      "count": 8,
+      "meta": 9,
+      "price": 150,
+      "image": "items/dye_powder_pink",
+      "sell": 6
+    },
+    "lime dye": {
+      "id": 351,
+      "count": 8,
+      "meta": 10,
+      "price": 150,
+      "image": "items/dye_powder_lime",
+      "sell": 6
+    },
+    "yellow dye": {
+      "id": 351,
+      "count": 8,
+      "meta": 11,
+      "price": 150,
+      "image": "items/dye_powder_yellow",
+      "sell": 6
+    },
+    "light blue dye": {
+      "id": 351,
+      "count": 8,
+      "meta": 12,
+      "price": 150,
+      "image": "items/dye_powder_light_blue",
+      "sell": 6
+    },
+    "magenta dye": {
+      "id": 351,
+      "count": 8,
+      "meta": 13,
+      "price": 150,
+      "image": "items/dye_powder_magenta",
+      "sell": 6
+    },
+    "orange dye": {
+      "id": 351,
+      "count": 8,
+      "meta": 14,
+      "price": 150,
+      "image": "items/dye_powder_orange",
+      "sell": 6
+    },
+    "brown dye": {
+      "id": 351,
+      "count": 8,
+      "meta": 17,
+      "price": 150,
+      "image": "items/dye_powder_brown",
+      "sell": 6
+    },
+    "blue dye": {
+      "id": 351,
+      "count": 8,
+      "meta": 18,
+      "price": 150,
+      "image": "items/dye_powder_blue",
+      "sell": 6
+    },
+    "white dye": {
+      "id": 351,
+      "count": 8,
+      "meta": 19,
+      "price": 150,
+      "image": "items/dye_powder_white",
+      "sell": 6
+    }
+  },
   "blocks": {
     "grass block": {
       "id": 2,
       "count": 20,
-      "price": 370,
+      "price": 300,
       "image": false,
-      "sell": 15
+      "sell": 1
     },
     "glass block": {
       "id": 20,
       "count": 25,
       "price": 350,
       "image": false,
-      "sell": 10
+      "sell": 5
     },
     "ice": {
       "id": 79,
       "count": 15,
       "price": 450,
       "image": false,
-      "sell": 17
+      "sell": 10
     },
     "glowstone": {
       "id": 89,
       "count": 15,
       "price": 450,
       "image": false,
-      "sell": 18
+      "sell": 12
     },
     "wool": {
       "id": 35,
       "count": 10,
       "price": 300,
       "image": false,
-      "sell": 12
+      "sell": 10
     },
     "book shelf": {
       "id": 47,
       "count": 5,
       "price": 300,
       "image": false,
-      "sell": 20
+      "sell": 15
+    },
+    "hay bale": {
+      "id": 170,
+      "count": 5,
+      "price": 200,
+      "image": false,
+      "sell": 10
     },
     "sea lantern": {
       "id": 169,
       "count": 15,
       "price": 300,
       "image": false,
-      "sell": 12
+      "sell": 7
     },
     "ender chest": {
       "id": 130,
       "count": 1,
       "price": 1200,
       "image": false,
-      "sell": 350
+      "sell": 200
     },
     "shulker box": {
       "id": 218,
       "count": 1,
       "price": 2000,
       "image": false,
-      "sell": 1200
+      "sell": 700
     },
     "beacon": {
       "id": 138,
       "count": 1,
       "price": 6000,
       "image": false,
-      "sell": 3000
+      "sell": 1250
     },
     "obsidian": {
       "id": 49,
       "count": 5,
       "price": 300,
       "image": false,
-      "sell": 15
+      "sell": 12
+    }
+  },
+  "natural": {
+    "oak log": {
+      "id": 17,
+      "count": 8,
+      "meta": 0,
+      "price": 150,
+      "image": false,
+      "sell": 3
+    },
+    "spruce log": {
+      "id": 17,
+      "count": 8,
+      "meta": 1,
+      "price": 150,
+      "image": false,
+      "sell": 3
+    },
+    "birch log": {
+      "id": 17,
+      "count": 8,
+      "meta": 2,
+      "price": 150,
+      "image": false,
+      "sell": 3
+    },
+    "jungle log": {
+      "id": 17,
+      "count": 8,
+      "meta": 3,
+      "price": 150,
+      "image": false,
+      "sell": 3
+    },
+    "acacia log": {
+      "id": 162,
+      "count": 8,
+      "meta": 0,
+      "price": 150,
+      "image": false,
+      "sell": 3
+    },
+    "dark oak log": {
+      "id": 162,
+      "count": 8,
+      "meta": 1,
+      "price": 150,
+      "image": false,
+      "sell": 3
+    },
+    "vines": {
+      "id": 106,
+      "count": 8,
+      "price": 100,
+      "image": false,
+      "sell": 2
+    },
+    "cactus": {
+      "id": 81,
+      "count": 8,
+      "price": 150,
+      "image": false,
+      "sell": 3
+    },
+    "sugar cane ": {
+      "id": 338,
+      "count": 8,
+      "price": 150,
+      "image": false,
+      "sell": 3
     }
   },
   "vip": {
@@ -245,28 +498,28 @@
       "count": 1,
       "price": 1250,
       "image": false,
-      "sell": 800
+      "sell": 400
     },
     "elytra": {
       "id": 444,
       "count": 1,
       "price": 7500,
       "image": "items/elytra",
-      "sell": 4500
+      "sell": 2000
     },
     "saddle": {
       "id": 329,
       "count": 1,
       "price": 1250,
       "image": "items/saddle",
-      "sell": 800
+      "sell": 400
     },
     "totem": {
       "id": 450,
       "count": 1,
       "price": 8000,
       "image": "items/totem",
-      "sell": 6500
+      "sell": 2500
     },
     "ender pearl": {
       "id": 368,
@@ -274,7 +527,7 @@
       "price": 350,
       "image": false,
       "image": "items/ender_pearl",
-      "sell": 50
+      "sell": 25
     }
   }
 }
