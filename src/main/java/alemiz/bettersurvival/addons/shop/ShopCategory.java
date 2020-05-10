@@ -43,8 +43,7 @@ public class ShopCategory {
 
 
         for (ShopItem item : this.items){
-            String nameFormat = item.getName().substring(0, 1).toUpperCase() + item.getName().substring(1);
-            ElementButton button = new ElementButton("§5"+nameFormat+"\n§7Count: §8"+item.getCount()+" §7Price: §8"+item.getPrice()+"$");
+            ElementButton button = new ElementButton("§5"+item.getFormattedName()+"\n§7Count: §8"+item.getCount()+" §7Price: §8"+item.getPrice()+"$");
 
             if (item.canUseImage()){
                 String image = item.getCustomImage();
