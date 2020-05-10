@@ -525,7 +525,6 @@
       "id": 368,
       "count": 3,
       "price": 350,
-      "image": false,
       "image": "items/ender_pearl",
       "sell": 25
     }
