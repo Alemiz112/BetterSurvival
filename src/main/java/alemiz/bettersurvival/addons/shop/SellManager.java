@@ -38,7 +38,7 @@ public class SellManager {
 
         ElementDropdown dropdown = new ElementDropdown("");
         for (ShopItem item : category.getItems()){
-            dropdown.addOption("§5"+item.getItemSample().getName()+" §8Offer: §l"+item.getSellPrice()+"$");
+            dropdown.addOption("§5"+item.getFormattedName()+" §8Offer: §l"+item.getSellPrice()+"$");
         }
 
         form.addElement(dropdown);

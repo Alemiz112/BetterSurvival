@@ -1,20 +1,20 @@
 package alemiz.bettersurvival.addons;
 
-import alemiz.bettersurvival.commands.BlockCommand;
-import alemiz.bettersurvival.commands.TrollCommand;
-import alemiz.bettersurvival.commands.UnblockCommand;
-import alemiz.bettersurvival.commands.VanishCommand;
+import alemiz.bettersurvival.commands.*;
 import alemiz.bettersurvival.utils.Addon;
+import alemiz.bettersurvival.utils.fakeChest.FakeInventory;
+import alemiz.bettersurvival.utils.fakeChest.FakeInventoryManager;
+import alemiz.bettersurvival.utils.fakeChest.FakeSlotChangeEvent;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.event.player.PlayerQuitEvent;
+import cn.nukkit.inventory.transaction.action.SlotChangeAction;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Sound;
-import cn.nukkit.level.particle.ExplodeParticle;
 import cn.nukkit.level.particle.HugeExplodeParticle;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.DataPacket;
@@ -54,6 +54,8 @@ public class Troller extends Addon {
             configFile.set("permission-troll", "bettersurvival.troller.basic");
             configFile.set("permission-troll-advanced", "bettersurvival.troller.advanced");
 
+            configFile.set("permission-invsee", "bettersurvival.troller.invsee");
+
             /*Basic Troll commands*/
             configFile.set("anvilMessage", "§6»§7The anvil has been dropped on §6@{victim}§7!");
             configFile.set("chatMessage", "§6»§7It looks like §6@{victim}§7 is unsure what to say§7!");
@@ -69,6 +71,7 @@ public class Troller extends Addon {
         registerCommand("block", new BlockCommand("block", this));
         registerCommand("unblock", new UnblockCommand("unblock", this));
         registerCommand("troll", new TrollCommand("troll", this));
+        registerCommand("invsee", new InvseeCommand("invsee", this));
     }
 
     @EventHandler
@@ -93,6 +96,12 @@ public class Troller extends Addon {
         }
     }
 
+    /*@EventHandler //TODO: allow transferring items of invsee
+    public void onInventoryTranslation(FakeSlotChangeEvent event){
+        Player player = event.getPlayer();
+        SlotChangeAction action = event.getAction();
+
+    }*/
 
     public void showVanishPlayers(Player player){
         for (String pname : this.vanishPlayers){
@@ -420,8 +429,19 @@ public class Troller extends Addon {
         player.sendMessage(message);
     }
 
+    public void shopPlayerInv(Player player, String victim){
+        Player pvictim = plugin.getServer().getPlayer(victim);
+        if (!checkForPlayer(pvictim, player, configFile.getString("permission-invsee"),
+                "§cYou dont have inv-see permission!")) return;
+
+        FakeInventory inv = FakeInventoryManager.createInventory(player, pvictim.getName()+"'s Inventory", pvictim.getInventory().getContents(), FakeInventoryManager.INV_DOUBLE);
+        inv.setInventoryFlag(FakeInventory.Flags.IS_LOCKED, true);
+        inv.setInventoryFlag(FakeInventory.Flags.IS_INV_SEE, true);
+        inv.showInventory(player);
+    }
+
     public boolean checkForPlayer(Player player, Player executor, String permission, String permissionMessage){
-        if (!executor.hasPermission(permission)){
+        if (executor != null && !executor.hasPermission(permission)){
             executor.sendMessage(permissionMessage);
             return false;
         }

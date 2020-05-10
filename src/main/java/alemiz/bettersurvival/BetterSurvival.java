@@ -5,8 +5,22 @@ import alemiz.bettersurvival.addons.myland.MyLandProtect;
 import alemiz.bettersurvival.addons.shop.SurvivalShop;
 import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.ConfigManager;
+import alemiz.bettersurvival.utils.fakeChest.FakeInventory;
+import alemiz.bettersurvival.utils.fakeChest.FakeInventoryManager;
+import cn.nukkit.Player;
+import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
+import cn.nukkit.event.inventory.InventoryCloseEvent;
+import cn.nukkit.event.inventory.InventoryTransactionEvent;
+import cn.nukkit.inventory.transaction.action.InventoryAction;
+import cn.nukkit.inventory.transaction.action.SlotChangeAction;
 import cn.nukkit.plugin.PluginBase;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BetterSurvival extends PluginBase implements Listener {
 
@@ -16,16 +30,53 @@ public class BetterSurvival extends PluginBase implements Listener {
     @Override
     public void onEnable() {
         instance = this;
-        configManager = new ConfigManager(this);
+        this.configManager = new ConfigManager(this);
 
-        loadAddons();
+        this.loadAddons();
 
-        getLogger().info("§aEnabling BetterSurvival by §6Alemiz!");
+        this.getServer().getPluginManager().registerEvents(this, this);
+        this.getLogger().info("§aEnabling BetterSurvival by §6Alemiz!");
     }
 
     @Override
     public void onDisable() {
         getLogger().info("§aDisabling BetterSurvival by §6Alemiz!");
+    }
+
+    @EventHandler
+    public void onInventoryClose(InventoryCloseEvent event){
+        FakeInventoryManager.removeInventory(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onInventoryTranslation(InventoryTransactionEvent event){
+        Player player = event.getTransaction().getSource();
+        Map<FakeInventory, List<SlotChangeAction>> actions = new HashMap<>();
+
+        for (InventoryAction action : event.getTransaction().getActions()){
+            if (!(action instanceof SlotChangeAction)) continue;
+
+            SlotChangeAction slotChange = (SlotChangeAction) action;
+            if (!(slotChange.getInventory() instanceof FakeInventory)) continue;
+
+            FakeInventory inventory = (FakeInventory) slotChange.getInventory();
+            List<SlotChangeAction> slotChanges = actions.computeIfAbsent(inventory, fakeInventory -> new ArrayList<>());
+            slotChanges.add(slotChange);
+        }
+
+        AtomicBoolean cancel = new AtomicBoolean(false);
+        actions.forEach((FakeInventory inv, List<SlotChangeAction> aactions)->{
+            if (inv.getInventoryFlag(FakeInventory.Flags.IS_LOCKED)){
+                cancel.set(true);
+                return;
+            }
+
+            for (SlotChangeAction action : aactions){
+                if (!inv.slotChange(player, action)) cancel.set(true);
+            }
+        });
+
+        event.setCancelled(cancel.get());
     }
 
     public static BetterSurvival getInstance() {

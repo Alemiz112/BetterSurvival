@@ -7,24 +7,21 @@ import alemiz.bettersurvival.utils.CustomListener;
 import alemiz.bettersurvival.utils.Geometry;
 import alemiz.bettersurvival.utils.fakeChest.FakeInventory;
 import alemiz.bettersurvival.utils.fakeChest.FakeInventoryManager;
+import alemiz.bettersurvival.utils.fakeChest.FakeSlotChangeEvent;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.event.EventHandler;
-import cn.nukkit.event.inventory.InventoryCloseEvent;
-import cn.nukkit.event.inventory.InventoryTransactionEvent;
 import cn.nukkit.event.player.PlayerDropItemEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerJoinEvent;
-import cn.nukkit.event.plugin.PluginEnableEvent;
 import cn.nukkit.inventory.Inventory;
-import cn.nukkit.inventory.transaction.action.InventoryAction;
+import cn.nukkit.inventory.transaction.action.SlotChangeAction;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.particle.FloatingTextParticle;
 import cn.nukkit.level.particle.HeartParticle;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.scheduler.Task;
-import io.pocketvote.PocketVote;
 import io.pocketvote.event.VoteDispatchEvent;
 import io.pocketvote.event.VoteEvent;
 
@@ -153,50 +150,47 @@ public class BetterVoting extends Addon {
                 player.sendMessage("§c»§7You must have crate key. Vote to get one!");
                 return;
             }
-            FakeInventoryManager.createInventory(player, "Vote Chest", prepareItems());
+            FakeInventory inv = FakeInventoryManager.createInventory(player, "Vote Chest", prepareItems());
+            inv.setInventoryFlag(FakeInventory.Flags.IS_VOTE_INV, true);
+            inv.showInventory(player);
         }
     }
 
     @EventHandler
-    public void onInventoryClose(InventoryCloseEvent event){
-        if (this.enableVoteCrate){
-            FakeInventoryManager.removeInventory(event.getPlayer());
+    public void onInventoryTranslation(FakeSlotChangeEvent event){
+        if (!this.enableVoteCrate) return;
+        Player player = event.getPlayer();
+        SlotChangeAction action = event.getAction();
+
+        if (event.getInventory().getInventoryFlag(FakeInventory.Flags.IS_VOTE_INV) == null){
+            return;
         }
-    }
 
-    @EventHandler
-    public void onInventoryTranslation(InventoryTransactionEvent event){
-        if (this.enableVoteCrate){
-            Player player = event.getTransaction().getSource();
-            if (event.getTransaction().getInventories().stream().noneMatch(inventory -> inventory instanceof FakeInventory)) return;
-            event.setCancelled();
+        if (action.getSourceItem().getId() == Item.VINES){
+            event.setCancelled(true);
+            return;
+        }
 
-            for (InventoryAction action : event.getTransaction().getActions()){
-                if (action.getSourceItem().getNamedTagEntry(FakeInventoryManager.IS_INVENTORY_ITEM) == null) continue;
-                if (action.getSourceItem().getId() == Item.VINES) continue;
+        Inventory inv = player.getInventory();
+        event.setCancelled(true);
 
-                Inventory inv = player.getInventory();
+        for (Integer slot : inv.getContents().keySet()){
+            Item item = inv.getContents().get(slot);
 
-                for (Integer slot : inv.getContents().keySet()){
-                    Item item = inv.getContents().get(slot);
+            if (!item.getCustomName().equals(this.voteKey.getCustomName()) ||
+                    item.getId() != this.voteKey.getId()) continue;
 
-                    if (!item.getCustomName().equals(this.voteKey.getCustomName()) ||
-                            item.getId() != this.voteKey.getId()) continue;
-
-                    if (item.count <= 1){
-                        item = Item.get(Item.AIR, 0, 1);
-                    }else {
-                        item.setCount(item.count - 1);
-                    }
-
-                    inv.setItem(slot, item, true);
-                    break;
-                }
-                player.getInventory().addItem(action.getSourceItem().clearNamedTag());
+            if (item.count <= 1){
+                item = Item.get(Item.AIR, 0, 1);
+            }else {
+                item.setCount(item.count - 1);
             }
 
-            FakeInventoryManager.removeInventory(player);
+            inv.setItem(slot, item, true);
+            break;
         }
+        player.getInventory().addItem(action.getSourceItem().clearNamedTag());
+        event.getInventory().removeInventory(player);
     }
 
     @EventHandler
