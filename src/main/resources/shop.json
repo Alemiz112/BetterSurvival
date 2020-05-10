@@ -25,19 +25,19 @@
       "sell": 10
     },
     "cookie": {
-      "id": 357 ,
+      "id": 357,
       "count": 10,
       "price": 300,
       "sell": 7
     },
     "cake": {
-      "id": 354 ,
+      "id": 354,
       "count": 1,
       "price": 70,
       "sell": 15
     },
     "melon": {
-      "id": 360 ,
+      "id": 360,
       "count": 10,
       "price": 300,
       "sell": 5
@@ -45,32 +45,32 @@
   },
   "ingredients": {
     "wheat": {
-      "id": 296 ,
+      "id": 296,
       "count": 8,
       "price": 125,
       "sell": 5
     },
     "sugar": {
-      "id": 353 ,
+      "id": 353,
       "count": 8,
       "price": 125,
       "sell": 5
     },
     "egg": {
-      "id": 344 ,
+      "id": 344,
       "count": 8,
       "price": 125,
       "sell": 5
     },
     "cocoa beans": {
-      "id": 351 ,
+      "id": 351,
       "count": 8,
       "price": 125,
       "sell": 5,
       "image": false
     },
     "pumpkin": {
-      "id": 86 ,
+      "id": 86,
       "count": 8,
       "price": 125,
       "sell": 5,
@@ -112,36 +112,94 @@
       "price": 600,
       "image": "items/emerald",
       "sell": 15
+    },
+    "nether quartz": {
+      "id": 406,
+      "count": 18,
+      "price": 200,
+      "image": "items/quartz",
+      "sell": 5
     }
   },
-  "items": {
-    "slimeball": {
-      "id": 341,
-      "count": 16,
-      "price": 350,
-      "image": "items/slimeball",
-      "sell": 15
-    },
-    "snowball": {
-      "id": 332,
-      "count":  25,
-      "price": 250,
-      "image": "items/snowball",
-      "sell": 2
-    },
-    "magma cream": {
-      "id": 378,
-      "count":  5,
+  "drops": {
+    "leather": {
+      "id": 334,
+      "count": 8,
       "price": 200,
-      "image": "items/magma_cream",
-      "sell": 10
+      "image": "items/leather",
+      "sell": 8
+    },
+    "string": {
+      "id": 334,
+      "count": 8,
+      "price": 250,
+      "image": "items/string",
+      "sell": 7
+    },
+    "feather": {
+      "id": 200,
+      "count": 8,
+      "price": 250,
+      "image": "items/feather",
+      "sell": 8
+    },
+    "bone": {
+      "id": 352,
+      "count": 8,
+      "price": 250,
+      "image": "items/bone",
+      "sell": 8
     },
     "blaze rod": {
       "id": 369,
-      "count": 20,
-      "price": 850,
+      "count": 4,
+      "price": 200,
       "image": "items/blaze_rod",
-      "sell": 15
+      "sell": 10
+    },
+    "spider eye": {
+      "id": 375,
+      "count": 8,
+      "price": 200,
+      "image": "items/spider_eye",
+      "sell": 4
+    },
+    "gunpowder": {
+      "id": 289,
+      "count": 4,
+      "price": 200,
+      "image": "items/gunpowder",
+      "sell": 8
+    },
+    "ghast tear": {
+      "id": 370,
+      "count": 4,
+      "price": 150,
+      "image": "items/ghast_tear",
+      "sell": 5
+    },
+    "magma cream": {
+      "id": 378,
+      "count": 4,
+      "price": 200,
+      "image": "items/magma_cream",
+      "sell": 8
+    },
+    "slimeball": {
+      "id": 341,
+      "count": 4,
+      "price": 200,
+      "image": "items/slimeball",
+      "sell": 8
+    }
+  },
+  "items": {
+    "snowball": {
+      "id": 332,
+      "count": 25,
+      "price": 250,
+      "image": "items/snowball",
+      "sell": 2
     },
     "fireworks": {
       "id": 401,
@@ -150,13 +208,6 @@
       "image": "items/fireworks",
       "sell": 10
     },
-    "feather": {
-      "id": 288,
-      "count": 13,
-      "price": 110,
-      "image": "items/feather",
-      "sell": 3
-    },
     "paper": {
       "id": 339,
       "count": 24,
@@ -164,19 +215,39 @@
       "image": "items/paper",
       "sell": 4
     },
-    "string": {
-      "id": 287,
-      "count": 15,
-      "price": 200,
-      "image": "items/string",
+    "cobweb": {
+      "id": 30,
+      "count": 8,
+      "price": 150,
+      "image": "blocks/web",
       "sell": 3
     },
-    "leather": {
-      "id": 334,
-      "count": 5,
-      "price": 350,
-      "image": "items/leather",
+    "iron bars": {
+      "id": 101,
+      "count": 8,
+      "price": 100,
+      "image": "blocks/iron_bars",
+      "sell": 3
+    },
+    "end rod": {
+      "id": 208,
+      "count": 8,
+      "price": 250,
+      "image": false,
       "sell": 10
+    },
+    "arrow": {
+      "id": 262,
+      "count": 16,
+      "price": 200,
+      "sell": 3
+    },
+    "brick": {
+      "id": 336,
+      "count": 24,
+      "price": 200,
+      "image": "items/brick",
+      "sell": 3
     }
   },
   "spawn eggs": {
@@ -526,6 +597,79 @@
       "count": 3,
       "price": 350,
       "image": "items/ender_pearl",
+      "sell": 25
+    },
+    "bottle o'Enchanting": {
+      "id": 384,
+      "count": 3,
+      "price": 300,
+      "image": "items/experience_bottle",
+      "sell": 25
+    }
+  },
+  "potions": {
+    "night vision": {
+      "id": 373,
+      "count": 1,
+      "meta": 5,
+      "price": 100,
+      "image": "items/potion_bottle_nightVision",
+      "sell": 25
+    },
+    "leaping": {
+      "id": 373,
+      "count": 1,
+      "meta": 9,
+      "price": 100,
+      "image": "items/potion_bottle_jump",
+      "sell": 25
+    },
+    "fire resistance": {
+      "id": 373,
+      "count": 1,
+      "meta": 12,
+      "price": 150,
+      "image": "items/potion_bottle_fireResistance",
+      "sell": 25
+    },
+    "swiftness": {
+      "id": 373,
+      "count": 1,
+      "meta": 14,
+      "price": 100,
+      "image": "items/potion_bottle_moveSpeed",
+      "sell": 25
+    },
+    "water breathing": {
+      "id": 373,
+      "count": 1,
+      "meta": 19,
+      "price": 150,
+      "image": "items/potion_bottle_waterBreathing",
+      "sell": 25
+    },
+    "healing": {
+      "id": 373,
+      "count": 1,
+      "meta": 21,
+      "price": 100,
+      "image": "items/potion_bottle_heal",
+      "sell": 25
+    },
+    "regeneration": {
+      "id": 373,
+      "count": 1,
+      "meta": 28,
+      "price": 200,
+      "image": "items/potion_bottle_regeneration",
+      "sell": 25
+    },
+    "strength": {
+      "id": 373,
+      "count": 1,
+      "meta": 31,
+      "price": 200,
+      "image": "items/potion_bottle_harm",
       "sell": 25
     }
   }
