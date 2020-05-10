@@ -78,6 +78,7 @@ public class CubeBridge extends Addon {
             perms.add(Addon.getAddon("troller").configFile.getString("permission-block"));
             perms.add(Addon.getAddon("troller").configFile.getString("permission-troll"));
             perms.add(Addon.getAddon("troller").configFile.getString("permission-troll-advanced"));
+            perms.add(Addon.getAddon("troller").configFile.getString("permission-invsee"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-mute"));
         }
 

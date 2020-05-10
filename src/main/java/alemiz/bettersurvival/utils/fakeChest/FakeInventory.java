@@ -87,7 +87,7 @@ public class FakeInventory extends ContainerInventory {
         packet.z = (int) pos.z;
         packet.dataLayer = 0;
         packet.flags = UpdateBlockPacket.FLAG_NONE;
-        packet.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(BlockID.CHEST, 0);
+        packet.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(player.protocol, BlockID.CHEST, 0);
         player.dataPacket(packet);
     }
 
