@@ -231,7 +231,7 @@ public class MyLandProtect extends Addon {
 
     public void loadLand(SuperConfig config){
        String owner = config.getName().substring(0, config.getName().lastIndexOf("."));
-       this.plugin.getLogger().info("§eLoading lands for player §3"+owner"§e!");
+       this.plugin.getLogger().info("§eLoading lands for player §3"+owner+"§e!");
 
        for (String land : config.getSection("land").getKeys(false)){
            Level level = this.plugin.getServer().getLevelByName(config.getString("land."+land+"level"));
