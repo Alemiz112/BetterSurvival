@@ -299,7 +299,7 @@ public class BetterVoting extends Addon {
     public void givekey(Player executor, String targetName, int count){
         if (executor == null) return;
 
-        Item item = this.voteKey;
+        Item item = this.voteKey.clone();
         item.setCount(count);
 
         Player target = Server.getInstance().getPlayer(targetName);
