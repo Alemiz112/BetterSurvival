@@ -29,12 +29,7 @@ public class ShopItem {
     }
 
     public boolean buyItem(Player player){
-        if (player == null) return false;
-
-        int balance = Money.getInstance().getMoney(player, false);
-        if ((balance - this.price) < 1) return false;
-
-        Money.getInstance().reduceMoney(player, this.price);
+        if (player == null || !Money.getInstance().reduceMoney(player, this.price)) return false;
         player.getInventory().addItem(this.buildItem());
         return true;
     }

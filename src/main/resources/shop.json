@@ -130,14 +130,14 @@
       "sell": 8
     },
     "string": {
-      "id": 334,
+      "id": 287,
       "count": 8,
       "price": 250,
       "image": "items/string",
       "sell": 7
     },
     "feather": {
-      "id": 200,
+      "id": 288,
       "count": 8,
       "price": 250,
       "image": "items/feather",
