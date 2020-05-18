@@ -7,6 +7,7 @@ import cn.nukkit.AdventureSettings;
 import cn.nukkit.Server;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.EventPriority;
+import cn.nukkit.event.block.BlockBreakEvent;
 import cn.nukkit.event.level.LevelLoadEvent;
 import cn.nukkit.event.player.*;
 import cn.nukkit.Player;
@@ -18,6 +19,7 @@ import cn.nukkit.level.GameRules;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Location;
 import cn.nukkit.math.Vector3;
+import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.SpawnParticleEffectPacket;
 import cn.nukkit.potion.Effect;
 
@@ -178,6 +180,41 @@ public class MoreVanilla extends Addon{
 
             tpa(player, response);
         }
+    }
+
+    @EventHandler
+    public void onBreak(BlockBreakEvent event){
+        Player player = event.getPlayer();
+        Item item = event.getItem();
+
+        switch (item.getId()){
+            case Item.DIAMOND_PICKAXE:
+            case Item.GOLD_PICKAXE:
+            case Item.IRON_PICKAXE:
+            case Item.STONE_PICKAXE:
+            case Item.WOODEN_PICKAXE:
+            case Item.DIAMOND_AXE:
+            case Item.GOLD_AXE:
+            case Item.IRON_AXE:
+            case Item.STONE_AXE:
+            case Item.WOODEN_AXE:
+            case Item.DIAMOND_SHOVEL:
+            case Item.GOLD_SHOVEL:
+            case Item.IRON_SHOVEL:
+            case Item.STONE_SHOVEL:
+            case Item.WOODEN_SHOVEL:
+                break;
+            default:
+                return;
+        }
+
+        CompoundTag namedTag = item.getNamedTag() == null? new CompoundTag() : item.getNamedTag();
+        int broken = namedTag.getInt("brokenBlocks")+1;
+
+        namedTag.putInt("brokenBlocks", broken);
+        item.setNamedTag(namedTag);
+        item.setLore("§r§5Block Destroyed: "+broken);
+        player.getInventory().setItemInHand(item);
     }
 
     public boolean changeArmor(Player player, Item item){

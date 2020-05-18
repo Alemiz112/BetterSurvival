@@ -104,7 +104,7 @@ public class SmithShop {
             return;
         }
 
-        item.setCustomName("§r"+customName);
+        item.setCustomName("§r§f"+customName);
         player.getInventory().setItemInHand(item);
         player.sendMessage("§a»§r§7Your item was renamed!");
     }
