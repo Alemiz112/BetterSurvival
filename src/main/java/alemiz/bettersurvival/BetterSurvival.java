@@ -5,9 +5,11 @@ import alemiz.bettersurvival.addons.myland.MyLandProtect;
 import alemiz.bettersurvival.addons.shop.SurvivalShop;
 import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.ConfigManager;
+import alemiz.bettersurvival.utils.enitity.FakeHuman;
 import alemiz.bettersurvival.utils.fakeChest.FakeInventory;
 import alemiz.bettersurvival.utils.fakeChest.FakeInventoryManager;
 import cn.nukkit.Player;
+import cn.nukkit.entity.Entity;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.inventory.InventoryCloseEvent;
@@ -36,6 +38,11 @@ public class BetterSurvival extends PluginBase implements Listener {
 
         this.getServer().getPluginManager().registerEvents(this, this);
         this.getLogger().info("§aEnabling BetterSurvival by §6Alemiz!");
+    }
+
+    @Override
+    public void onLoad() {
+        Entity.registerEntity("FakeHuman", FakeHuman.class);
     }
 
     @Override

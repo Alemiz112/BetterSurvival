@@ -7,8 +7,12 @@ import alemiz.bettersurvival.utils.ConfigManager;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.blockentity.BlockEntitySign;
+import cn.nukkit.entity.Entity;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.block.BlockBreakEvent;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.event.entity.EntitySpawnEvent;
 import cn.nukkit.event.player.PlayerFormRespondedEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.form.response.FormResponseSimple;
@@ -24,9 +28,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 public class SurvivalShop extends Addon {
@@ -35,6 +37,10 @@ public class SurvivalShop extends Addon {
 
     private Position shopSpawn;
     private SellManager sellManager;
+
+    private List<String> npcRemovers = new ArrayList<>();
+
+    private SmithShop smithShop;
 
     public SurvivalShop(String path){
         super("survivalshop", path);
@@ -58,17 +64,23 @@ public class SurvivalShop extends Addon {
             Level level = this.plugin.getServer().getLevelByName(data[3]);
             this.shopSpawn = new Position(Double.parseDouble(data[0]), Double.parseDouble(data[1]), Double.parseDouble(data[2]), level);
         }
+
+        if (configFile.getBoolean("enableSmith")){
+            this.smithShop = new SmithShop(this);
+        }
     }
 
     @Override
     public void loadConfig() {
         if (!configFile.exists("enable")) {
             configFile.set("enable", true);
+            configFile.set("enableSmith", true);
+
             configFile.set("signTitle", "§f[Shop]");
 
-            configFile.set("shopCreatePermission", "bettersurvival.shop.create");
             configFile.set("shopRemovePermission", "bettersurvival.shop.remove");
-            configFile.set("shopVipPermission", "bettersurvival.shop.remove");
+            configFile.set("shopVipPermission", "bettersurvival.shop.vip");
+            configFile.set("shopManagePermission", "bettersurvival.shop.manage");
 
             configFile.set("netEnoughMoney", "§c»§7You do not have enough coins to buy {item}!");
             configFile.set("wrongFormat", "§c»§7Shop was not created! Use following format: Line 1: shop Line 2: category");
@@ -105,6 +117,39 @@ public class SurvivalShop extends Addon {
     public void registerCommands() {
         registerCommand("shop", new ShopCommand("shop", this));
         registerCommand("sell", new SellCommand("sell", this));
+    }
+
+    @EventHandler
+    public void onDamage(EntityDamageEvent event){
+        Entity entity = event.getEntity();
+        if (entity.namedTag.getByte("shop_npc") == 0) return;
+
+        if ((event instanceof EntityDamageByEntityEvent) && (((EntityDamageByEntityEvent) event).getDamager() instanceof Player)){
+            Player player = (Player) ((EntityDamageByEntityEvent) event).getDamager();
+
+            if (this.npcRemovers.contains(player.getName())){
+                this.npcRemovers.remove(player.getName());
+
+                player.sendMessage("§6»§7Shop npc removed successfully!");
+                entity.close();
+                event.setCancelled(true);
+                return;
+            }
+
+            this.smithShop.onDamage((EntityDamageByEntityEvent) event);
+        }
+
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onSpawn(EntitySpawnEvent event){
+        Entity entity = event.getEntity();
+
+        if (entity.namedTag.getByte("shop_npc") == 0) return;
+        entity.setNameTagAlwaysVisible(true);
+
+        if (this.smithShop != null) this.smithShop.onSpawn(entity);
     }
 
     @EventHandler
@@ -174,8 +219,18 @@ public class SurvivalShop extends Addon {
 
     @EventHandler
     public void onForm(PlayerFormRespondedEvent event){
-        if ((event.getWindow() instanceof FormWindowCustom && ((FormWindowCustom) event.getWindow()).getTitle().startsWith("§l§8Sell"))){
-            this.sellManager.handleSellForm((FormWindowCustom) event.getWindow(), event.getPlayer());
+        if ((event.getWindow() instanceof FormWindowCustom)){
+            String title = ((FormWindowCustom) event.getWindow()).getTitle();
+
+            switch (title){
+                case "§l§8Rename Item":
+                    this.smithShop.handleRenameForm((FormWindowCustom) event.getWindow(), event.getPlayer());
+                    return;
+            }
+
+            if (title.startsWith("§l§8Sell")){
+                this.sellManager.handleSellForm((FormWindowCustom) event.getWindow(), event.getPlayer());
+            }
             return;
         }
 
@@ -184,6 +239,12 @@ public class SurvivalShop extends Addon {
         Player player = event.getPlayer();
         FormWindowSimple form = (FormWindowSimple) event.getWindow();
         FormResponseSimple response = (FormResponseSimple) event.getResponse();
+
+        switch (form.getTitle()){
+            case "§l§8Smith the Man":
+                this.smithShop.handleMenu(form, event.getPlayer());
+                return;
+        }
 
         if (!form.getTitle().startsWith("§l§8Shop")){
             if (form.getTitle().equals("§l§8Sell Items")) this.sellManager.handleForm(form, player);
@@ -242,6 +303,26 @@ public class SurvivalShop extends Addon {
 
     public SellManager getSellManager() {
         return this.sellManager;
+    }
+
+    public SmithShop getSmithShop() {
+        return smithShop;
+    }
+
+    public void addRemover(Player player){
+        if (player == null) return;
+
+        player.sendMessage("§6»§7Hit shop npc to remove!");
+        this.npcRemovers.add(player.getName());
+    }
+
+    public void removeRemover(Player player){
+        if (player == null) return;
+        this.npcRemovers.remove(player.getName());
+    }
+
+    public List<String> getNpcRemovers() {
+        return npcRemovers;
     }
 
     private String messageFormat(Player player, String messageKey){

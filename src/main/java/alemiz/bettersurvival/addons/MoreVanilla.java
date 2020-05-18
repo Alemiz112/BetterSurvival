@@ -7,6 +7,7 @@ import cn.nukkit.AdventureSettings;
 import cn.nukkit.Server;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.EventPriority;
+import cn.nukkit.event.level.LevelLoadEvent;
 import cn.nukkit.event.player.*;
 import cn.nukkit.Player;
 import cn.nukkit.form.window.FormWindowSimple;
@@ -32,13 +33,6 @@ public class MoreVanilla extends Addon{
 
     public MoreVanilla(String path){
         super("morevanilla", path);
-
-        /* make sure coordinates will be shown*/
-        GameRules gameRules = plugin.getServer().getDefaultLevel().getGameRules();
-        gameRules.setGameRule(GameRule.SHOW_COORDINATES,
-                configFile.getBoolean("showCoordinates", true));
-        gameRules.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN,
-                configFile.getBoolean("doImmediateRespawn", true));
 
         plugin.getServer().getScheduler().scheduleRepeatingTask(new MuteCheckTask(this), 20*60, true);
     }
@@ -104,7 +98,18 @@ public class MoreVanilla extends Addon{
         registerCommand("jump", new JumpCommand("jump", this));
         registerCommand("rand", new RandCommand("rand", this));
         registerCommand("mute", new MuteCommand("mute", this));
+
+
         registerCommand("unmute", new UnmuteCommand("unmute", this));
+    }
+
+    @EventHandler
+    public void onLevelLoad(LevelLoadEvent event){
+        GameRules gameRules = event.getLevel().getGameRules();
+        gameRules.setGameRule(GameRule.SHOW_COORDINATES,
+                configFile.getBoolean("showCoordinates", true));
+        gameRules.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN,
+                configFile.getBoolean("doImmediateRespawn", true));
     }
 
     @EventHandler(priority = EventPriority.LOW)
