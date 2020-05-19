@@ -94,7 +94,7 @@ public class SurvivalShop extends Addon {
         this.saveFromResources("shop.json");
     }
 
-    private void saveFromResources(String fileName){
+    protected void saveFromResources(String fileName){
         try {
             File shopFile = new File(ConfigManager.getInstance().ADDONS_PATH+"/"+fileName);
             if (!shopFile.exists()){
@@ -244,10 +244,20 @@ public class SurvivalShop extends Addon {
             case "§l§8Smith the Man":
                 this.smithShop.handleMenu(form, event.getPlayer());
                 return;
+            case "§l§8Enchants Shop":
+                this.smithShop.handleEnchantsForm(form, event.getPlayer());
+                return;
+            case "§l§8Sell Items":
+                this.sellManager.handleForm(form, player);
+                return;
+
+        }
+
+        if (form.getTitle().startsWith("§l§8Levels of ")){
+            return;
         }
 
         if (!form.getTitle().startsWith("§l§8Shop")){
-            if (form.getTitle().equals("§l§8Sell Items")) this.sellManager.handleForm(form, player);
             return;
         }
 
