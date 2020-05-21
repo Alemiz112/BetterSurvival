@@ -3,7 +3,6 @@ package alemiz.bettersurvival.addons.shop;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.enchantment.Enchantment;
 import net.minidev.json.JSONObject;
-import org.apache.commons.lang3.ArrayUtils;
 
 public class Enchant {
 
@@ -45,6 +44,10 @@ public class Enchant {
         return Enchantment.get(this.enchantId);
     }
 
+    public Enchantment getEnchantment(int level){
+        return Enchantment.get(this.enchantId).setLevel(level);
+    }
+
     public String getName() {
         return this.name;
     }
@@ -71,9 +74,13 @@ public class Enchant {
 
     public Item getEnchantItem(int level){
         Item item = SmithShop.getEnchantItem();
+        if (item == null) return null;
+
         item.getNamedTag().putInt("enchant_id", this.enchantId);
-        item.setCustomName("§r§l§a"+this.formattedName+" §r§b Orb");
-        item.setLore(ArrayUtils.addAll(new String[]{"§r§5Level: "+level}, item.getLore()));
+        item.getNamedTag().putInt("enchant_level", level);
+        item.addEnchantment(this.getEnchantment(level));
+        item.setCustomName("§r§l§a"+this.formattedName+"§r§b Orb");
+        //item.setLore(ArrayUtils.addAll(new String[]{"§r§5Level: "+level}, item.getLore()));
         return item;
     }
 }

@@ -29,7 +29,7 @@ public class ShopItem {
     }
 
     public boolean buyItem(Player player){
-        if (player == null || EconomyAPI.getInstance().reduceMoney(player, this.count) < 1) return false;
+        if (player == null || EconomyAPI.getInstance().reduceMoney(player, this.price) < 1) return false;
 
         player.getInventory().addItem(this.buildItem());
         return true;

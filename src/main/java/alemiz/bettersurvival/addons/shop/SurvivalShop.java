@@ -18,8 +18,10 @@ import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.form.response.FormResponseSimple;
 import cn.nukkit.form.window.FormWindowCustom;
 import cn.nukkit.form.window.FormWindowSimple;
+import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
+import cn.nukkit.nbt.tag.CompoundTag;
 import me.onebone.economyapi.EconomyAPI;
 import net.minidev.json.JSONObject;
 
@@ -40,7 +42,7 @@ public class SurvivalShop extends Addon {
 
     private List<String> npcRemovers = new ArrayList<>();
 
-    private SmithShop smithShop;
+    private SmithShop smithShop = null;
 
     public SurvivalShop(String path){
         super("survivalshop", path);
@@ -81,8 +83,8 @@ public class SurvivalShop extends Addon {
             configFile.set("shopRemovePermission", "bettersurvival.shop.remove");
             configFile.set("shopVipPermission", "bettersurvival.shop.vip");
             configFile.set("shopManagePermission", "bettersurvival.shop.manage");
+            configFile.set("enchantPermission", "bettersurvival.shop.enchant");
 
-            configFile.set("netEnoughMoney", "§c»§7You do not have enough coins to buy {item}!");
             configFile.set("wrongFormat", "§c»§7Shop was not created! Use following format: Line 1: shop Line 2: category");
             configFile.set("shopSet", "§6»§7Shop was created successfully!");
 
@@ -136,7 +138,7 @@ public class SurvivalShop extends Addon {
                 return;
             }
 
-            this.smithShop.onDamage((EntityDamageByEntityEvent) event);
+            if (this.smithShop != null) this.smithShop.onDamage((EntityDamageByEntityEvent) event);
         }
 
         event.setCancelled(true);
@@ -195,15 +197,30 @@ public class SurvivalShop extends Addon {
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event){
+        Player player = event.getPlayer();
+
+        Item item = event.getItem();
+        if (item.getNamedTag() != null){
+            System.out.println("Is orb: "+item.getNamedTag().getByte("enchant_orb"));
+            System.out.println("Enchant ID: "+item.getNamedTag().getByte("enchant_id"));
+        }
+
+        if (this.smithShop != null){
+            CompoundTag namedTag = event.getItem().getNamedTag();
+            if (namedTag == null || namedTag.getByte("enchant_orb") != 1) return;
+            event.setCancelled(true);
+            return;
+        }
+
         if (event.getAction() != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) return;
 
-        Player player = event.getPlayer();
         Block block = event.getBlock();
 
         if ((block.getId() != Block.WALL_SIGN && block.getId() != Block.SIGN_POST) || !(player.getLevel().getBlockEntity(block) instanceof BlockEntitySign)) return;
         BlockEntitySign sign =  (BlockEntitySign) player.getLevel().getBlockEntity(block);
 
         if (!this.isShopSign(sign)) return;
+        event.setCancelled(true);
 
         String[] lines = sign.getText();
         if (lines[2].equals("§5VIP Only") && !player.hasPermission(configFile.getString("shopVipPermission"))){
@@ -224,7 +241,7 @@ public class SurvivalShop extends Addon {
 
             switch (title){
                 case "§l§8Rename Item":
-                    this.smithShop.handleRenameForm((FormWindowCustom) event.getWindow(), event.getPlayer());
+                    if (this.smithShop != null) this.smithShop.handleRenameForm((FormWindowCustom) event.getWindow(), event.getPlayer());
                     return;
             }
 
@@ -242,10 +259,10 @@ public class SurvivalShop extends Addon {
 
         switch (form.getTitle()){
             case "§l§8Smith the Man":
-                this.smithShop.handleMenu(form, event.getPlayer());
+                if (this.smithShop != null) this.smithShop.handleMenu(form, event.getPlayer());
                 return;
             case "§l§8Enchants Shop":
-                this.smithShop.handleEnchantsForm(form, event.getPlayer());
+                if (this.smithShop != null) this.smithShop.handleEnchantsForm(form, event.getPlayer());
                 return;
             case "§l§8Sell Items":
                 this.sellManager.handleForm(form, player);
@@ -253,7 +270,8 @@ public class SurvivalShop extends Addon {
 
         }
 
-        if (form.getTitle().startsWith("§l§8Levels of ")){
+        if (form.getTitle().startsWith("§l§8Levels of ") && this.smithShop != null){
+            this.smithShop.handleEnchantLevelForm(form, event.getPlayer());
             return;
         }
 
@@ -271,7 +289,7 @@ public class SurvivalShop extends Addon {
 
         String message = this.messageFormat(player, (success? "messageSuccess" : "messageFail"));
         message = message.replace("{item}", item.getName());
-        message = message.replace("{money}", item.getName());
+        message = message.replace("{money}", String.valueOf(item.getPrice()));
         player.sendMessage(message);
     }
 
@@ -335,7 +353,7 @@ public class SurvivalShop extends Addon {
         return npcRemovers;
     }
 
-    private String messageFormat(Player player, String messageKey){
+    protected String messageFormat(Player player, String messageKey){
         if (player == null || messageKey == null || configFile.getString(messageKey).equals("")) return "";
 
         String message = configFile.getString(messageKey);

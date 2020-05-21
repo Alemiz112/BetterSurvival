@@ -1,10 +1,187 @@
 {
-  "efficiency": {
+  "protection": {
+    "id": 0,
+    "price1": 500,
+    "price2": 1000,
+    "price3": 2000,
+    "price4": 3500
+  },
+  "fire protection": {
+    "id": 1,
+    "price1": 250,
+    "price2": 500,
+    "price3": 1000,
+    "price4": 1500
+  },
+  "feather falling": {
+    "id": 2,
+    "price1": 500,
+    "price2": 1000,
+    "price3": 2000,
+    "price4": 3500
+  },
+  "blast protection": {
+    "id": 3,
+    "price1": 250,
+    "price2": 500,
+    "price3": 1000,
+    "price4": 1500
+  },
+  "projectile protection": {
+    "id": 4,
+    "price1": 250,
+    "price2": 500,
+    "price3": 1000,
+    "price4": 1500
+  },
+  "thorns": {
+    "id": 5,
+    "price1": 500,
+    "price2": 1000,
+    "price3": 2000
+  },
+  "respiration": {
+    "id": 6,
+    "price1": 250,
+    "price2": 500,
+    "price3": 1000
+  },
+  "depth strider": {
+    "id": 7,
+    "price1": 250,
+    "price2": 500,
+    "price3": 1000
+  },
+  "aqua affinity": {
+    "id": 8,
+    "price1": 250
+  },
+  "sharpness": {
+    "id": 9,
+    "price1": 500,
+    "price2": 1000,
+    "price3": 2000,
+    "price4": 3500,
+    "price5": 5000
+  },
+  "smite": {
+    "id": 10,
+    "price1": 250,
+    "price2": 500,
+    "price3": 1000,
+    "price4": 2000,
+    "price5": 3500
+  },
+  "bane of arthropods": {
+    "id": 11,
+    "price1": 250,
+    "price2": 500,
+    "price3": 1000,
+    "price4": 2000,
+    "price5": 3500
+  },
+  "knockback": {
+    "id": 12,
+    "price1": 500,
+    "price2": 1000
+  },
+  "fire aspect": {
+    "id": 13,
+    "price1": 500,
+    "price2": 1000
+  },
+  "looting": {
+    "id": 14,
+    "price1": 250,
+    "price2": 500,
+    "price3": 1000
+  },
+  "efficency": {
     "id": 15,
+    "price1": 500,
+    "price2": 1000,
+    "price3": 2000,
+    "price4": 3500,
+    "price5": 5000
+  },
+  "silk touch": {
+    "id": 16,
+    "price1": 500
+  },
+  "unbreaking": {
+    "id": 17,
+    "price1": 750,
+    "price2": 1500,
+    "price3": 3000
+  },
+  "fortune": {
+    "id": 18,
     "price1": 1000,
-    "price2": 50000,
-    "price3": 500000,
-    "price4": 5000000,
-    "price5": 50000000
+    "price2": 2000,
+    "price3": 3500
+  },
+  "power": {
+    "id": 19,
+    "price1": 250,
+    "price2": 500,
+    "price3": 1000,
+    "price4": 2000,
+    "price5": 3500
+  },
+  "punch": {
+    "id": 20,
+    "price1": 250,
+    "price2": 500
+  },
+  "flame": {
+    "id": 21,
+    "price1": 750
+  },
+  "infinity": {
+    "id": 22,
+    "price1": 1000
+  },
+  "luck of the sea": {
+    "id": 23,
+    "price1": 250,
+    "price2": 500,
+    "price3": 1000
+  },
+  "lure": {
+    "id": 24,
+    "price1": 250,
+    "price2": 500,
+    "price3": 1000
+  },
+  "frost walker": {
+    "id": 25,
+    "price1": 750,
+    "price2": 1500
+  },
+  "impaling": {
+    "id": 29,
+    "price1": 250,
+    "price2": 500,
+    "price3": 1000,
+    "price4": 2000,
+    "price5": 3500
+  },
+  "riptide": {
+    "id": 30,
+    "price1": 250,
+    "price2": 500,
+    "price3": 1000,
+    "price4": 2000,
+    "price5": 3500
+  },
+  "loyalty": {
+    "id": 31,
+    "price1": 500,
+    "price2": 1000,
+    "price3": 1500
+  },
+  "channeling": {
+    "id": 32,
+    "price1": 750
   }
 }

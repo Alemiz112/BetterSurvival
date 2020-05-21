@@ -49,6 +49,11 @@ public class ShopCommand extends Command {
                 player.sendMessage("§6»§7Shop spawn was saved!");
                 break;
             case "smith":
+                if (this.loader.getSmithShop() == null){
+                    player.sendMessage("§c»§7Smith addon is not enabled. Please enable it in SurvivalShop config!");
+                    break;
+                }
+
                 this.loader.getSmithShop().createSmith(player);
                 break;
             case "clear":
