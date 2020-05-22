@@ -17,6 +17,7 @@ import cn.nukkit.event.player.PlayerFormRespondedEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.form.response.FormResponseSimple;
 import cn.nukkit.form.window.FormWindowCustom;
+import cn.nukkit.form.window.FormWindowModal;
 import cn.nukkit.form.window.FormWindowSimple;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
@@ -199,12 +200,6 @@ public class SurvivalShop extends Addon {
     public void onInteract(PlayerInteractEvent event){
         Player player = event.getPlayer();
 
-        Item item = event.getItem();
-        if (item.getNamedTag() != null){
-            System.out.println("Is orb: "+item.getNamedTag().getByte("enchant_orb"));
-            System.out.println("Enchant ID: "+item.getNamedTag().getByte("enchant_id"));
-        }
-
         if (this.smithShop != null){
             CompoundTag namedTag = event.getItem().getNamedTag();
             if (namedTag == null || namedTag.getByte("enchant_orb") != 1) return;
@@ -239,16 +234,24 @@ public class SurvivalShop extends Addon {
         if ((event.getWindow() instanceof FormWindowCustom)){
             String title = ((FormWindowCustom) event.getWindow()).getTitle();
 
-            switch (title){
-                case "§l§8Rename Item":
-                    if (this.smithShop != null) this.smithShop.handleRenameForm((FormWindowCustom) event.getWindow(), event.getPlayer());
-                    return;
+            if ("§l§8Rename Item".equals(title) && this.smithShop != null) {
+                this.smithShop.handleRenameForm((FormWindowCustom) event.getWindow(), event.getPlayer());
+                return;
             }
 
             if (title.startsWith("§l§8Sell")){
                 this.sellManager.handleSellForm((FormWindowCustom) event.getWindow(), event.getPlayer());
             }
             return;
+        }
+
+        if (event.getWindow() instanceof FormWindowModal){
+            String title = ((FormWindowModal) event.getWindow()).getTitle();
+
+            if ("§l§8Smith Repair".equals(title) && this.smithShop != null) {
+                this.smithShop.handleRepairForm((FormWindowModal) event.getWindow(), event.getPlayer());
+                return;
+            }
         }
 
         if (!(event.getWindow() instanceof FormWindowSimple)) return;

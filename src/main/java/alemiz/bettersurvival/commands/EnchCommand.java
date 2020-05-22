@@ -34,7 +34,13 @@ public class EnchCommand extends Command {
         }
 
         Player player = (Player) sender;
-        Item item = this.loader.enchantItem(player, player.getInventory().getItemInHand());
+        Item inHand = player.getInventory().getItemInHand();
+        if (inHand.getId() == Item.AIR){
+            player.sendMessage("§c»§r§7Can not change name of air!");
+            return true;
+        }
+
+        Item item = this.loader.enchantItem(player, inHand);
         if (item != null) player.getInventory().setItemInHand(item);
         return true;
     }

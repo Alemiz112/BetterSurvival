@@ -11,6 +11,7 @@ import cn.nukkit.form.element.ElementButton;
 import cn.nukkit.form.element.ElementInput;
 import cn.nukkit.form.element.ElementLabel;
 import cn.nukkit.form.window.FormWindowCustom;
+import cn.nukkit.form.window.FormWindowModal;
 import cn.nukkit.form.window.FormWindowSimple;
 import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.item.Item;
@@ -106,6 +107,7 @@ public class SmithShop {
                 this.sendEnchantsForm(player);
                 break;
             case "§6Repair Item":
+                this.sendRepairForm(player);
                 break;
             case "§cHelp":
                 this.sendHelpForm(player);
@@ -258,23 +260,26 @@ public class SmithShop {
             enchants.add(entry);
         }
 
-        Enchantment[] enchantments = target.getEnchantments();
+        if (enchants.isEmpty()){
+            player.sendMessage("§c»§r§7You do not have any applicable orb in your inventory!");
+            return null;
+        }
+
         for (Map.Entry<Integer, Item> entry : enchants){
             Item item = entry.getValue();
             int level = item.getNamedTag().getInt("enchant_level");
             int enchantId = item.getNamedTag().getInt("enchant_id");
 
-            System.out.println("Is orb: "+item.getNamedTag().getByte("enchant_orb"));
-            System.out.println("Enchant ID: "+item.getNamedTag().getByte("enchant_id"));
-
             Enchant enchant = this.getEnchant(enchantId);
             if (enchant == null) continue;
 
             Enchantment localEnchantment = enchant.getEnchantment(level);
+            Enchantment[] enchantments = target.getEnchantments();
+
             boolean proccess = enchantments.length == 0;
 
             for (Enchantment enchantment : enchantments){
-                if (enchantment.getId() == localEnchantment.getId() && enchantment.getLevel() >= localEnchantment.getLevel()) continue;
+                if (enchantment.getId() != localEnchantment.getId() || (enchantment.getId() == localEnchantment.getId() && enchantment.getLevel() >= localEnchantment.getLevel())) continue;
                 proccess = true;
             }
 
@@ -287,11 +292,75 @@ public class SmithShop {
         }
 
         if (update){
+            player.sendMessage("§a»§r§7Your item was successfully enchanted!");
             player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_RANDOM_ANVIL_USE);
             return target;
         }
 
+        player.sendMessage("§6»§r§7No changes were applied on your item. Maybe incompatible enchants?");
         return null;
+    }
+
+    public void sendRepairForm(Player player){
+        if (player == null) return;
+
+        Item item = player.getInventory().getItemInHand();
+        if (item.getId() == Item.AIR){
+            player.sendMessage("§c»§r§7You do not hold any item!");
+            return;
+        }
+
+        float damage = ((float) item.getDamage() / item.getMaxDurability()) * 100;
+        int price = this.getPriceByDamage(damage);
+
+        if (price == 0){
+            player.sendMessage("§c»§r§7This item can not be repaired!");
+            return;
+        }
+
+        FormWindowModal form = new FormWindowModal("§l§8Smith Repair", "§7Item in your hand will be repaired! Price is based on item damage.\n" +
+                "§7Price: §l"+price+" emeralds§r\n" +
+                "§7Would you like to repair it?",
+                "Yes",
+                "Exit");
+
+        player.showFormWindow(form);
+    }
+
+    public void handleRepairForm(FormWindowModal form, Player player){
+        if (player == null || form == null || form.getResponse() == null || form.getResponse().getClickedButtonText().equals("Exit")) return;
+        PlayerInventory inv = player.getInventory();
+
+
+        Item item = inv.getItemInHand();
+        float damage = ((float) item.getDamage() / item.getMaxDurability()) * 100;
+        int price = this.getPriceByDamage(damage);
+
+        if (price == 0){
+            player.sendMessage("§c»§r§7This item can not be repaired!");
+            return;
+        }
+
+        Item emerald = Item.get(Item.EMERALD, 0, 1);
+        int balance = 0;
+        for(Item slot : inv.getContents().values()){
+            if (slot.getId() != emerald.getId() || !slot.getName().equals(emerald.getName())) continue;
+            balance += slot.getCount();
+        }
+
+        if (balance < price){
+            player.sendMessage("§c»§r§7You do not have enough emeralds to repair item!");
+            return;
+        }
+
+        emerald.setCount(price);
+        inv.removeItem(emerald);
+
+        item.setDamage(0);
+        inv.setItemInHand(item);
+
+        player.sendMessage("§a»§r§7Your item was successfully repaired!");
+        player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_RANDOM_ANVIL_USE);
     }
 
     public Enchant getEnchant(int id){
@@ -299,6 +368,24 @@ public class SmithShop {
             if (enchant.getEnchantId() == id) return enchant;
         }
         return null;
+    }
+
+    public int getPriceByDamage(float damage){
+        if (damage > 0 && damage <= 15){
+            return 32;
+        }else if (damage > 15 && damage <= 30){
+            return 64;
+        }else if (damage > 30 && damage <= 50){
+            return 100;
+        }else if (damage > 50 && damage <= 70){
+            return 128;
+        }else if (damage > 70 && damage <= 90){
+            return 160;
+        }else if (damage > 90){
+            return 256;
+        }
+
+        return 0;
     }
 
     public List<Enchant> getEnchants() {
