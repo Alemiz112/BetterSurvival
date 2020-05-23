@@ -227,8 +227,15 @@ public class SmithShop {
     public void sendHelpForm(Player player){
         if (player == null) return;
 
-        //TODO: text
-        FormWindowSimple form = new FormWindowSimple("§l§8Smith Help", "§7!");
+        FormWindowSimple form = new FormWindowSimple("§l§8Smith Help", "§7Rename Item:\n" +
+                "§7To rename item you must hold it in hand. Renaming is free.\n" +
+                "§7Enchant Item:\n" +
+                "§7Enchantments are applied by orbs. You can trade this orbs with players. To apply enchantments on item use /ench." +
+                "Than all orbs from your inventory will be applied on item. WARNING: Even enchants that are not compatible with your tool may apply." +
+                "To prevent this please store orbs, that you do not want to apply in chest.\n" +
+                "§7Repair Item:\n" +
+                "Item in your hand will be repaired. Repair price is in Emeralds based on item damage. Repair will not reset block destroyed counter.");
+        form.addButton(new ElementButton("Exit"));
         player.showFormWindow(form);
     }
 
@@ -279,7 +286,7 @@ public class SmithShop {
             boolean proccess = enchantments.length == 0;
 
             for (Enchantment enchantment : enchantments){
-                if (enchantment.getId() != localEnchantment.getId() || (enchantment.getId() == localEnchantment.getId() && enchantment.getLevel() >= localEnchantment.getLevel())) continue;
+                if (enchantment.getId() == localEnchantment.getId() && enchantment.getLevel() >= localEnchantment.getLevel()) continue;
                 proccess = true;
             }
 
