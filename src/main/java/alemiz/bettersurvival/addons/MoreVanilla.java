@@ -5,6 +5,8 @@ import alemiz.bettersurvival.tasks.MuteCheckTask;
 import alemiz.bettersurvival.utils.Addon;
 import cn.nukkit.AdventureSettings;
 import cn.nukkit.Server;
+import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.EventPriority;
 import cn.nukkit.event.block.BlockBreakEvent;
@@ -18,15 +20,29 @@ import cn.nukkit.level.GameRule;
 import cn.nukkit.level.GameRules;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Location;
+import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.SpawnParticleEffectPacket;
 import cn.nukkit.potion.Effect;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class MoreVanilla extends Addon{
+
+    private static BitSet UNSAFE_BLOCKS = new BitSet();
+
+    static {
+        UNSAFE_BLOCKS.set(BlockID.AIR);
+        UNSAFE_BLOCKS.set(BlockID.LAVA);
+        UNSAFE_BLOCKS.set(BlockID.STILL_LAVA);
+        UNSAFE_BLOCKS.set(BlockID.FIRE);
+        UNSAFE_BLOCKS.set(BlockID.CACTUS);
+        UNSAFE_BLOCKS.set(BlockID.NETHER_PORTAL);
+        UNSAFE_BLOCKS.set(BlockID.END_PORTAL);
+    }
 
     protected Map<String, String> tpa = new HashMap<>();
     protected Map<String, Location> back = new HashMap<>();
@@ -464,16 +480,37 @@ public class MoreVanilla extends Addon{
             return;
         }
 
-        Random rnd = new Random();
-        int x = rnd.nextInt(1500) + 50;
-        int z = rnd.nextInt(1500) + 50;
-        int y = 70;
+        Runnable task = () -> {
+            Level level = player.getLevel();
+            ThreadLocalRandom rand = ThreadLocalRandom.current();
 
-        player.teleport(new Location(x, y, z, player.getLevel()));
+            int x = 0;
+            int z = 0;
+            int y = 0;
+            boolean found = false;
 
-        String message = configFile.getString("randtpMessage");
-        message = message.replace("{player}", player.getName());
-        player.sendMessage(message);
+            while (!found){
+                x = rand.nextInt(-5000, 5000) + rand.nextInt(-500, 500);
+                z = rand.nextInt(-5000,5000) + rand.nextInt(-500, 500);
+
+                BaseFullChunk chunk = level.getChunk(x >> 4, z >> 4, true);
+
+                for (y = 250; y >= 20; y--){
+                    if (UNSAFE_BLOCKS.get(chunk.getBlockId(x & 0xF, y, z & 0xF)) ||
+                            chunk.getBlockId(x & 0xF, y+1, z & 0xF) != BlockID.AIR ||
+                            chunk.getBlockId(x & 0xF, y+2, z & 0xF) != BlockID.AIR) continue;
+                    found = true;
+                    break;
+                }
+            }
+
+            player.teleport(new Location(x, y+1, z, player.getLevel()));
+
+            String message = configFile.getString("randtpMessage");
+            message = message.replace("{player}", player.getName());
+            player.sendMessage(message);
+        };
+        this.plugin.getServer().getScheduler().scheduleTask(plugin, task, true);
     }
 
     public void mute(Player player, String executor, String time){
