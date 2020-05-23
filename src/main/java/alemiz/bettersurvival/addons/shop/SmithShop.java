@@ -5,7 +5,6 @@ import alemiz.bettersurvival.utils.ConfigManager;
 import alemiz.bettersurvival.utils.enitity.FakeHuman;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.form.element.ElementButton;
 import cn.nukkit.form.element.ElementInput;

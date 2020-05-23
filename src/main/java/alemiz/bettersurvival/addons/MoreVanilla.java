@@ -193,7 +193,6 @@ public class MoreVanilla extends Addon{
         if (form.getTitle().equals("Player Teleport")){
             String response = form.getResponse().getClickedButton().getText();
             response = response.substring(2, response.indexOf("\n"));
-
             tpa(player, response);
         }
     }
