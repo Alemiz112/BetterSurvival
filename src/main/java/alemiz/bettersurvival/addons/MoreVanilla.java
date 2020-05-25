@@ -289,7 +289,6 @@ public class MoreVanilla extends Addon{
         }
 
         Player requester = Server.getInstance().getPlayer(tpa.get(player.getName()));
-
         if (requester == null || !requester.isConnected()){
             player.sendMessage("§cPlayer is not online!");
         }else {
