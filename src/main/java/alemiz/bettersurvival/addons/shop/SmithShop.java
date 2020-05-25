@@ -16,7 +16,7 @@ import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
-import me.onebone.economyapi.EconomyAPI;
+import cubemc.nukkit.connector.modules.Money;
 import net.minidev.json.JSONObject;
 
 import java.util.*;
@@ -210,7 +210,7 @@ public class SmithShop {
         }
 
         int price = enchant.getPrice(level);
-        boolean success = EconomyAPI.getInstance().reduceMoney(player, price) >= 1;
+        boolean success = Money.getInstance().reduceMoney(player, price);
 
         if (success){
             Item item = enchant.getEnchantItem(level);
