@@ -128,6 +128,6 @@ public class Home extends Addon {
         Config config = ConfigManager.getInstance().loadPlayer(player);
         if (config == null) return null;
 
-        return config.getSection("home").getKeys();
+        return config.getSection("home").getKeys(false);
     }
 }

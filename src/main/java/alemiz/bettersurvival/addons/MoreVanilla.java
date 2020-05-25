@@ -5,8 +5,12 @@ import alemiz.bettersurvival.tasks.MuteCheckTask;
 import alemiz.bettersurvival.utils.Addon;
 import cn.nukkit.AdventureSettings;
 import cn.nukkit.Server;
+import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.EventPriority;
+import cn.nukkit.event.block.BlockBreakEvent;
+import cn.nukkit.event.level.LevelLoadEvent;
 import cn.nukkit.event.player.*;
 import cn.nukkit.Player;
 import cn.nukkit.form.window.FormWindowSimple;
@@ -16,14 +20,29 @@ import cn.nukkit.level.GameRule;
 import cn.nukkit.level.GameRules;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Location;
+import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.math.Vector3;
+import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.SpawnParticleEffectPacket;
 import cn.nukkit.potion.Effect;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class MoreVanilla extends Addon{
+
+    private static BitSet UNSAFE_BLOCKS = new BitSet();
+
+    static {
+        UNSAFE_BLOCKS.set(BlockID.AIR);
+        UNSAFE_BLOCKS.set(BlockID.LAVA);
+        UNSAFE_BLOCKS.set(BlockID.STILL_LAVA);
+        UNSAFE_BLOCKS.set(BlockID.FIRE);
+        UNSAFE_BLOCKS.set(BlockID.CACTUS);
+        UNSAFE_BLOCKS.set(BlockID.NETHER_PORTAL);
+        UNSAFE_BLOCKS.set(BlockID.END_PORTAL);
+    }
 
     protected Map<String, String> tpa = new HashMap<>();
     protected Map<String, Location> back = new HashMap<>();
@@ -32,13 +51,6 @@ public class MoreVanilla extends Addon{
 
     public MoreVanilla(String path){
         super("morevanilla", path);
-
-        /* make sure coordinates will be shown*/
-        GameRules gameRules = plugin.getServer().getDefaultLevel().getGameRules();
-        gameRules.setGameRule(GameRule.SHOW_COORDINATES,
-                configFile.getBoolean("showCoordinates", true));
-        gameRules.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN,
-                configFile.getBoolean("doImmediateRespawn", true));
 
         plugin.getServer().getScheduler().scheduleRepeatingTask(new MuteCheckTask(this), 20*60, true);
     }
@@ -104,7 +116,18 @@ public class MoreVanilla extends Addon{
         registerCommand("jump", new JumpCommand("jump", this));
         registerCommand("rand", new RandCommand("rand", this));
         registerCommand("mute", new MuteCommand("mute", this));
+
+
         registerCommand("unmute", new UnmuteCommand("unmute", this));
+    }
+
+    @EventHandler
+    public void onLevelLoad(LevelLoadEvent event){
+        GameRules gameRules = event.getLevel().getGameRules();
+        gameRules.setGameRule(GameRule.SHOW_COORDINATES,
+                configFile.getBoolean("showCoordinates", true));
+        gameRules.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN,
+                configFile.getBoolean("doImmediateRespawn", true));
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -170,9 +193,43 @@ public class MoreVanilla extends Addon{
         if (form.getTitle().equals("Player Teleport")){
             String response = form.getResponse().getClickedButton().getText();
             response = response.substring(2, response.indexOf("\n"));
-
             tpa(player, response);
         }
+    }
+
+    @EventHandler
+    public void onBreak(BlockBreakEvent event){
+        Player player = event.getPlayer();
+        Item item = event.getItem();
+
+        switch (item.getId()){
+            case Item.DIAMOND_PICKAXE:
+            case Item.GOLD_PICKAXE:
+            case Item.IRON_PICKAXE:
+            case Item.STONE_PICKAXE:
+            case Item.WOODEN_PICKAXE:
+            case Item.DIAMOND_AXE:
+            case Item.GOLD_AXE:
+            case Item.IRON_AXE:
+            case Item.STONE_AXE:
+            case Item.WOODEN_AXE:
+            case Item.DIAMOND_SHOVEL:
+            case Item.GOLD_SHOVEL:
+            case Item.IRON_SHOVEL:
+            case Item.STONE_SHOVEL:
+            case Item.WOODEN_SHOVEL:
+                break;
+            default:
+                return;
+        }
+
+        CompoundTag namedTag = item.getNamedTag() == null? new CompoundTag() : item.getNamedTag();
+        int broken = namedTag.getInt("brokenBlocks")+1;
+
+        namedTag.putInt("brokenBlocks", broken);
+        item.setNamedTag(namedTag);
+        item.setLore("§r§5Block Destroyed: "+broken);
+        player.getInventory().setItemInHand(item);
     }
 
     public boolean changeArmor(Player player, Item item){
@@ -232,7 +289,6 @@ public class MoreVanilla extends Addon{
         }
 
         Player requester = Server.getInstance().getPlayer(tpa.get(player.getName()));
-
         if (requester == null || !requester.isConnected()){
             player.sendMessage("§cPlayer is not online!");
         }else {
@@ -421,16 +477,37 @@ public class MoreVanilla extends Addon{
             return;
         }
 
-        Random rnd = new Random();
-        int x = rnd.nextInt(1500) + 50;
-        int z = rnd.nextInt(1500) + 50;
-        int y = 70;
+        Runnable task = () -> {
+            Level level = player.getLevel();
+            ThreadLocalRandom rand = ThreadLocalRandom.current();
 
-        player.teleport(new Location(x, y, z, player.getLevel()));
+            int x = 0;
+            int z = 0;
+            int y = 0;
+            boolean found = false;
 
-        String message = configFile.getString("randtpMessage");
-        message = message.replace("{player}", player.getName());
-        player.sendMessage(message);
+            while (!found){
+                x = rand.nextInt(-5000, 5000) + rand.nextInt(-500, 500);
+                z = rand.nextInt(-5000,5000) + rand.nextInt(-500, 500);
+
+                BaseFullChunk chunk = level.getChunk(x >> 4, z >> 4, true);
+
+                for (y = 250; y >= 20; y--){
+                    if (UNSAFE_BLOCKS.get(chunk.getBlockId(x & 0xF, y, z & 0xF)) ||
+                            chunk.getBlockId(x & 0xF, y+1, z & 0xF) != BlockID.AIR ||
+                            chunk.getBlockId(x & 0xF, y+2, z & 0xF) != BlockID.AIR) continue;
+                    found = true;
+                    break;
+                }
+            }
+
+            player.teleport(new Location(x, y+1, z, player.getLevel()));
+
+            String message = configFile.getString("randtpMessage");
+            message = message.replace("{player}", player.getName());
+            player.sendMessage(message);
+        };
+        this.plugin.getServer().getScheduler().scheduleTask(plugin, task, true);
     }
 
     public void mute(Player player, String executor, String time){

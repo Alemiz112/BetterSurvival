@@ -171,6 +171,7 @@ public class BetterVoting extends Addon {
             return;
         }
 
+        boolean update = false;
         Inventory inv = player.getInventory();
         event.setCancelled(true);
 
@@ -180,16 +181,13 @@ public class BetterVoting extends Addon {
             if (!item.getCustomName().equals(this.voteKey.getCustomName()) ||
                     item.getId() != this.voteKey.getId()) continue;
 
-            if (item.count <= 1){
-                item = Item.get(Item.AIR, 0, 1);
-            }else {
-                item.setCount(item.count - 1);
-            }
-
+            item.setCount(item.count - 1);
             inv.setItem(slot, item, true);
+            update = true;
             break;
         }
-        player.getInventory().addItem(action.getSourceItem().clearNamedTag());
+
+        if (update) player.getInventory().addItem(action.getSourceItem().clearNamedTag());
         event.getInventory().removeInventory(player);
     }
 

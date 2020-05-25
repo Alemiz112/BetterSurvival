@@ -38,7 +38,7 @@ public class ShopCommand extends Command {
             return true;
         }
 
-        if (!player.hasPermission(this.loader.configFile.getString("shopCreatePermission"))){
+        if (!player.hasPermission(this.loader.configFile.getString("bettersurvival.shop.manage"))){
             player.sendMessage("§c»§7You dont have permission to create shop!");
             return true;
         }
@@ -48,8 +48,26 @@ public class ShopCommand extends Command {
                 this.loader.setShopSpawn(player);
                 player.sendMessage("§6»§7Shop spawn was saved!");
                 break;
+            case "smith":
+                if (this.loader.getSmithShop() == null){
+                    player.sendMessage("§c»§7Smith addon is not enabled. Please enable it in SurvivalShop config!");
+                    break;
+                }
+
+                this.loader.getSmithShop().createSmith(player);
+                break;
+            case "clear":
+                if (this.loader.getNpcRemovers().contains(player.getName())){
+                    this.loader.removeRemover(player);
+                    break;
+                }
+                this.loader.addRemover(player);
+                break;
             default:
-                player.sendMessage("§7/shop : Teleports to shop\n§7/shop set : set shop spawn");
+                player.sendMessage("§6Shop Commands:\n§7/shop : Teleports to shop\n"+
+                        "§7/shop set : Set shop spawn\n" +
+                        "§7/shop smith : Creates new smith npc\n" +
+                        "§7/shop clear : Hit any shop npc to remove");
                 break;
         }
         return true;

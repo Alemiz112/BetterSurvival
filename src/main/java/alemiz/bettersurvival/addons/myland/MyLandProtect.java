@@ -207,6 +207,12 @@ public class MyLandProtect extends Addon {
             return false;
         }
 
+        for (Block block : blocks){
+            if (!block.getLevel().isInSpawnRadius(block)) continue;
+            player.sendMessage("§c»§7You can not create land inside spawn area!");
+            return false;
+        }
+
         int landSize = configFile.getInt("landsLimitSize");
         if (player != null && player.hasPermission(PERM_VIP)){
             landSize = configFile.getInt("landsLimitSizeVip");

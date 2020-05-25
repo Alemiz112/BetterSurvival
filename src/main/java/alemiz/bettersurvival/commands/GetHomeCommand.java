@@ -46,9 +46,9 @@ public class GetHomeCommand extends Command {
             return true;
         }
 
-        String format = "";
+        StringBuilder format = new StringBuilder();
         for (String home : homes){
-            format += home+", ";
+            format.append(home).append(", ");
         }
 
         player.sendMessage("§6»§7Your homes: "+format.substring(0, format.length()-2));

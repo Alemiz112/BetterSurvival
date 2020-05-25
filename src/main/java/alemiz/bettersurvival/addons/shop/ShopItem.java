@@ -8,7 +8,7 @@ import cubemc.nukkit.connector.modules.Money;
 public class ShopItem {
 
     public final String name;
-    public String formattedName;
+    public final String formattedName;
 
     public String customImage = "";
     public boolean useImage = true;
