@@ -193,6 +193,98 @@
       "sell": 8
     }
   },
+  "equipments": {
+    "diamond pickaxe": {
+      "id": 278,
+      "count": 1,
+      "price": 1500,
+      "image": "items/diamond_pickaxe",
+      "sell": 75
+    },
+    "diamond axe": {
+      "id": 279,
+      "count": 1,
+      "price": 1500,
+      "image": "items/diamond_axe",
+      "sell": 75
+    },
+    "diamond hoe": {
+      "id": 293,
+      "count": 1,
+      "price": 1500,
+      "image": "items/diamond_hoe",
+      "sell": 75
+    },
+    "diamond sword": {
+      "id": 276,
+      "count": 1,
+      "price": 1500,
+      "image": "items/diamond_sword",
+      "sell": 75
+    },
+    "diamond shovel": {
+      "id": 277,
+      "count": 1,
+      "price": 1500,
+      "image": "items/diamond_shovel",
+      "sell": 75
+    },
+    "shears": {
+      "id": 359,
+      "count": 1,
+      "price": 250,
+      "image": "items/shears",
+      "sell": 35
+    },
+    "flint and steel": {
+      "id": 259,
+      "count": 1,
+      "price": 100,
+      "image": "items/flint_and_steel",
+      "sell": 20
+    },
+    "diamond helmet": {
+      "id": 310,
+      "count": 1,
+      "price": 2500,
+      "image": "items/diamond_helmet",
+      "sell": 150
+    },
+    "diamond chestplate": {
+      "id": 311,
+      "count": 1,
+      "price": 2500,
+      "image": "items/diamond_chestplate",
+      "sell": 150
+    },
+    "diamond leggings": {
+      "id": 312,
+      "count": 1,
+      "price": 2500,
+      "image": "items/diamond_leggings",
+      "sell": 150
+    },
+    "diamond boots": {
+      "id": 313,
+      "count": 1,
+      "price": 2500,
+      "image": "items/diamond_boots",
+      "sell": 150
+    },
+    "bow": {
+      "id": 261,
+      "count": 1,
+      "price": 200,
+      "sell": 7,
+      "image": "items/bow_pulling_0"
+    },
+    "arrow": {
+      "id": 262,
+      "count": 16,
+      "price": 150,
+      "sell": 3
+    }
+  },
   "items": {
     "snowball": {
       "id": 332,
@@ -235,12 +327,6 @@
       "price": 250,
       "image": false,
       "sell": 10
-    },
-    "arrow": {
-      "id": 262,
-      "count": 16,
-      "price": 200,
-      "sell": 3
     },
     "brick": {
       "id": 336,
@@ -470,20 +556,6 @@
       "image": false,
       "sell": 200
     },
-    "shulker box": {
-      "id": 218,
-      "count": 1,
-      "price": 2000,
-      "image": false,
-      "sell": 700
-    },
-    "beacon": {
-      "id": 138,
-      "count": 1,
-      "price": 6000,
-      "image": false,
-      "sell": 1250
-    },
     "obsidian": {
       "id": 49,
       "count": 5,
@@ -563,20 +635,13 @@
       "sell": 3
     }
   },
-  "vip": {
+  "subscriber": {
     "trident": {
       "id": 455,
       "count": 1,
       "price": 1250,
       "image": false,
       "sell": 400
-    },
-    "elytra": {
-      "id": 444,
-      "count": 1,
-      "price": 7500,
-      "image": "items/elytra",
-      "sell": 2000
     },
     "saddle": {
       "id": 329,
@@ -585,13 +650,6 @@
       "image": "items/saddle",
       "sell": 400
     },
-    "totem": {
-      "id": 450,
-      "count": 1,
-      "price": 8000,
-      "image": "items/totem",
-      "sell": 2500
-    },
     "ender pearl": {
       "id": 368,
       "count": 3,
@@ -599,12 +657,55 @@
       "image": "items/ender_pearl",
       "sell": 25
     },
+    "golden apple": {
+      "id": 322,
+      "count": 1,
+      "price": 200,
+      "image": "items/apple_golden",
+      "sell": 25
+    },
+    "shulker box": {
+      "id": 218,
+      "count": 1,
+      "price": 3500,
+      "image": false,
+      "sell": 700
+    }
+  },
+  "vip": {
+    "elytra": {
+      "id": 444,
+      "count": 1,
+      "price": 7500,
+      "image": "items/elytra",
+      "sell": 1500
+    },
+    "totem": {
+      "id": 450,
+      "count": 1,
+      "price": 8000,
+      "image": "items/totem",
+      "sell": 2000
+    },
+    "diamond": {
+      "id": 264,
+      "count": 2,
+      "price": 450,
+      "sell": 10
+    },
     "bottle o'Enchanting": {
       "id": 384,
       "count": 3,
       "price": 300,
       "image": "items/experience_bottle",
       "sell": 25
+    },
+    "beacon": {
+      "id": 138,
+      "count": 1,
+      "price": 7500,
+      "image": false,
+      "sell": 1250
     }
   },
   "potions": {
