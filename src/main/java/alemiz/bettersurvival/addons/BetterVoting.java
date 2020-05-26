@@ -3,7 +3,6 @@ package alemiz.bettersurvival.addons;
 import alemiz.bettersurvival.commands.CrateCommand;
 import alemiz.bettersurvival.commands.VoteCommand;
 import alemiz.bettersurvival.utils.Addon;
-import alemiz.bettersurvival.utils.CustomListener;
 import alemiz.bettersurvival.utils.Geometry;
 import alemiz.bettersurvival.utils.fakeChest.FakeInventory;
 import alemiz.bettersurvival.utils.fakeChest.FakeInventoryManager;
@@ -22,8 +21,7 @@ import cn.nukkit.level.particle.FloatingTextParticle;
 import cn.nukkit.level.particle.HeartParticle;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.scheduler.Task;
-import io.pocketvote.event.VoteDispatchEvent;
-import io.pocketvote.event.VoteEvent;
+import cubemc.nukkit.connector.events.CubeVoteEvent;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -39,9 +37,6 @@ public class BetterVoting extends Addon {
     public FloatingTextParticle voteCrateParticle = null;
 
     protected List<String> setters = new ArrayList<>();
-
-    /*TODO: Implement multi-server voting system using MySql database and one server with PocketVote
-    *  Must implement & create permissions system to support permission rewards - done */
 
     public BetterVoting(String path){
         super("bettervoting", path);
@@ -89,36 +84,8 @@ public class BetterVoting extends Addon {
 
     @Override
     public void registerCommands() {
-        registerCommand("crate", new CrateCommand("crate", this));
-
-        //TODO: depend on "usePocketVote"
-        if (configFile.getBoolean("customVoteCommand")){
-            registerCommand("vote", new VoteCommand("vote", this), false);
-        }
-    }
-
-    @Override
-    public void loadListeners() {
-        if (plugin.getServer().getPluginManager().getPlugin("PocketVote") != null){
-            CustomListener listener = new CustomListener(this){
-                @EventHandler
-                public void onVote(VoteEvent event){
-                    voteReceive(event.getPlayer());
-
-                    /* Cancel event as we handle it here*/
-                    event.setCancelled();
-                }
-
-                @EventHandler
-                public void onVote(VoteDispatchEvent event){
-                    voteReceive(event.getPlayer());
-
-                    /* Cancel event as we handle it here*/
-                    event.setCancelled();
-                }
-            };
-            plugin.getServer().getPluginManager().registerEvents(listener, plugin);
-        }
+        registerCommand("crate", new CrateCommand("crate", this), false);
+        registerCommand("vote", new VoteCommand("vote", this), false);
     }
 
     @EventHandler
@@ -126,6 +93,12 @@ public class BetterVoting extends Addon {
         if (this.voteCrateParticle != null){
             plugin.getServer().getDefaultLevel().addParticle(this.voteCrateParticle, event.getPlayer());
         }
+    }
+
+    @EventHandler
+    public void onVote(CubeVoteEvent event){
+        boolean success = this.voteReceive(event.getPlayer());
+        event.setCancelled(!success);
     }
 
     @EventHandler
@@ -246,8 +219,7 @@ public class BetterVoting extends Addon {
                configFile.getString("voteCrateTitle"), configFile.getString("voteCrateText", (String) null));
     }
 
-    public boolean voteReceive(String username){
-        Player player = this.plugin.getServer().getPlayer(username);
+    public boolean voteReceive(Player player){
         if (player == null) return false;
 
         try {
@@ -272,7 +244,7 @@ public class BetterVoting extends Addon {
             }
 
             if (this.enableVoteCrate){
-                Item item = this.voteKey;
+                Item item = this.voteKey.clone();
                 player.getInventory().addItem(item);
             }
 
