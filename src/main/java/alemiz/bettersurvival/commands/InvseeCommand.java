@@ -14,7 +14,7 @@ public class InvseeCommand extends Command {
     public InvseeCommand(String name, Troller loader) {
         super(name, "Shop players inventory", "");
 
-        this.usage = "§7/invsee <player>: Shop players inventory ";
+        this.usage = "§7/invsee <player>: Show players inventory ";
         this.setUsage(getUsageMessage());
 
         this.commandParameters.clear();

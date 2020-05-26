@@ -187,7 +187,7 @@ public class SmithShop {
     }
 
     public void handleEnchantLevelForm(FormWindowSimple form, Player player){
-        if (player == null || form.getResponse() == null) return;
+        if (player == null || form.getResponse() == null || form.getResponse().getClickedButton().getText().equals("Exit")) return;
 
         int level = form.getResponse().getClickedButtonId()+1;
         String enchantName = form.getTitle().substring(14);

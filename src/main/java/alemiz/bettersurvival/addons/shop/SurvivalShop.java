@@ -1,5 +1,6 @@
 package alemiz.bettersurvival.addons.shop;
 
+import alemiz.bettersurvival.addons.PlayerPermissions;
 import alemiz.bettersurvival.commands.SellCommand;
 import alemiz.bettersurvival.commands.ShopCommand;
 import alemiz.bettersurvival.utils.Addon;
@@ -15,6 +16,7 @@ import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntitySpawnEvent;
 import cn.nukkit.event.player.PlayerFormRespondedEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
+import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.form.response.FormResponseSimple;
 import cn.nukkit.form.window.FormWindowCustom;
 import cn.nukkit.form.window.FormWindowModal;
@@ -120,6 +122,17 @@ public class SurvivalShop extends Addon {
     public void registerCommands() {
         registerCommand("shop", new ShopCommand("shop", this));
         registerCommand("sell", new SellCommand("sell", this));
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event){
+        Player player = event.getPlayer();
+
+        if (Addon.getAddon("playerpermissions") != null && (Addon.getAddon("playerpermissions") instanceof PlayerPermissions)){
+            ((PlayerPermissions) Addon.getAddon("playerpermissions")).addPermission(player, configFile.getString("enchantPermission"));
+        }else {
+            player.addAttachment(plugin, configFile.getString("enchantPermission"), true);
+        }
     }
 
     @EventHandler
