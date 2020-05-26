@@ -378,17 +378,17 @@ public class SmithShop {
 
     public int getPriceByDamage(float damage){
         if (damage > 0 && damage <= 15){
-            return 32;
+            return 10;
         }else if (damage > 15 && damage <= 30){
-            return 64;
+            return 20;
         }else if (damage > 30 && damage <= 50){
-            return 100;
+            return 35;
         }else if (damage > 50 && damage <= 70){
-            return 128;
+            return 60;
         }else if (damage > 70 && damage <= 90){
-            return 160;
+            return 85;
         }else if (damage > 90){
-            return 256;
+            return 125;
         }
 
         return 0;
