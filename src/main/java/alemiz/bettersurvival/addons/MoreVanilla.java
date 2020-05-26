@@ -137,6 +137,7 @@ public class MoreVanilla extends Addon{
         /* Set Default Permissions*/
         player.addAttachment(plugin, configFile.getString("permission-tpa"), true);
         player.addAttachment(plugin, configFile.getString("permission-back"), true);
+        player.addAttachment(plugin, configFile.getString("permission-randtp"), true);
     }
 
     @EventHandler
