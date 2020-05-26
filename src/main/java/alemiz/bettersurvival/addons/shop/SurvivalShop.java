@@ -212,9 +212,10 @@ public class SurvivalShop extends Addon {
 
         if (this.smithShop != null && event.getItem() != null){
             CompoundTag namedTag = event.getItem().getNamedTag();
-            if (namedTag == null || namedTag.getByte("enchant_orb") != 1) return;
-            event.setCancelled(true);
-            return;
+            if (namedTag != null && namedTag.getByte("enchant_orb") == 1){
+                event.setCancelled(true);
+                return;
+            }
         }
 
         if (event.getAction() != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) return;
