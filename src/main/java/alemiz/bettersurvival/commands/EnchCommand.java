@@ -36,7 +36,7 @@ public class EnchCommand extends Command {
         Player player = (Player) sender;
         Item inHand = player.getInventory().getItemInHand();
         if (inHand.getId() == Item.AIR){
-            player.sendMessage("§c»§r§7Can not change name of air!");
+            player.sendMessage("§c»§r§7You must hold item!");
             return true;
         }
 
