@@ -252,9 +252,8 @@ public class SmithShop {
             int enchantId = item.getNamedTag().getInt("enchant_id");
             int level = item.getNamedTag().getInt("enchant_level");
 
-            if (level <= 0 || enchantId <= 0){
-                continue;
-            }
+            //In case of wrong ID UnknownEnchantment will be returned
+            if (level <= 0 || Enchantment.get(enchantId).getName().equals("unknown")) continue;
 
             for (Map.Entry<Integer, Item> enchant : new ArrayList<>(enchants)){
                 int enchantId1 = enchant.getValue().getNamedTag().getInt("enchant_id");
@@ -378,17 +377,17 @@ public class SmithShop {
 
     public int getPriceByDamage(float damage){
         if (damage > 0 && damage <= 15){
-            return 32;
+            return 10;
         }else if (damage > 15 && damage <= 30){
-            return 64;
+            return 20;
         }else if (damage > 30 && damage <= 50){
-            return 100;
+            return 35;
         }else if (damage > 50 && damage <= 70){
-            return 128;
+            return 60;
         }else if (damage > 70 && damage <= 90){
-            return 160;
+            return 85;
         }else if (damage > 90){
-            return 256;
+            return 125;
         }
 
         return 0;
