@@ -252,9 +252,8 @@ public class SmithShop {
             int enchantId = item.getNamedTag().getInt("enchant_id");
             int level = item.getNamedTag().getInt("enchant_level");
 
-            if (level <= 0 || enchantId <= 0){
-                continue;
-            }
+            //In case of wrong ID UnknownEnchantment will be returned
+            if (level <= 0 || Enchantment.get(enchantId).getName().equals("unknown")) continue;
 
             for (Map.Entry<Integer, Item> enchant : new ArrayList<>(enchants)){
                 int enchantId1 = enchant.getValue().getNamedTag().getInt("enchant_id");
