@@ -217,9 +217,8 @@ public class SmithShop {
             player.getInventory().addItem(item);
         }
 
-        String message = this.loader.messageFormat(player, (success? "messageSuccess" : "messageFail"));
+        String message = this.loader.messageFormat(player, (success? "messageSuccess" : "messageFail"), price);
         message = message.replace("{item}", enchantName+" Enchant");
-        message = message.replace("{money}", String.valueOf(price));
         player.sendMessage(message);
     }
 

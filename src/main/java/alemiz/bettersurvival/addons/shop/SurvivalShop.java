@@ -304,9 +304,8 @@ public class SurvivalShop extends Addon {
         if (item == null) return;
         boolean success = item.buyItem(player);
 
-        String message = this.messageFormat(player, (success? "messageSuccess" : "messageFail"));
+        String message = this.messageFormat(player, (success? "messageSuccess" : "messageFail"), item.getPrice());
         message = message.replace("{item}", item.getName());
-        message = message.replace("{money}", String.valueOf(item.getPrice()));
         player.sendMessage(message);
     }
 
@@ -371,11 +370,15 @@ public class SurvivalShop extends Addon {
     }
 
     protected String messageFormat(Player player, String messageKey){
+        return this.messageFormat(player, messageKey, (int) EconomyAPI.getInstance().myMoney(player));
+    }
+
+    protected String messageFormat(Player player, String messageKey, int money){
         if (player == null || messageKey == null || configFile.getString(messageKey).equals("")) return "";
 
         String message = configFile.getString(messageKey);
         message = message.replace("{player}", player.getName());
-        message = message.replace("{money}", String.valueOf(EconomyAPI.getInstance().myMoney(player)));
+        message = message.replace("{money}", String.valueOf(money));
         return message;
     }
 }
