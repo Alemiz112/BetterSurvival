@@ -50,7 +50,7 @@ public class CubeBridge extends Addon {
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-feed"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-near"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-jump"));
-            perms.add(Addon.getAddon("levelvote").configFile.getString("permission-vote"));
+            //perms.add(Addon.getAddon("levelvote").configFile.getString("permission-vote"));
         }
 
         if (player.hasPermission(PLUS_PERM) || isStaff){
@@ -70,6 +70,7 @@ public class CubeBridge extends Addon {
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-fly"));
 
             perms.add(Addon.getAddon("mylandprotect").configFile.getString("landsVipPermission"));
+            perms.add(Addon.getAddon("survivalshop").configFile.getString("shopVipPermission"));
         }
 
         if (player.hasPermission(STAFF_PERM)){
