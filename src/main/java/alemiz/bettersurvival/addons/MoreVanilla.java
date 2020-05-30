@@ -23,6 +23,7 @@ import cn.nukkit.level.Location;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.PlaySoundPacket;
 import cn.nukkit.network.protocol.SpawnParticleEffectPacket;
 import cn.nukkit.potion.Effect;
 
@@ -164,6 +165,19 @@ public class MoreVanilla extends Addon{
         format = format.replace("{player}", player.getName());
         format = format.replace("{message}", event.getMessage());
         event.setFormat(format);
+
+        for (Player pplayer : this.plugin.getServer().getOnlinePlayers().values()){
+            if (!event.getMessage().contains("@"+pplayer.getName())) continue;
+
+            PlaySoundPacket packet = new PlaySoundPacket();
+            packet.name = "note.hat"; //cubemc use as info sound
+            packet.volume = 1;
+            packet.pitch = 1;
+            packet.x = (int) player.getX();
+            packet.y = (int) player.getY();
+            packet.z = (int) player.getZ();
+            pplayer.dataPacket(packet);
+        }
     }
 
     @EventHandler
