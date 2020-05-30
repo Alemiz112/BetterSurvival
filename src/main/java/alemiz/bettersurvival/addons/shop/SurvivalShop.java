@@ -5,6 +5,7 @@ import alemiz.bettersurvival.commands.SellCommand;
 import alemiz.bettersurvival.commands.ShopCommand;
 import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.ConfigManager;
+import alemiz.bettersurvival.utils.TextUtils;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.blockentity.BlockEntitySign;
@@ -21,7 +22,6 @@ import cn.nukkit.form.response.FormResponseSimple;
 import cn.nukkit.form.window.FormWindowCustom;
 import cn.nukkit.form.window.FormWindowModal;
 import cn.nukkit.form.window.FormWindowSimple;
-import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -92,7 +92,7 @@ public class SurvivalShop extends Addon {
             configFile.set("shopSet", "§6»§7Shop was created successfully!");
 
             configFile.set("messageSuccess", "§a»§7You have successfully bought §6{item}§7!");
-            configFile.set("messageFail", "§e»§7You dont have §e{money}§7 coins to buy §6{item}§7!");
+            configFile.set("messageFail", "§c»§7You dont have §e{money}§7 coins to buy §6{item}§7!");
             configFile.save();
         }
 
@@ -378,7 +378,7 @@ public class SurvivalShop extends Addon {
 
         String message = configFile.getString(messageKey);
         message = message.replace("{player}", player.getName());
-        message = message.replace("{money}", String.valueOf(money));
+        message = message.replace("{money}", TextUtils.formatBigNumber(money));
         return message;
     }
 }
