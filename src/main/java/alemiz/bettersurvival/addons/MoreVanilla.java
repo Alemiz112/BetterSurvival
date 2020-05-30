@@ -117,8 +117,6 @@ public class MoreVanilla extends Addon{
         registerCommand("jump", new JumpCommand("jump", this));
         registerCommand("rand", new RandCommand("rand", this));
         registerCommand("mute", new MuteCommand("mute", this));
-
-
         registerCommand("unmute", new UnmuteCommand("unmute", this));
     }
 
