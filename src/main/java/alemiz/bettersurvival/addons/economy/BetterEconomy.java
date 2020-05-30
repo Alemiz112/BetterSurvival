@@ -66,10 +66,12 @@ public class BetterEconomy extends Addon {
 
         //TODO: include clan mode economy
         boolean success = EconomyAPI.getInstance().reduceMoney(player, price) >= 1;
+        String owner = player.getName(); //may be clan name too
+
         if (success){
             Item item = getBankNote();
             item.setCustomName(item.getCustomName()+" §6"+TextUtils.formatBigNumber(price)+"$");
-            item.setLore(ArrayUtils.addAll(new String[]{"§r§5Value: "+price+"$", "§r§5Created For: §d"+player.getName()}, item.getLore()));
+            item.setLore(ArrayUtils.addAll(new String[]{"§r§5Value: "+price+"$", "§r§5Created For: §d"+owner}, item.getLore()));
 
             CompoundTag tag = item.getNamedTag();
             tag.putInt("economy_value", price);
