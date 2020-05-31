@@ -447,7 +447,8 @@
       "id": 33,
       "count": 3,
       "price": 150,
-      "sell": 2
+      "sell": 2,
+      "image": "blocks/piston_side"
     },
     "sticky piston": {
       "id": 29,
@@ -466,31 +467,36 @@
       "id": 66,
       "count": 16,
       "price": 250,
-      "sell": 2
+      "sell": 2,
+      "image": false
     },
     "powered rails": {
       "id": 27,
       "count": 8,
       "price": 250,
-      "sell": 2
+      "sell": 2,
+      "image": false
     },
     "dropper": {
       "id": 158,
       "count": 3,
       "price": 150,
-      "sell": 2
+      "sell": 2,
+      "image": "blocks/dropper_front_horizontal"
     },
     "dispenser": {
       "id": 23,
       "count": 3,
       "price": 250,
-      "sell": 3
+      "sell": 3,
+      "image": "blocks/dispenser_front_horizontal"
     },
     "redstone lamp": {
       "id": 123,
       "count": 5,
       "price": 200,
-      "sell": 3
+      "sell": 3,
+      "image": "blocks/redstone_lamp_on"
     }
   },
   "spawn eggs": {
