@@ -8,7 +8,7 @@ import cn.nukkit.Player;
 import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.nbt.tag.CompoundTag;
-import me.onebone.economyapi.EconomyAPI;
+import cubemc.nukkit.connector.modules.Money;
 import org.apache.commons.lang3.ArrayUtils;
 
 public class BetterEconomy extends Addon {
@@ -65,7 +65,7 @@ public class BetterEconomy extends Addon {
         }
 
         //TODO: include clan mode economy
-        boolean success = EconomyAPI.getInstance().reduceMoney(player, price) >= 1;
+        boolean success = Money.getInstance().reduceMoney(player, price);
         if (success){
             Item item = getBankNote();
             item.setCustomName(item.getCustomName()+" §6"+TextUtils.formatBigNumber(price)+"$");
@@ -103,14 +103,14 @@ public class BetterEconomy extends Addon {
         int value = item.getNamedTag().getInt("economy_value");
 
         //TODO: include clan mode economy
-        EconomyAPI.getInstance().addMoney(player, value);
+        Money.getInstance().addMoney(player, value);
 
         PlayerInventory inv = player.getInventory();
         inv.clear(inv.getHeldItemIndex());
 
         String message = configFile.getString("noteApplyMessage");
         message = message.replace("{player}", player.getName());
-        message = message.replace("{money}", TextUtils.formatBigNumber(EconomyAPI.getInstance().myMoney(player)));
+        message = message.replace("{money}", TextUtils.formatBigNumber(Money.getInstance().getMoney(player, false)));
         player.sendMessage(message);
     }
 
