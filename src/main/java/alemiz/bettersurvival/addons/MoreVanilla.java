@@ -39,6 +39,8 @@ public class MoreVanilla extends Addon{
         UNSAFE_BLOCKS.set(BlockID.AIR);
         UNSAFE_BLOCKS.set(BlockID.LAVA);
         UNSAFE_BLOCKS.set(BlockID.STILL_LAVA);
+        UNSAFE_BLOCKS.set(BlockID.WATER);
+        UNSAFE_BLOCKS.set(BlockID.STILL_WATER);
         UNSAFE_BLOCKS.set(BlockID.FIRE);
         UNSAFE_BLOCKS.set(BlockID.CACTUS);
         UNSAFE_BLOCKS.set(BlockID.NETHER_PORTAL);
@@ -501,8 +503,8 @@ public class MoreVanilla extends Addon{
             boolean found = false;
 
             while (!found){
-                x = rand.nextInt(-5000, 5000) + rand.nextInt(-500, 500);
-                z = rand.nextInt(-5000,5000) + rand.nextInt(-500, 500);
+                x = rand.nextInt(-50000, 50000);
+                z = rand.nextInt(-50000,50000);
 
                 BaseFullChunk chunk = level.getChunk(x >> 4, z >> 4, true);
 
