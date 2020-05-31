@@ -41,6 +41,8 @@ public class CubeBridge extends Addon {
     @EventHandler
     public void onNetworkJoin(CubePlayerJoinEvent event){
         Player player = event.getPlayer();
+        if (player == null) return;
+
         List<String> perms = new ArrayList<>();
 
         boolean isStaff = player.hasPermission(STAFF_PERM);
