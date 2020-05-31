@@ -1,6 +1,7 @@
 package alemiz.bettersurvival;
 
 import alemiz.bettersurvival.addons.*;
+import alemiz.bettersurvival.addons.economy.BetterEconomy;
 import alemiz.bettersurvival.addons.myland.MyLandProtect;
 import alemiz.bettersurvival.addons.shop.SurvivalShop;
 import alemiz.bettersurvival.utils.Addon;
@@ -105,6 +106,7 @@ public class BetterSurvival extends PluginBase implements Listener {
         Addon.loadAddon(new BetterVoting("better_voting.yml"));
         Addon.loadAddon(new LevelVote("level_vote.yml"));
         Addon.loadAddon(new SurvivalShop("survival_shop.yml"));
+        Addon.loadAddon(new BetterEconomy("better_economy.yml"));
 
         //CubeMC addons
         Addon.loadAddon(new EasterAddon("easter_addon.yml"));

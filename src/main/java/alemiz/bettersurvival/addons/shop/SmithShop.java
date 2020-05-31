@@ -2,6 +2,7 @@ package alemiz.bettersurvival.addons.shop;
 
 import alemiz.bettersurvival.commands.EnchCommand;
 import alemiz.bettersurvival.utils.ConfigManager;
+import alemiz.bettersurvival.utils.Items;
 import alemiz.bettersurvival.utils.enitity.FakeHuman;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
@@ -30,7 +31,7 @@ public class SmithShop {
 
     static {
         Item item = Item.get(Item.ENDER_EYE, 0, 1);
-        item.setLore("§r§5Use /ench to apply enchant", "§r§5You must hold target item");
+        item.setLore("§r§5Use §d/ench§5 to apply enchant", "§r§5You must hold target item");
         item.getNamedTag().putByte("enchant_orb", 1);
         enchantItem = item;
     }
@@ -397,15 +398,7 @@ public class SmithShop {
     }
 
     public static Item getEnchantItem() {
-        try {
-            Item item = enchantItem.getClass().newInstance();
-            if (enchantItem.hasCompoundTag()) item.setNamedTag(enchantItem.getNamedTag().clone());
-            return item;
-        }catch (InstantiationException | IllegalAccessException e){
-            //ignore
-        }
-
-        return null;
+        return Items.deepCopy(enchantItem);
     }
 
     public SurvivalShop getLoader() {
