@@ -150,9 +150,7 @@ public class BetterVoting extends Addon {
                 player.sendMessage("§c»§7You must have crate key. Vote to get one!");
                 return;
             }
-            FakeInventory inv = FakeInventoryManager.createInventory(player, "Vote Chest", prepareItems());
-            inv.setInventoryFlag(FakeInventory.Flags.IS_VOTE_INV, true);
-            inv.showInventory(player);
+            this.sendCrateMenu(player);
         }
     }
 
@@ -326,5 +324,11 @@ public class BetterVoting extends Addon {
         String message = configFile.getString("crateSetMessage");
         message = message.replace("{player}", player.getName());
         player.sendMessage(message);
+    }
+
+    public void sendCrateMenu(Player player){
+        FakeInventory inv = FakeInventoryManager.createInventory(player, "Vote Chest", this.prepareItems());
+        inv.setInventoryFlag(FakeInventory.Flags.IS_VOTE_INV, true);
+        inv.showInventory(player);
     }
 }
