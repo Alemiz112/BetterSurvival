@@ -41,6 +41,8 @@ public class CrateCommand extends Command {
             return true;
         }
 
+        Player player = (Player) sender;
+
         switch (args[0]){
             case "give":
                 if (args.length < 3){
@@ -52,11 +54,20 @@ public class CrateCommand extends Command {
                 }catch (Exception e){
                     sender.sendMessage("§cPlease enter count as a number!");
                 }
-                break;
+                return true;
             case "set":
                 this.loader.getCratePos((Player) sender);
-                break;
+                return true;
         }
+
+        if (!this.loader.enableVoteCrate) return true;
+
+        if (!player.getInventory().getItemInHand().getCustomName().equals(this.loader.voteKey.getCustomName())){
+            player.sendMessage("§c»§7You must have crate key. Vote to get one!");
+            return true;
+        }
+
+        this.loader.sendCrateMenu(player);
         return true;
     }
 }
