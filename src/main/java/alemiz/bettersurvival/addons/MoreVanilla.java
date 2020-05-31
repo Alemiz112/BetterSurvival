@@ -129,7 +129,7 @@ public class MoreVanilla extends Addon{
                 configFile.getBoolean("doImmediateRespawn", true));
     }
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onJoin(PlayerJoinEvent event){
         Player player = event.getPlayer();
 
