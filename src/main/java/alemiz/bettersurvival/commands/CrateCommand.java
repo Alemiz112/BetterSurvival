@@ -36,12 +36,20 @@ public class CrateCommand extends Command {
             sender.sendMessage("§cThis command can be run only in game!");
             return true;
         }
-        if (args.length < 1){
-            sender.sendMessage(getUsageMessage());
-            return true;
-        }
 
         Player player = (Player) sender;
+
+        if (args.length < 1){
+            if (!this.loader.enableVoteCrate) return true;
+
+            if (!player.getInventory().getItemInHand().getCustomName().equals(this.loader.voteKey.getCustomName())){
+                player.sendMessage("§c»§7You must have crate key. Vote to get one!");
+                return true;
+            }
+
+            this.loader.sendCrateMenu(player);
+            return true;
+        }
 
         switch (args[0]){
             case "give":
@@ -60,14 +68,7 @@ public class CrateCommand extends Command {
                 return true;
         }
 
-        if (!this.loader.enableVoteCrate) return true;
 
-        if (!player.getInventory().getItemInHand().getCustomName().equals(this.loader.voteKey.getCustomName())){
-            player.sendMessage("§c»§7You must have crate key. Vote to get one!");
-            return true;
-        }
-
-        this.loader.sendCrateMenu(player);
         return true;
     }
 }
