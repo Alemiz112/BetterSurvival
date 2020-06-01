@@ -13,10 +13,7 @@ import cn.nukkit.utils.Config;
 import cn.nukkit.utils.TextFormat;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class PlayerClans extends Addon {
 
@@ -64,12 +61,15 @@ public class PlayerClans extends Addon {
         Clan clan = this.getClan(event.getPlayer());
         if (clan == null) return;
 
-        clan.chat(message, event.getPlayer());
+        clan.chat(message.substring(1), event.getPlayer());
+        event.setCancelled(true);
     }
 
     private void loadClan(SuperConfig config){
-        this.plugin.getLogger().info("§eLoading clan "+config.getName()+"§e!");
-        this.clans.put(config.getName(), new Clan(config.getName(), config.getString("formattedName"), config, this));
+        String rawName = config.getName().split("\\.")[0];
+        this.plugin.getLogger().info("§eLoading clan "+rawName+"§e!");
+
+        this.clans.put(rawName, new Clan(rawName, config.getString("formattedName"), config, this));
     }
 
     public Clan createClan(Player player, String name){
@@ -86,7 +86,7 @@ public class PlayerClans extends Addon {
 
         config.set("formattedName", name);
         config.set("owner", player.getName());
-        config.set("players", new ArrayList<>());
+        config.set("players", new ArrayList<>(Collections.singletonList(player.getName())));
         config.set("money", 0);
         config.set("maxMoney", configFile.getInt("moneyLimit", 400000));
         config.set("playerLimit", configFile.getInt("playerLimit", 10));
@@ -127,7 +127,7 @@ public class PlayerClans extends Addon {
         List<String> pendingInvites = config.getStringList("clanInvites");
 
         if (pendingInvites.isEmpty()) return;
-        StringBuilder builder = new StringBuilder("§3»§7You have new pending invites to this clans:");
+        StringBuilder builder = new StringBuilder("§3»§7You have new pending invites to this clans: ");
 
         for (String invite : pendingInvites){
             builder.append("§6").append(invite).append("§7,");

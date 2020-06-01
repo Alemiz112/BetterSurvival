@@ -78,7 +78,7 @@ public class Clan {
             return;
         }
 
-        int limit = config.getInt("playerLimit");
+        int limit = this.config.getInt("playerLimit");
         if (this.players.size() >= limit){
             if (executor != null) executor.sendMessage("§c»§7Your clan player limit is §6"+limit+"§7 players. You can not add another player! " +
                     "TIP: Upgrade your clan and get more player slots!");
@@ -98,7 +98,7 @@ public class Clan {
     public void addPlayer(Player player){
         if (player == null) return;
 
-        this.sendMessage("Player @6"+player.getName()+" joined your clan!");
+        this.sendMessage("Player @6"+player.getName()+" joined your Clan!");
         this.players.add(player.getName());
         this.savePlayerList();
 
@@ -106,20 +106,31 @@ public class Clan {
     }
 
     //TODO: create and allow admins to kick player
+    //TODO: do not allow admins to kick admin
     public void kickPlayer(String playerName, Player executor){
         if (playerName == null) return;
 
         if (executor != null && !this.owner.equals(executor.getName())){
-            executor.sendMessage("§c»§7You do not have permission to invite player to clan!");
+            executor.sendMessage("§c»§7You do not have permission to invite player to Clan!");
+            return;
+        }
+
+        if (executor != null && executor.getName().equalsIgnoreCase(playerName)){
+            executor.sendMessage("§c»§7You can not kick yourself from clan!");
+            return;
+        }
+
+        if (playerName.equalsIgnoreCase(this.owner)){
+            if (executor != null) executor.sendMessage("§c»§7You can not kick owner of Clan!");;
             return;
         }
 
         if (!this.players.contains(playerName)){
-            if (executor != null) executor.sendMessage("§c»§7Player §6@"+playerName+" is not member in your clan!");
+            if (executor != null) executor.sendMessage("§c»§7Player §6@"+playerName+" is not member in your Clan!");
             return;
         }
 
-        this.sendMessage("Player @6"+playerName+" was kicked from your clan!");
+        this.sendMessage("Player §6@"+playerName+" was kicked from your Clan!");
         this.players.remove(playerName);
         this.savePlayerList();
 
@@ -130,11 +141,11 @@ public class Clan {
     public void removePlayer(Player player){
         if (player == null) return;
 
-        this.sendMessage("Player @6"+player.getName()+" leaved your clan!");
+        this.sendMessage("Player @6"+player.getName()+" leaved your Clan!");
         this.players.remove(player.getName());
         this.savePlayerList();
 
-        player.sendMessage("§6»§7You leaved §6@"+this.name+"§7 Clan! Welcome to your new Home!");
+        player.sendMessage("§6»§7You leaved §6@"+this.name+"§7 Clan!");
     }
 
     public void chat(String message, Player player){
@@ -147,7 +158,7 @@ public class Clan {
     }
 
     public void sendMessage(String message, String author){
-        String formattedMessage = "§f[§a"+this.name+"§f]"+(author == null? "" : author)+": §7"+message;
+        String formattedMessage = "§f[§a"+this.name+"§f] §7"+(author == null? "" : author)+": §f"+message;
 
         for (String playerName : this.players){
             Player member = Server.getInstance().getPlayer(playerName);
@@ -155,6 +166,14 @@ public class Clan {
             if (member == null) continue;
             member.sendMessage(formattedMessage);
         }
+    }
+
+    public String buildTextInfo(){
+        return "§a"+this.name+"§a Clan:\n" +
+                "§3»§7 Owner: "+this.owner+"\n" +
+                "§3»§7 Money: §e"+this.money+"§7/§6"+this.config.getInt("maxMoney")+"$\n" +
+                "§3»§7 Players: §c"+this.players.size()+"§7/§4"+this.config.getInt("playerLimit")+"\n" +
+                "§3»§7 Player List: "+String.join(", ", this.players);
     }
 
     public String getRawName() {

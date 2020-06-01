@@ -22,10 +22,11 @@ public class ClanCommand extends Command {
 
         this.usage = "§7/clan create <name> : Creates new clan\n" +
                 "§7/clan invite <player> : Invites player to your clan\n" +
-                "§7clan kick <player> : Kicks player from your clan\n" +
+                "§7/clan kick <player> : Kicks player from your clan\n" +
                 "§7/clan invitations : Lists all pending invitations\n" +
-                "§7clan accept <clan - rawName> : Accept invitation from clan\n" +
+                "§7/clan accept <clan - rawName> : Accept invitation from clan\n" +
                 "§7/clan deny <clan - rawName> : Deny invitation from clan\n" +
+                "§7/clan info : Shows info about your clan\n" +
                 "§aYou can use clan chat by starting message with §6%§a!";
         this.setUsage(getUsageMessage());
 
@@ -60,7 +61,7 @@ public class ClanCommand extends Command {
 
         switch (args[0]){
             case "create":
-                 clanName = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+                clanName = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
                 this.loader.createClan(player, clanName);
                 break;
             case "invite":
@@ -115,6 +116,15 @@ public class ClanCommand extends Command {
                 config.save();
 
                 player.sendMessage("§6»§7You have denied invitation from clan §6"+args[1]+"§7!");
+                break;
+            case "info":
+                clan = this.loader.getClan(player);
+                if (clan == null){
+                    player.sendMessage("§c»§7You are not in any clan!");
+                    break;
+                }
+
+                player.sendMessage(clan.buildTextInfo());
                 break;
             default:
                 player.sendMessage(this.getUsageMessage());
