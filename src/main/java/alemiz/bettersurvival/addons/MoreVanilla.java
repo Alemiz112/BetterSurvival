@@ -178,6 +178,14 @@ public class MoreVanilla extends Addon{
     }
 
     @EventHandler
+    public void onWakeUp(PlayerBedLeaveEvent event){
+        Player player = event.getPlayer();
+
+        Position safeSpawn = player.getLevel().getSafeSpawn(player.getSpawn());
+        player.teleport(safeSpawn.add(-0.5, -0.5, -0.5));
+    }
+
+    @EventHandler
     public void onDeath(PlayerDeathEvent event){
         Player player = event.getEntity();
         this.back.put(player.getName(), player.clone());
