@@ -2,10 +2,10 @@ package alemiz.bettersurvival.addons;
 
 import alemiz.bettersurvival.commands.*;
 import alemiz.bettersurvival.tasks.MuteCheckTask;
+import alemiz.bettersurvival.tasks.RandomTpTask;
 import alemiz.bettersurvival.utils.Addon;
 import cn.nukkit.AdventureSettings;
 import cn.nukkit.Server;
-import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.EventPriority;
@@ -16,11 +16,7 @@ import cn.nukkit.Player;
 import cn.nukkit.form.window.FormWindowSimple;
 import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.item.Item;
-import cn.nukkit.level.GameRule;
-import cn.nukkit.level.GameRules;
-import cn.nukkit.level.Level;
-import cn.nukkit.level.Location;
-import cn.nukkit.level.format.generic.BaseFullChunk;
+import cn.nukkit.level.*;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.PlaySoundPacket;
@@ -28,12 +24,11 @@ import cn.nukkit.network.protocol.SpawnParticleEffectPacket;
 import cn.nukkit.potion.Effect;
 
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class MoreVanilla extends Addon{
 
-    private static BitSet UNSAFE_BLOCKS = new BitSet();
+    public static BitSet UNSAFE_BLOCKS = new BitSet();
 
     static {
         UNSAFE_BLOCKS.set(BlockID.AIR);
@@ -51,6 +46,7 @@ public class MoreVanilla extends Addon{
     protected Map<String, Location> back = new HashMap<>();
 
     protected Map<String, Date> mutedPlayers = new HashMap<>();
+    protected Map<String, Integer> randTpDelay = new HashMap<>();
 
     public MoreVanilla(String path){
         super("morevanilla", path);
@@ -146,6 +142,7 @@ public class MoreVanilla extends Addon{
         Player player = event.getPlayer();
 
         this.back.remove(player.getName());
+        this.randTpDelay.remove(player.getName());
     }
 
     @EventHandler
@@ -178,6 +175,14 @@ public class MoreVanilla extends Addon{
             packet.z = (int) player.getZ();
             pplayer.dataPacket(packet);
         }
+    }
+
+    @EventHandler
+    public void onWakeUp(PlayerBedLeaveEvent event){
+        Player player = event.getPlayer();
+
+        Position safeSpawn = player.getLevel().getSafeSpawn(player.getSpawn());
+        player.teleport(safeSpawn.add(-0.5, -0.5, -0.5));
     }
 
     @EventHandler
@@ -493,37 +498,20 @@ public class MoreVanilla extends Addon{
             return;
         }
 
-        Runnable task = () -> {
-            Level level = player.getLevel();
-            ThreadLocalRandom rand = ThreadLocalRandom.current();
+        Integer lastTp = this.randTpDelay.get(player.getName());
+        int now = Server.getInstance().getTick();
 
-            int x = 0;
-            int z = 0;
-            int y = 0;
-            boolean found = false;
+        if (lastTp != null && (now - lastTp < (20 * 10))){
+            player.sendMessage("§c»§7Please wait! you have benn teleported just few seconds ago!");
+            return;
+        }
 
-            while (!found){
-                x = rand.nextInt(-50000, 50000);
-                z = rand.nextInt(-50000,50000);
+        this.randTpDelay.put(player.getName(), Server.getInstance().getTick());
+        player.sendMessage("§6»§7Finding nice location... This usually takes some time!");
 
-                BaseFullChunk chunk = level.getChunk(x >> 4, z >> 4, true);
-
-                for (y = 250; y >= 20; y--){
-                    if (UNSAFE_BLOCKS.get(chunk.getBlockId(x & 0xF, y, z & 0xF)) ||
-                            chunk.getBlockId(x & 0xF, y+1, z & 0xF) != BlockID.AIR ||
-                            chunk.getBlockId(x & 0xF, y+2, z & 0xF) != BlockID.AIR) continue;
-                    found = true;
-                    break;
-                }
-            }
-
-            player.teleport(new Location(x, y+1, z, player.getLevel()));
-
-            String message = configFile.getString("randtpMessage");
-            message = message.replace("{player}", player.getName());
-            player.sendMessage(message);
-        };
-        this.plugin.getServer().getScheduler().scheduleTask(plugin, task, true);
+        String message = configFile.getString("randtpMessage");
+        message = message.replace("{player}", player.getName());
+        this.plugin.getServer().getScheduler().scheduleDelayedTask(new RandomTpTask(player, message), 30);
     }
 
     public void mute(Player player, String executor, String time){
