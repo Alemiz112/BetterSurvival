@@ -47,6 +47,7 @@ public class MoreVanilla extends Addon{
 
     protected Map<String, Date> mutedPlayers = new HashMap<>();
     protected Map<String, Integer> randTpDelay = new HashMap<>();
+    protected Map<String, Position> sleepPos = new HashMap<>();
 
     public MoreVanilla(String path){
         super("morevanilla", path);
@@ -143,6 +144,7 @@ public class MoreVanilla extends Addon{
 
         this.back.remove(player.getName());
         this.randTpDelay.remove(player.getName());
+        this.sleepPos.remove(player.getName());
     }
 
     @EventHandler
@@ -178,11 +180,17 @@ public class MoreVanilla extends Addon{
     }
 
     @EventHandler
+    public void onSleep(PlayerBedEnterEvent event){
+        Player player = event.getPlayer();
+        this.sleepPos.put(player.getName(), player.clone());
+    }
+
+    @EventHandler
     public void onWakeUp(PlayerBedLeaveEvent event){
         Player player = event.getPlayer();
 
-        Position safeSpawn = player.getLevel().getSafeSpawn(player.getSpawn());
-        player.teleport(safeSpawn.add(-0.5, -0.5, -0.5));
+        Position safeSpawn = this.sleepPos.getOrDefault(player.getName(), player.getLevel().getSafeSpawn(player.getSpawn()));
+        player.teleport(safeSpawn);
     }
 
     @EventHandler
