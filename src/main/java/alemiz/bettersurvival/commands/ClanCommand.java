@@ -9,6 +9,7 @@ import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.utils.Config;
+import me.onebone.economyapi.EconomyAPI;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,6 +27,7 @@ public class ClanCommand extends Command {
                 "§7/clan invitations : Lists all pending invitations\n" +
                 "§7/clan accept <clan - rawName> : Accept invitation from clan\n" +
                 "§7/clan deny <clan - rawName> : Deny invitation from clan\n" +
+                "§7/clan leave : Leave current clan\n" +
                 "§7/clan info : Shows info about your clan\n" +
                 "§7/clan bank note <value> : Creates bank note signed by your clan\n" +
                 "§7/clan bank apply : Applies note from your hand to clan bank\n" +
@@ -130,6 +132,15 @@ public class ClanCommand extends Command {
 
                 player.sendMessage(clan.buildTextInfo());
                 break;
+            case "leave":
+                clan = this.loader.getClan(player);
+                if (clan == null){
+                    player.sendMessage("§c»§7You are not in any clan!");
+                    break;
+                }
+
+                clan.removePlayer(player);
+                break;
             case "bank":
                 if (args.length < 2){
                     player.sendMessage(this.getUsageMessage());
@@ -141,7 +152,6 @@ public class ClanCommand extends Command {
                     player.sendMessage("§c»§7You are not in any clan!");
                     break;
                 }
-
 
                 switch (args[1]){
                     case "status":
@@ -160,6 +170,13 @@ public class ClanCommand extends Command {
                     case "donate":
                         try {
                             int value = Integer.parseInt(args[2]);
+                            boolean success = EconomyAPI.getInstance().reduceMoney(player, value) >= 1;
+
+                            if (!success){
+                                player.sendMessage("§c»§7You do not have enough coins to donate!");
+                                break;
+                            }
+
                             clan.addMoney(value);
                             clan.onDonate(player, value);
                         }catch (Exception e){

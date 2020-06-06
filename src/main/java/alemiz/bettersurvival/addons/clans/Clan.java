@@ -147,8 +147,13 @@ public class Clan {
     public void removePlayer(Player player){
         if (player == null) return;
 
-        this.sendMessage("Player @6"+player.getName()+" leaved your Clan!");
+        if (this.owner.equalsIgnoreCase(player.getName())){
+            player.sendMessage("§c»§7You are owner of this clan, you can not leave. If you want to cancel you clan use §e/clan destroy§7.");
+            return;
+        }
+
         this.players.remove(player.getName());
+        this.sendMessage("Player @6"+player.getName()+" leaved your Clan!");
         this.savePlayerList();
 
         player.sendMessage("§6»§7You leaved §6@"+this.name+"§7 Clan!");

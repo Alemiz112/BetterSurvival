@@ -39,6 +39,7 @@ public class BetterEconomy extends Addon {
 
             configFile.set("noteCreateMessage", "§6»§7You have successfully created Bank Note with price §e{money}$§7!");
             configFile.set("noteApplyMessage", "§6»§7Bank Note was applied to your global balance. Your new balance is §e{money}$§7!");
+            configFile.set("noteApplyMessageClan", "§6»§7Bank Note was applied to your clan balance. Your new balance is §e{money}$§7!");
             configFile.set("failMessage", "§c»§7You do not have enough coins to create bank note§7!");
             configFile.set("failMessageLimit", "§c»§7Maximum limit to bank note is §e{limit}$§7!");
             configFile.save();
@@ -117,9 +118,10 @@ public class BetterEconomy extends Addon {
         }
 
         int value = item.getNamedTag().getInt("economy_value");
+        Clan clan = null;
 
         if (clanMode && Addon.getAddon("playerclans") != null){
-            Clan clan = ((PlayerClans) Addon.getAddon("playerclans")).getClan(player);
+            clan = ((PlayerClans) Addon.getAddon("playerclans")).getClan(player);
             if (clan == null) {
                 player.sendMessage("§c»§7You are not in any clan!");
                 return;
@@ -134,9 +136,9 @@ public class BetterEconomy extends Addon {
         PlayerInventory inv = player.getInventory();
         inv.clear(inv.getHeldItemIndex());
 
-        String message = configFile.getString("noteApplyMessage");
+        String message = configFile.getString(clanMode? "noteApplyMessageClan" : "noteApplyMessage");
         message = message.replace("{player}", player.getName());
-        message = message.replace("{money}", TextUtils.formatBigNumber(EconomyAPI.getInstance().myMoney(player)));
+        message = message.replace("{money}", TextUtils.formatBigNumber((clanMode && clan != null)? clan.getMoney() : EconomyAPI.getInstance().myMoney(player)));
         player.sendMessage(message);
     }
 

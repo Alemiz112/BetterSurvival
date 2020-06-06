@@ -67,7 +67,7 @@ public class PlayerClans extends Addon {
 
     private void loadClan(SuperConfig config){
         String rawName = config.getName().split("\\.")[0];
-        this.plugin.getLogger().info("§eLoading clan "+rawName+"§e!");
+        this.plugin.getLogger().info("§eLoading clan §3"+rawName+"§e!");
 
         this.clans.put(rawName, new Clan(rawName, config.getString("formattedName"), config, this));
     }
