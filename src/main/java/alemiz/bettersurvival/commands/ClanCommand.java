@@ -27,6 +27,10 @@ public class ClanCommand extends Command {
                 "§7/clan accept <clan - rawName> : Accept invitation from clan\n" +
                 "§7/clan deny <clan - rawName> : Deny invitation from clan\n" +
                 "§7/clan info : Shows info about your clan\n" +
+                "§7/clan bank note <value> : Creates bank note signed by your clan\n" +
+                "§7/clan bank apply : Applies note from your hand to clan bank\n" +
+                "§7/clan bank donate <value> : Gives money to clan bank\n" +
+                "§7/clan bank status: Shows your clan bank status\n" +
                 "§aYou can use clan chat by starting message with §6%§a!";
         this.setUsage(getUsageMessage());
 
@@ -125,6 +129,43 @@ public class ClanCommand extends Command {
                 }
 
                 player.sendMessage(clan.buildTextInfo());
+                break;
+            case "bank":
+                if (args.length < 2){
+                    player.sendMessage(this.getUsageMessage());
+                    return true;
+                }
+
+                clan = this.loader.getClan(player);
+                if (clan == null){
+                    player.sendMessage("§c»§7You are not in any clan!");
+                    break;
+                }
+
+
+                switch (args[1]){
+                    case "status":
+                        player.sendMessage("§a"+clan.getName()+"§a Clan:\n§3»§7 Money: §e"+clan.getMoney()+"§7/§6"+clan.getMaxMoney()+"$");
+                    break;
+                    case "note":
+                        try {
+                            clan.createBankNote(player, Integer.parseInt(args[2]));
+                        }catch (Exception e){
+                            player.sendMessage("§c»§7Please provide numerical value!");
+                        }
+                        break;
+                    case "apply":
+                        clan.applyBankNote(player);
+                        break;
+                    case "donate":
+                        try {
+                            int value = Integer.parseInt(args[2]);
+                            clan.addMoney(value);
+                            clan.onDonate(player, value);
+                        }catch (Exception e){
+                            player.sendMessage("§c»§7Please provide numerical value!");
+                        }
+                }
                 break;
             default:
                 player.sendMessage(this.getUsageMessage());

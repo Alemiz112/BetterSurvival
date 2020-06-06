@@ -1,5 +1,7 @@
 package alemiz.bettersurvival.addons.economy;
 
+import alemiz.bettersurvival.addons.clans.Clan;
+import alemiz.bettersurvival.addons.clans.PlayerClans;
 import alemiz.bettersurvival.commands.BankCommand;
 import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.Items;
@@ -64,9 +66,21 @@ public class BetterEconomy extends Addon {
             return;
         }
 
-        //TODO: include clan mode economy
-        boolean success = EconomyAPI.getInstance().reduceMoney(player, price) >= 1;
-        String owner = player.getName(); //may be clan name too
+        boolean success;
+        String owner;
+        if (clanMode && Addon.getAddon("playerclans") != null){
+            Clan clan = ((PlayerClans) Addon.getAddon("playerclans")).getClan(player);
+            if (clan == null) {
+                player.sendMessage("§c»§7You are not in any clan!");
+                return;
+            }
+
+            owner = clan.getName();
+            success = clan.reduceMoney(price);
+        }else {
+            success = EconomyAPI.getInstance().reduceMoney(player, price) >= 1;
+            owner = player.getName();
+        }
 
         if (success){
             Item item = getBankNote();
@@ -104,8 +118,18 @@ public class BetterEconomy extends Addon {
 
         int value = item.getNamedTag().getInt("economy_value");
 
-        //TODO: include clan mode economy
-        EconomyAPI.getInstance().addMoney(player, value);
+        if (clanMode && Addon.getAddon("playerclans") != null){
+            Clan clan = ((PlayerClans) Addon.getAddon("playerclans")).getClan(player);
+            if (clan == null) {
+                player.sendMessage("§c»§7You are not in any clan!");
+                return;
+            }
+
+            clan.addMoney(value);
+            clan.onApplyNote(player, value);
+        }else {
+            EconomyAPI.getInstance().addMoney(player, value);
+        }
 
         PlayerInventory inv = player.getInventory();
         inv.clear(inv.getHeldItemIndex());

@@ -1,8 +1,12 @@
 package alemiz.bettersurvival.addons.clans;
 
+import alemiz.bettersurvival.addons.economy.BetterEconomy;
+import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.ConfigManager;
+import alemiz.bettersurvival.utils.TextUtils;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.item.Item;
 import cn.nukkit.utils.Config;
 
 import java.util.ArrayList;
@@ -115,6 +119,8 @@ public class Clan {
             return;
         }
 
+        //TODO: admin check
+
         if (executor != null && executor.getName().equalsIgnoreCase(playerName)){
             executor.sendMessage("§c»§7You can not kick yourself from clan!");
             return;
@@ -146,6 +152,49 @@ public class Clan {
         this.savePlayerList();
 
         player.sendMessage("§6»§7You leaved §6@"+this.name+"§7 Clan!");
+    }
+
+    //TODO: admins can do this too
+    public void createBankNote(Player player, int value){
+        if (player == null || value == 0) return;
+
+        if (!this.owner.equals(player.getName())){
+            player.sendMessage("§c»§7You do not have permission to invite player to Clan!");
+            return;
+        }
+
+        if (Addon.getAddon("bettereconomy") == null){
+            player.sendMessage("§c»§7Economy addon is not enabled!");
+            return;
+        }
+
+        BetterEconomy economy = (BetterEconomy) Addon.getAddon("bettereconomy");
+        economy.createNote(player, value, true);
+    }
+
+    public void applyBankNote(Player player){
+        if (Addon.getAddon("bettereconomy") == null){
+            player.sendMessage("§c»§7Economy addon is not enabled!");
+            return;
+        }
+
+        BetterEconomy economy = (BetterEconomy) Addon.getAddon("bettereconomy");
+        Item item = player.getInventory().getItemInHand();
+
+        if (item.getId() == Item.AIR){
+            player.sendMessage("§c»§r§7You must hold Bank Note item!");
+            return;
+        }
+        economy.applyNote(player, item, true);
+    }
+
+    //May be useful in feature
+    public void onApplyNote(Player player, int value){
+        this.onDonate(player, value);
+    }
+
+    public void onDonate(Player player, int value){
+        this.sendMessage("Player §6@"+player.getName()+"§f donated to clan bank value of §e"+TextUtils.formatBigNumber(value)+"$§f!");
     }
 
     public void chat(String message, Player player){
@@ -194,6 +243,10 @@ public class Clan {
 
     public int getMoney() {
         return this.money;
+    }
+
+    public int getMaxMoney(){
+        return this.config.getInt("maxMoney");
     }
 
     public Config getConfig(){
