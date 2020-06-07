@@ -147,7 +147,7 @@ public class MoreVanilla extends Addon{
         this.sleepPos.remove(player.getName());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onChat(PlayerChatEvent event){
         Player player = event.getPlayer();
 

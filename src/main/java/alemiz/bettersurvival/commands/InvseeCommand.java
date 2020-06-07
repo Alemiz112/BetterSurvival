@@ -12,7 +12,7 @@ public class InvseeCommand extends Command {
     public Troller loader;
 
     public InvseeCommand(String name, Troller loader) {
-        super(name, "Shop players inventory", "");
+        super(name, "Show players inventory", "");
 
         this.usage = "§7/invsee <player>: Show players inventory ";
         this.setUsage(getUsageMessage());
