@@ -16,9 +16,9 @@ public class ConfigManager {
     protected static ConfigManager instance;
     public BetterSurvival plugin;
 
-    public String PATH = null;
-    public String PLAYER_PATH;
-    public String ADDONS_PATH;
+    public static String PATH = null;
+    public static String PLAYER_PATH;
+    public static String ADDONS_PATH;
 
     public Config cfg;
 
@@ -51,7 +51,11 @@ public class ConfigManager {
     }
 
     public List<SuperConfig> loadAllPlayers(){
-        File folder = new File(PLAYER_PATH);
+        return this.loadAllFromFolder(PLAYER_PATH);
+    }
+
+    public List<SuperConfig> loadAllFromFolder(String path){
+        File folder = new File(path);
         File[] listFiles = folder.listFiles();
 
         List<SuperConfig> configs = new ArrayList<>();

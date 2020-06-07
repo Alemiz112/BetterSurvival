@@ -1,5 +1,7 @@
 package alemiz.bettersurvival.addons.economy;
 
+import alemiz.bettersurvival.addons.clans.Clan;
+import alemiz.bettersurvival.addons.clans.PlayerClans;
 import alemiz.bettersurvival.commands.BankCommand;
 import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.Items;
@@ -37,6 +39,7 @@ public class BetterEconomy extends Addon {
 
             configFile.set("noteCreateMessage", "§6»§7You have successfully created Bank Note with price §e{money}$§7!");
             configFile.set("noteApplyMessage", "§6»§7Bank Note was applied to your global balance. Your new balance is §e{money}$§7!");
+            configFile.set("noteApplyMessageClan", "§6»§7Bank Note was applied to your clan balance. Your new balance is §e{money}$§7!");
             configFile.set("failMessage", "§c»§7You do not have enough coins to create bank note§7!");
             configFile.set("failMessageLimit", "§c»§7Maximum limit to bank note is §e{limit}$§7!");
             configFile.save();
@@ -64,12 +67,25 @@ public class BetterEconomy extends Addon {
             return;
         }
 
-        //TODO: include clan mode economy
-        boolean success = Money.getInstance().reduceMoney(player, price);
+        boolean success;
+        String owner;
+        if (clanMode && Addon.getAddon("playerclans") != null){
+            Clan clan = ((PlayerClans) Addon.getAddon("playerclans")).getClan(player);
+            if (clan == null) {
+                player.sendMessage("§c»§7You are not in any clan!");
+                return;
+            }
+
+            owner = clan.getName();
+            success = clan.reduceMoney(price);
+        }else {
+            success = Money.getInstance().reduceMoney(player, price);
+            owner = player.getName();
+        }
         if (success){
             Item item = getBankNote();
             item.setCustomName(item.getCustomName()+" §6"+TextUtils.formatBigNumber(price)+"$");
-            item.setLore(ArrayUtils.addAll(new String[]{"§r§5Value: "+price+"$", "§r§5Created For: §d"+player.getName()}, item.getLore()));
+            item.setLore(ArrayUtils.addAll(new String[]{"§r§5Value: "+price+"$", "§r§5Created For: §d"+owner}, item.getLore()));
 
             CompoundTag tag = item.getNamedTag();
             tag.putInt("economy_value", price);
@@ -101,16 +117,27 @@ public class BetterEconomy extends Addon {
         }
 
         int value = item.getNamedTag().getInt("economy_value");
+        Clan clan = null;
 
-        //TODO: include clan mode economy
-        Money.getInstance().addMoney(player, value);
+        if (clanMode && Addon.getAddon("playerclans") != null){
+            clan = ((PlayerClans) Addon.getAddon("playerclans")).getClan(player);
+            if (clan == null) {
+                player.sendMessage("§c»§7You are not in any clan!");
+                return;
+            }
+
+            clan.addMoney(value);
+            clan.onApplyNote(player, value);
+        }else {
+            Money.getInstance().addMoney(player, value);
+        }
 
         PlayerInventory inv = player.getInventory();
         inv.clear(inv.getHeldItemIndex());
 
-        String message = configFile.getString("noteApplyMessage");
+        String message = configFile.getString(clanMode? "noteApplyMessageClan" : "noteApplyMessage");
         message = message.replace("{player}", player.getName());
-        message = message.replace("{money}", TextUtils.formatBigNumber(Money.getInstance().getMoney(player, false)));
+        message = message.replace("{money}", TextUtils.formatBigNumber((clanMode && clan != null)? clan.getMoney() : Money.getInstance().getMoney(player, false)));
         player.sendMessage(message);
     }
 
