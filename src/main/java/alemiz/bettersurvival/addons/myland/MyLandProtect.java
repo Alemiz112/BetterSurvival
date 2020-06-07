@@ -6,6 +6,9 @@ import alemiz.bettersurvival.utils.ConfigManager;
 import alemiz.bettersurvival.utils.SuperConfig;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
+import cn.nukkit.blockentity.BlockEntity;
+import cn.nukkit.blockentity.BlockEntityChest;
+import cn.nukkit.blockentity.BlockEntitySign;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.block.BlockBreakEvent;
 import cn.nukkit.event.block.BlockPlaceEvent;
@@ -28,6 +31,7 @@ public class MyLandProtect extends Addon {
     public static String WAND = "§6LandWand";
     public static String PERM_VIP = "bettersurvival.land.vip";
     public static String PERM_ACCESS = "bettersurvival.land.access";
+    public static String PERM_ACCESS_CHEST = "bettersurvival.chest.access";
 
     public MyLandProtect(String path){
         super("mylandprotect", path);
@@ -35,6 +39,7 @@ public class MyLandProtect extends Addon {
         WAND = configFile.getString("wandName");
         PERM_VIP = configFile.getString("landsVipPermission");
         PERM_ACCESS = configFile.getString("landsAccessPermission");
+        PERM_ACCESS_CHEST = configFile.getString("chestsAccessPermission");
 
         for (SuperConfig config : ConfigManager.getInstance().loadAllPlayers()){
             loadLand(config);
@@ -45,6 +50,7 @@ public class MyLandProtect extends Addon {
     public void loadConfig() {
         if (!configFile.exists("enable")){
             configFile.set("enable", true);
+            configFile.set("enablePrivateChests", true);
 
             configFile.set("wandName", "§6Land§eWand");
 
@@ -54,6 +60,7 @@ public class MyLandProtect extends Addon {
 
             configFile.set("landsVipPermission", "bettersurvival.land.vip");
             configFile.set("landsAccessPermission", "bettersurvival.land.access");
+            configFile.set("chestsAccessPermission", "bettersurvival.chest.access");
 
             configFile.set("landNotExists", "§6»§7Land §6{land}§7 not found!");
             configFile.set("landWithNameExists", "§6»§7Land §6{land}§7 already exists§7!");
@@ -73,6 +80,10 @@ public class MyLandProtect extends Addon {
 
             configFile.set("landWhitelistAdd", "§6»§7You gain access §6@{player}§7 to your land §6{land}§7!");
             configFile.set("landWhitelistRemove", "§6»§7You restrict §6@{player}§7's access to your land §6{land}§7!");
+
+            configFile.set("privateChestCreate", "§6»§r§7You have successfully created private chest!");
+            configFile.set("privateChestAccessDenied", "§c»§r§7This chest is owned by §6@{owner}§7! You can not access it.");
+            configFile.set("privateChestDestroy", "§c»§r§7You have successfully destroyed private chest!");
             configFile.save();
         }
     }
@@ -87,6 +98,7 @@ public class MyLandProtect extends Addon {
     @EventHandler
     public void onBlockTouch(PlayerInteractEvent event){
         Player player = event.getPlayer();
+        Block block = event.getBlock();
 
         String item = player.getInventory().getItemInHand().getName();
 
@@ -108,10 +120,24 @@ public class MyLandProtect extends Addon {
             message = message.replace("{select}", (blocks.size() == 1)? "first" : "second");
             player.sendMessage(message);
             event.setCancelled();
+            return;
         }
 
         LandRegion region = getLandByPos(event.getBlock());
-        if (!interact(player, region)) event.setCancelled();
+        if (!interact(player, region)) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (!configFile.getBoolean("enablePrivateChests", false)) return;
+
+        if (block.getId() == Block.CHEST && (block.getLevel().getBlockEntity(block) instanceof BlockEntityChest)){
+            BlockEntityChest chest = (BlockEntityChest) block.getLevel().getBlockEntity(block);
+
+            if (!this.interactChest(player, chest)){
+                event.setCancelled();
+            }
+        }
     }
 
     @EventHandler
@@ -119,10 +145,52 @@ public class MyLandProtect extends Addon {
         Block block = event.getBlock();
         Player player = event.getPlayer();
 
-        LandRegion region = getLandByPos(block);
-        if (!interact(player, region)){
-            event.setCancelled();
+        LandRegion region = this.getLandByPos(block);
+        if (!this.interact(player, region)){
+            event.setCancelled(true);
+            return;
         }
+
+        if (!configFile.getBoolean("enablePrivateChests", false)) return;
+
+        if ((block.getId() == Block.WALL_SIGN || block.getId() == Block.SIGN_POST) && (player.getLevel().getBlockEntity(block) instanceof BlockEntitySign)){
+            BlockEntitySign sign =  (BlockEntitySign) player.getLevel().getBlockEntity(block);
+            if (this.signInteract(event, sign)) return;
+        }
+
+        if (block.getId() == Block.CHEST && (block.getLevel().getBlockEntity(block) instanceof BlockEntityChest)){
+            BlockEntityChest chest = (BlockEntityChest) block.getLevel().getBlockEntity(block);
+
+            if (!this.interactChest(player, chest)){
+                event.setCancelled();
+            }
+        }
+    }
+
+    private boolean signInteract(BlockBreakEvent event, BlockEntitySign sign){
+        Player player = event.getPlayer();
+        String[] lines = sign.getText();
+
+        if (!lines[0].equals("[private]") && !lines[0].equals("§r§f[§clocked§f]")) return false;
+        BlockEntityChest chest = this.getChestBySign(sign);
+
+        if (chest == null) return false;
+
+        switch (lines[0]){
+            case "§r§f[§clocked§f]":
+                String owner = this.getPrivateChestOwner(chest);
+                if (owner == null || this.removePrivateChest(player, chest)) break;
+                event.setCancelled();
+                break;
+            case "[private]":
+                if (this.createPrivateChest(player, chest)){
+                    event.setCancelled();
+                    sign.setText("§r§f[§clocked§f]", "§a"+player.getName());
+                }
+                break;
+        }
+
+        return true;
     }
 
     @EventHandler
@@ -179,6 +247,34 @@ public class MyLandProtect extends Addon {
                 return region;
         }
 
+        return null;
+    }
+
+    public boolean interactChest(Player player, BlockEntityChest chest){
+        if (player == null || chest == null) return true;
+        if (player.isOp() || player.hasPermission(PERM_ACCESS_CHEST)) return true;
+
+        String owner = this.getPrivateChestOwner(chest);
+        if (owner == null || owner.equalsIgnoreCase(player.getName())) return true;
+
+        String message = configFile.getString("privateChestAccessDenied");
+        message = message.replace("{player}", player.getName());
+        message = message.replace("{owner}", owner);
+        player.sendMessage(message);
+
+        return false;
+    }
+
+    public BlockEntityChest getChestBySign(BlockEntity block){
+        if (block.getLevel().getBlockEntity(block.north()) instanceof BlockEntityChest){
+            return (BlockEntityChest) block.getLevel().getBlockEntity(block.north());
+        }else if (block.getLevel().getBlockEntity(block.south()) instanceof BlockEntityChest){
+            return (BlockEntityChest) block.getLevel().getBlockEntity(block.south());
+        }else if (block.getLevel().getBlockEntity(block.east()) instanceof BlockEntityChest){
+            return (BlockEntityChest) block.getLevel().getBlockEntity(block.east());
+        }else if (block.getLevel().getBlockEntity(block.west()) instanceof BlockEntityChest){
+            return (BlockEntityChest) block.getLevel().getBlockEntity(block.west());
+        }
         return null;
     }
 
@@ -395,6 +491,92 @@ public class MyLandProtect extends Addon {
         message = message.replace("{land}", region.land);
         message = message.replace("{player}", owner.getName());
         owner.sendMessage(message);
+    }
+
+    public boolean createPrivateChest(Player player, BlockEntityChest chest){
+        if (player == null || chest == null) return false;
+
+        String owner = this.getPrivateChestOwner(chest);
+        if (owner != null){
+            player.sendMessage("§c»§r§7This chest is already owned by §6@"+owner+"§7!");
+            return false;
+        }
+
+        chest.namedTag.putString("private_owner", player.getName());
+
+        String message = configFile.getString("privateChestCreate");
+        message = message.replace("{player}", player.getName());
+        player.sendMessage(message);
+        return true;
+    }
+
+    public boolean removePrivateChest(Player player, BlockEntityChest chest){
+        if (player == null || chest == null) return false;
+
+        BlockEntityChest privateChest = this.getPrivateChest(chest);
+        if (privateChest == null) return false;
+
+        String owner = privateChest.namedTag.getString("private_owner");
+
+        if (!owner.equalsIgnoreCase(player.getName()) && !player.isOp() && !player.hasPermission(PERM_ACCESS_CHEST)){
+            String message = configFile.getString("privateChestAccessDenied");
+            message = message.replace("{player}", player.getName());
+            message = message.replace("{owner}", owner);
+            player.sendMessage(message);
+            return false;
+        }
+
+        privateChest.namedTag.remove("private_owner");
+        String message = configFile.getString("privateChestDestroy");
+        message = message.replace("{player}", player.getName());
+        player.sendMessage(message);
+        return true;
+    }
+
+    public boolean isPrivateChest(Position pos){
+        BlockEntity entity = pos.getLevel().getBlockEntity(pos);
+        if (!(entity instanceof BlockEntityChest)) return false;
+
+        return this.isPrivateChest((BlockEntityChest) entity);
+    }
+
+    public boolean isPrivateChest(BlockEntityChest chest){
+        return this.getPrivateChestOwner(chest) != null;
+    }
+
+    public String getPrivateChestOwner(Position pos){
+        BlockEntity entity = pos.getLevel().getBlockEntity(pos);
+        if (!(entity instanceof BlockEntityChest)) return null;
+
+        return this.getPrivateChestOwner((BlockEntityChest) entity);
+    }
+
+    public String getPrivateChestOwner(BlockEntityChest chest){
+        if (chest == null) return null;
+
+        String owner = null;
+        if (chest.namedTag.contains("private_owner")){
+            owner = chest.namedTag.getString("private_owner");
+        }else if (chest.isPaired() && chest.getPair().namedTag.contains("private_owner")){
+            owner = chest.getPair().namedTag.getString("private_owner");
+        }
+
+        return owner;
+    }
+
+    public BlockEntityChest getPrivateChest(Position pos){
+        if (pos == null) return null;
+        BlockEntity entity = pos.getLevel().getBlockEntity(pos);
+
+        if (!(entity instanceof BlockEntityChest)) return null;
+        BlockEntityChest chest = (BlockEntityChest) entity;
+
+        if (!chest.namedTag.getString("private_owner").equals("")){
+            return chest;
+        }else if (chest.isPaired() && !chest.getPair().namedTag.getString("private_owner").equals("")){
+            return chest.getPair();
+        }
+        return null;
     }
 
     public void listLands(Player player){

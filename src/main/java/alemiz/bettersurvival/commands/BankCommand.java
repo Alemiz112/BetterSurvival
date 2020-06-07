@@ -55,7 +55,7 @@ public class BankCommand extends Command {
                     int value = Integer.parseInt(args[1]);
                     this.loader.createNote(player, value);
                 }catch (NumberFormatException e){
-                    player.sendMessage("§c»§7Please provide numerical value!");
+                    player.sendMessage("§c»§r§7Please provide numerical value!");
                     break;
                 }
                 break;
