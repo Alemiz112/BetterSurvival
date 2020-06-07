@@ -47,24 +47,24 @@ public class CubeBridge extends Addon {
 
         boolean isStaff = player.hasPermission(STAFF_PERM);
 
+        //Subscriber Features
         if (player.hasPermission(SUBSCRIBER_PERM) || isStaff){
-            //Subscriber Features
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-feed"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-near"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-jump"));
             //perms.add(Addon.getAddon("levelvote").configFile.getString("permission-vote"));
         }
 
+        //Cube+ Freatures
         if (player.hasPermission(PLUS_PERM) || isStaff){
-            //Cube+ Freatures
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-feed"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-heal"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-near"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-jump"));
         }
 
+        //VIP Perms
         if (player.hasPermission(VIP_PERM) || isStaff){
-            //VIP Perms
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-feed"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-heal"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-near"));
@@ -75,14 +75,15 @@ public class CubeBridge extends Addon {
             perms.add(Addon.getAddon("survivalshop").configFile.getString("shopVipPermission"));
         }
 
+        //STAFF Perms here
         if (player.hasPermission(STAFF_PERM)){
-            //STAFF Perms here
             perms.add(Addon.getAddon("troller").configFile.getString("permission-vanish"));
             perms.add(Addon.getAddon("troller").configFile.getString("permission-block"));
             perms.add(Addon.getAddon("troller").configFile.getString("permission-troll"));
             perms.add(Addon.getAddon("troller").configFile.getString("permission-troll-advanced"));
             perms.add(Addon.getAddon("troller").configFile.getString("permission-invsee"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-mute"));
+            perms.add(Addon.getAddon("mylandprotect").configFile.getString("chestsAccessPermission"));
         }
 
         for (String perm : perms){
