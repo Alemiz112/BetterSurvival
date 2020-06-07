@@ -3,67 +3,67 @@
     "apple": {
       "id": 260,
       "count": 10,
-      "price": 300,
-      "sell": 5
+      "price": 200,
+      "sell": 7
     },
     "bread": {
       "id": 297,
       "count": 10,
-      "price": 300,
-      "sell": 5
+      "price": 250,
+      "sell": 8
     },
     "steak": {
       "id": 364,
       "count": 10,
-      "price": 350,
+      "price": 250,
       "image": "items/beef_cooked",
-      "sell": 5
+      "sell": 8
     },
     "cookie": {
       "id": 357,
       "count": 10,
-      "price": 300,
+      "price": 200,
       "sell": 5
     },
     "cooked porkchop": {
       "id": 320,
       "count": 10,
-      "price": 320,
+      "price": 250,
       "image": "items/porkchop_cooked",
-      "sell": 5
+      "sell": 8
     },
     "cooked mutton": {
       "id": 424,
       "count": 10,
-      "price": 350,
+      "price": 250,
       "image": "items/mutton_cooked",
-      "sell": 5
+      "sell": 8
     },
     "cooked chicken": {
       "id": 366,
       "count": 10,
-      "price": 350,
+      "price": 250,
       "image": "items/chicken_cooked",
-      "sell": 5
+      "sell": 8
     },
     "cooked rabbit": {
       "id": 412,
       "count": 10,
-      "price": 350,
+      "price": 250,
       "image": "items/rabbit_cooked",
-      "sell": 5
+      "sell": 8
     },
     "pumpkin pie": {
       "id": 400,
       "count": 10,
-      "price": 350,
+      "price": 250,
       "image": "items/pumpkin_pie",
-      "sell": 5
+      "sell": 10
     },
     "cake": {
       "id": 354,
       "count": 1,
-      "price": 100,
+      "price": 50,
       "sell": 15
     }
   },
@@ -71,20 +71,20 @@
     "melon": {
       "id": 360,
       "count": 10,
-      "price": 300,
-      "sell": 2
+      "price": 200,
+      "sell": 5
     },
     "potato": {
       "id": 392,
       "count": 10,
       "price": 150,
-      "sell": 4
+      "sell": 6
     },
     "carrot": {
       "id": 391,
       "count": 10,
       "price": 150,
-      "sell": 2
+      "sell": 5
     },
     "sugar": {
       "id": 353,
@@ -96,21 +96,21 @@
       "id": 351,
       "count": 8,
       "price": 150,
-      "sell": 3,
+      "sell": 5,
       "image": false
     },
     "pumpkin": {
       "id": 86,
       "count": 8,
       "price": 125,
-      "sell": 3,
+      "sell": 6,
       "image": "items/seeds_pumpkin"
     },
     "seeds": {
       "id": 295,
       "count": 8,
       "price": 150,
-      "sell": 2,
+      "sell": 4,
       "image": "items/seeds_wheat"
     }
   },
@@ -119,20 +119,20 @@
       "id": 296,
       "count": 8,
       "price": 150,
-      "sell": 3
+      "sell": 5
     },
     "egg": {
       "id": 344,
       "count": 8,
       "price": 125,
-      "sell": 3
+      "sell": 5
     },
     "milk": {
       "id": 335,
       "count": 1,
       "price": 125,
       "image": "items/bucket_milk",
-      "sell": 3
+      "sell": 5
     }
   },
   "resources": {
@@ -141,14 +141,14 @@
       "count": 5,
       "price": 400,
       "image": "items/iron_ingot",
-      "sell": 15
+      "sell": 20
     },
     "coal": {
       "id": 263,
       "count": 30,
       "price": 500,
       "image": "items/coal",
-      "sell": 2
+      "sell": 3
     },
     "gold": {
       "id": 266,
@@ -167,9 +167,9 @@
     "emerald": {
       "id": 388,
       "count": 5,
-      "price": 500,
+      "price": 350,
       "image": "items/emerald",
-      "sell": 20
+      "sell": 30
     },
     "nether quartz": {
       "id": 406,
@@ -249,6 +249,13 @@
       "price": 200,
       "image": "items/slimeball",
       "sell": 8
+    },
+    "rotten flesh": {
+      "id": 367,
+      "count": 15,
+      "price": 150,
+      "image": "items/rotten_flesh",
+      "sell": 4
     }
   },
   "equipments": {
@@ -257,28 +264,28 @@
       "count": 1,
       "price": 2000,
       "image": "items/diamond_pickaxe",
-      "sell": 75
+      "sell": 150
     },
     "diamond axe": {
       "id": 279,
       "count": 1,
       "price": 2000,
       "image": "items/diamond_axe",
-      "sell": 75
+      "sell": 150
     },
     "diamond hoe": {
       "id": 293,
       "count": 1,
       "price": 1500,
       "image": "items/diamond_hoe",
-      "sell": 75
+      "sell": 100
     },
     "diamond sword": {
       "id": 276,
       "count": 1,
       "price": 1500,
       "image": "items/diamond_sword",
-      "sell": 75
+      "sell": 100
     },
     "diamond shovel": {
       "id": 277,
@@ -306,28 +313,28 @@
       "count": 1,
       "price": 2500,
       "image": "items/diamond_helmet",
-      "sell": 150
+      "sell": 300
     },
     "diamond chestplate": {
       "id": 311,
       "count": 1,
       "price": 3500,
       "image": "items/diamond_chestplate",
-      "sell": 150
+      "sell": 400
     },
     "diamond leggings": {
       "id": 312,
       "count": 1,
       "price": 3000,
       "image": "items/diamond_leggings",
-      "sell": 150
+      "sell": 300
     },
     "diamond boots": {
       "id": 313,
       "count": 1,
       "price": 2500,
       "image": "items/diamond_boots",
-      "sell": 150
+      "sell": 300
     },
     "bow": {
       "id": 261,
@@ -349,7 +356,7 @@
       "count": 25,
       "price": 250,
       "image": "items/snowball",
-      "sell": 1
+      "sell": 2
     },
     "fireworks": {
       "id": 401,
@@ -384,20 +391,20 @@
       "count": 8,
       "price": 350,
       "image": false,
-      "sell": 10
+      "sell": 25
     },
     "brick": {
       "id": 336,
       "count": 24,
       "price": 250,
       "image": "items/brick",
-      "sell": 3
+      "sell": 4
     },
     "end crystal": {
       "id": 426,
       "count": 1,
       "price": 500,
-      "sell": 25
+      "sell": 50
     },
     "nether brick": {
       "id": 405,
@@ -411,7 +418,7 @@
       "count": 8,
       "price": 250,
       "image": "items/nether_wart",
-      "sell": 2
+      "sell": 5
     },
     "enchanting table": {
       "id": 116,
@@ -434,27 +441,27 @@
       "count": 5,
       "price": 150,
       "image": "items/comparator",
-      "sell": 2
+      "sell": 5
     },
     "redstone repeater": {
       "id": 356,
       "count": 5,
       "price": 150,
       "image": "items/repeater",
-      "sell": 2
+      "sell": 5
     },
     "piston": {
       "id": 33,
       "count": 3,
       "price": 150,
-      "sell": 2,
+      "sell": 5,
       "image": "blocks/piston_side"
     },
     "sticky piston": {
       "id": 29,
       "count": 3,
       "price": 250,
-      "sell": 3
+      "sell": 5
     },
     "hopper": {
       "id": 154,
@@ -474,14 +481,14 @@
       "id": 27,
       "count": 8,
       "price": 250,
-      "sell": 2,
+      "sell": 3,
       "image": false
     },
     "dropper": {
       "id": 158,
       "count": 3,
       "price": 150,
-      "sell": 2,
+      "sell": 3,
       "image": "blocks/dropper_front_horizontal"
     },
     "dispenser": {
@@ -495,58 +502,58 @@
       "id": 123,
       "count": 5,
       "price": 200,
-      "sell": 3,
+      "sell": 5,
       "image": "blocks/redstone_lamp_on"
     }
   },
   "spawn eggs": {
     "chicken spawn egg": {
       "id": 383,
-      "count": 1,
+      "count": 2,
       "meta": 10,
       "price": 1500,
       "image": "items/spawn_egg",
-      "sell": 100
+      "sell": 250
     },
     "cow spawn egg": {
       "id": 383,
-      "count": 1,
+      "count": 2,
       "meta": 11,
-      "price": 1000,
+      "price": 1500,
       "image": "items/spawn_egg",
-      "sell": 100
+      "sell": 250
     },
     "pig spawn egg": {
       "id": 383,
-      "count": 1,
+      "count": 2,
       "meta": 12,
-      "price": 1000,
+      "price": 1500,
       "image": "items/spawn_egg",
-      "sell": 100
+      "sell": 250
     },
     "sheep spawn egg": {
       "id": 383,
-      "count": 1,
+      "count": 2,
       "meta": 13,
       "price": 1500,
       "image": "items/spawn_egg",
-      "sell": 100
+      "sell": 250
     },
     "wolf spawn egg": {
       "id": 383,
-      "count": 1,
+      "count": 2,
       "meta": 14,
       "price": 1250,
       "image": "items/spawn_egg",
-      "sell": 100
+      "sell": 250
     },
     "rabbit spawn egg": {
       "id": 383,
-      "count": 1,
+      "count": 2,
       "meta": 18,
       "price": 1000,
       "image": "items/spawn_egg",
-      "sell": 100
+      "sell": 250
     },
     "bat spawn egg": {
       "id": 383,
@@ -554,7 +561,7 @@
       "meta": 19,
       "price": 1000,
       "image": "items/spawn_egg",
-      "sell": 100
+      "sell": 250
     },
     "ocelot spawn egg": {
       "id": 383,
@@ -562,7 +569,7 @@
       "meta": 22,
       "price": 1250,
       "image": "items/spawn_egg",
-      "sell": 100
+      "sell": 250
     },
     "horse spawn egg": {
       "id": 383,
@@ -570,7 +577,7 @@
       "meta": 23,
       "price": 1000,
       "image": "items/spawn_egg",
-      "sell": 100
+      "sell": 250
     },
     "donkey spawn egg": {
       "id": 383,
@@ -578,7 +585,7 @@
       "meta": 24,
       "price": 1000,
       "image": "items/spawn_egg",
-      "sell": 100
+      "sell": 250
     },
     "mule spawn egg": {
       "id": 383,
@@ -586,7 +593,7 @@
       "meta": 25,
       "price": 1000,
       "image": "items/spawn_egg",
-      "sell": 100
+      "sell": 250
     },
     "skeleton horse spawn egg": {
       "id": 383,
@@ -594,7 +601,7 @@
       "meta": 26,
       "price": 2500,
       "image": "items/spawn_egg",
-      "sell": 100
+      "sell": 250
     },
     "zombie horse spawn egg": {
       "id": 383,
@@ -602,7 +609,7 @@
       "meta": 27,
       "price": 2500,
       "image": "items/spawn_egg",
-      "sell": 100
+      "sell": 500
     },
     "polar bear spawn egg": {
       "id": 383,
@@ -610,7 +617,7 @@
       "meta": 28,
       "price": 1500,
       "image": "items/spawn_egg",
-      "sell": 100
+      "sell": 250
     },
     "llama spawn egg": {
       "id": 383,
@@ -618,7 +625,7 @@
       "meta": 29,
       "price": 1500,
       "image": "items/spawn_egg",
-      "sell": 100
+      "sell": 250
     },
     "parrot spawn egg": {
       "id": 383,
@@ -626,7 +633,7 @@
       "meta": 30,
       "price": 1500,
       "image": "items/spawn_egg",
-      "sell": 100
+      "sell": 250
     },
     "dolphin spawn egg": {
       "id": 383,
@@ -634,15 +641,15 @@
       "meta": 31,
       "price": 2000,
       "image": "items/spawn_egg",
-      "sell": 100
+      "sell": 250
     },
     "cat spawn egg": {
       "id": 383,
-      "count": 1,
+      "count": 2,
       "meta": 75,
       "price": 2000,
       "image": "items/spawn_egg",
-      "sell": 100
+      "sell": 250
     },
     "panda spawn egg": {
       "id": 383,
@@ -650,7 +657,31 @@
       "meta": 113,
       "price": 2500,
       "image": "items/spawn_egg",
-      "sell": 100
+      "sell": 500
+    },
+    "zombie spawn egg": {
+      "id": 383,
+      "count": 1,
+      "meta": 32,
+      "price": 2500,
+      "image": "items/spawn_egg",
+      "sell": 500
+    },
+    "spider spawn egg": {
+      "id": 383,
+      "count": 1,
+      "meta": 35,
+      "price": 2500,
+      "image": "items/spawn_egg",
+      "sell": 500
+    },
+    "skeleton spawn egg": {
+      "id": 383,
+      "count": 1,
+      "meta": 34,
+      "price": 2500,
+      "image": "items/spawn_egg",
+      "sell": 250
     }
   },
   "dyes": {
@@ -781,28 +812,28 @@
       "count": 25,
       "price": 350,
       "image": false,
-      "sell": 4
+      "sell": 5
     },
     "ice": {
       "id": 79,
       "count": 15,
       "price": 450,
       "image": false,
-      "sell": 5
+      "sell": 6
     },
     "glowstone": {
       "id": 89,
       "count": 15,
       "price": 450,
       "image": false,
-      "sell": 8
+      "sell": 10
     },
     "wool": {
       "id": 35,
       "count": 10,
       "price": 300,
       "image": false,
-      "sell": 6
+      "sell": 8
     },
     "book shelf": {
       "id": 47,
@@ -816,14 +847,14 @@
       "count": 5,
       "price": 200,
       "image": false,
-      "sell": 10
+      "sell": 20
     },
     "sea lantern": {
       "id": 169,
       "count": 15,
       "price": 300,
       "image": false,
-      "sell": 7
+      "sell": 20
     },
     "ender chest": {
       "id": 130,
@@ -861,7 +892,7 @@
       "meta": 0,
       "price": 250,
       "image": false,
-      "sell": 5
+      "sell": 8
     },
     "spruce log": {
       "id": 17,
@@ -869,7 +900,7 @@
       "meta": 1,
       "price": 150,
       "image": false,
-      "sell": 3
+      "sell": 5
     },
     "birch log": {
       "id": 17,
@@ -877,7 +908,7 @@
       "meta": 2,
       "price": 200,
       "image": false,
-      "sell": 3
+      "sell": 5
     },
     "jungle log": {
       "id": 17,
@@ -885,7 +916,7 @@
       "meta": 3,
       "price": 150,
       "image": false,
-      "sell": 3
+      "sell": 5
     },
     "acacia log": {
       "id": 162,
@@ -893,7 +924,7 @@
       "meta": 0,
       "price": 200,
       "image": false,
-      "sell": 3
+      "sell": 5
     },
     "dark oak log": {
       "id": 162,
@@ -901,28 +932,28 @@
       "meta": 1,
       "price": 150,
       "image": false,
-      "sell": 3
+      "sell": 5
     },
     "vines": {
       "id": 106,
       "count": 8,
       "price": 100,
       "image": false,
-      "sell": 2
+      "sell": 3
     },
     "cactus": {
       "id": 81,
       "count": 8,
       "price": 150,
       "image": false,
-      "sell": 2
+      "sell": 3
     },
     "sugar cane ": {
       "id": 338,
       "count": 8,
       "price": 150,
       "image": false,
-      "sell": 3
+      "sell": 6
     }
   },
   "subscriber": {
@@ -938,7 +969,7 @@
       "count": 1,
       "price": 2500,
       "image": "items/saddle",
-      "sell": 300
+      "sell": 500
     },
     "ender pearl": {
       "id": 368,
@@ -952,7 +983,7 @@
       "count": 1,
       "price": 200,
       "image": "items/apple_golden",
-      "sell": 20
+      "sell": 25
     },
     "shulker box": {
       "id": 218,
@@ -964,25 +995,25 @@
     "name tag": {
       "id": 421,
       "count": 1,
-      "price": 2000,
+      "price": 1000,
       "image": "items/name_tag",
-      "sell": 700
+      "sell": 300
     }
   },
   "vip": {
     "elytra": {
       "id": 444,
       "count": 1,
-      "price": 7500,
+      "price": 5500,
       "image": "items/elytra",
       "sell": 1500
     },
     "totem": {
       "id": 450,
       "count": 1,
-      "price": 8000,
+      "price": 5000,
       "image": "items/totem",
-      "sell": 2000
+      "sell": 1250
     },
     "diamond": {
       "id": 264,
@@ -993,16 +1024,23 @@
     "bottle o'Enchanting": {
       "id": 384,
       "count": 3,
-      "price": 300,
+      "price": 200,
       "image": "items/experience_bottle",
       "sell": 25
     },
     "beacon": {
       "id": 138,
       "count": 1,
-      "price": 10000,
+      "price": 6500,
       "image": false,
-      "sell": 2500
+      "sell": 2000
+    },
+    "monster spawner": {
+      "id": 52,
+      "count": 1,
+      "price": 12500,
+      "image": "blocks/mob_spawner",
+      "sell": 4000
     }
   },
   "potions": {
