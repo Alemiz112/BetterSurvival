@@ -102,12 +102,29 @@ public class PlayerClans extends Addon {
         return clan;
     }
 
+    public void destroyClan(Player player, Clan clan){
+        if (player == null || clan == null) return;
+
+        if (!clan.getOwner().equalsIgnoreCase(player.getName())){
+            player.sendMessage("§c»§7This command can be run only by Clan owner!");
+            return;
+        }
+
+        clan.sendMessage("§cYour clan was destroyed!");
+        this.clans.remove(clan.getRawName());
+
+        File file = new File(ConfigManager.PATH+"/clans/"+clan.getRawName()+".yml");
+        if (file.isFile()) file.delete();
+
+        player.sendMessage("§6»§7You have successfully closed your clan.");
+    }
+
     public void invite(String playerName, Player executor){
         if (playerName == null || executor == null) return;
 
         Clan clan = this.getClan(executor);
         if (clan == null){
-            executor.sendMessage("§c»§7You are not in any clan!");
+            executor.sendMessage("§c»§7You are not in any Clan!");
             return;
         }
 

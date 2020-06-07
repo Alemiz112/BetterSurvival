@@ -28,6 +28,7 @@ public class ClanCommand extends Command {
                 "§7/clan accept <clan - rawName> : Accept invitation from clan\n" +
                 "§7/clan deny <clan - rawName> : Deny invitation from clan\n" +
                 "§7/clan leave : Leave current clan\n" +
+                "§7/clan destroy : Destroy your clan. All clan values will be lost!\n" +
                 "§7/clan info : Shows info about your clan\n" +
                 "§7/clan bank note <value> : Creates bank note signed by your clan\n" +
                 "§7/clan bank apply : Applies note from your hand to clan bank\n" +
@@ -59,6 +60,7 @@ public class ClanCommand extends Command {
         String clanName;
         String playerName;
         Clan clan;
+        Config config;
 
         if (args.length < 1){
             player.sendMessage(this.getUsageMessage());
@@ -94,8 +96,10 @@ public class ClanCommand extends Command {
                     break;
                 }
 
-                List<String> pendingInvites = this.loader.getInvitations(player);
-                if (!pendingInvites.contains(args[1])){
+                config = ConfigManager.getInstance().loadPlayer(player);
+                List<String> pendingInvites = config.getStringList("clanInvites");
+
+                if (!pendingInvites.remove(args[1])){
                     player.sendMessage("§c»§7No invitation from §6"+args[1]+"§7 was found! Please ensure that you have entered right raw name.");
                     break;
                 }
@@ -103,6 +107,8 @@ public class ClanCommand extends Command {
                 clan = this.loader.getClans().get(args[1]);
                 if (clan == null){
                     player.sendMessage("§c»§7This clan does no longer exists!");
+                    config.set("clanInvites", pendingInvites);
+                    config.save();
                     break;
                 }
 
@@ -110,7 +116,7 @@ public class ClanCommand extends Command {
                 clan.addPlayer(player);
                 break;
             case "deny":
-                Config config = ConfigManager.getInstance().loadPlayer(player);
+                config = ConfigManager.getInstance().loadPlayer(player);
                 List<String> invites = config.getStringList("clanInvites");
 
                 if (!invites.remove(args[1])){
@@ -140,6 +146,14 @@ public class ClanCommand extends Command {
                 }
 
                 clan.removePlayer(player);
+                break;
+            case "destroy":
+                clan = this.loader.getClan(player);
+                if (clan == null){
+                    player.sendMessage("§c»§7You are not in any clan!");
+                    break;
+                }
+                this.loader.destroyClan(player, clan);
                 break;
             case "bank":
                 if (args.length < 2){
