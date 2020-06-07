@@ -82,6 +82,7 @@ public class BetterEconomy extends Addon {
             success = Money.getInstance().reduceMoney(player, price);
             owner = player.getName();
         }
+
         if (success){
             Item item = getBankNote();
             item.setCustomName(item.getCustomName()+" §6"+TextUtils.formatBigNumber(price)+"$");
