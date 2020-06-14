@@ -202,14 +202,19 @@ public class ClanCommand extends Command {
                     case "donate":
                         try {
                             int value = Integer.parseInt(args[2]);
-                            boolean success = EconomyAPI.getInstance().reduceMoney(player, value) >= 1;
+                            boolean success = (EconomyAPI.getInstance().myMoney(player) - value) >= 0;
 
                             if (!success){
                                 player.sendMessage("§c»§7You do not have enough coins to donate!");
                                 break;
                             }
 
-                            clan.addMoney(value);
+                            if (!clan.addMoney(value)){
+                                player.sendMessage("§c»§7Clan bank limit has been reached!");
+                                break;
+                            }
+
+                            EconomyAPI.getInstance().reduceMoney(player, value);
                             clan.onDonate(player, value);
                         }catch (Exception e){
                             player.sendMessage("§c»§7Please provide numerical value!");
