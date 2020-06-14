@@ -40,6 +40,8 @@ public class ClanCommand extends Command {
                 "§7/clan bank status: Shows your clan bank status\n" +
                 "§7/clan land create: Creates clan land\n" +
                 "§7/clan land remove: Removes clan land\n" +
+                "§7/clan home <create|remove|home>: Classic clan homes\n" +
+                "§7/clan listhome : Lists all homes\n" +
                 "§aYou can use clan chat by starting message with §6%§a!";
         this.setUsage(getUsageMessage());
 
@@ -212,6 +214,9 @@ public class ClanCommand extends Command {
                         }catch (Exception e){
                             player.sendMessage("§c»§7Please provide numerical value!");
                         }
+                    default:
+                        player.sendMessage(this.getUsageMessage());
+                        break;
                 }
                 break;
             case "land":
@@ -230,7 +235,52 @@ public class ClanCommand extends Command {
                     case "remove":
                         clan.removeLand(player);
                         break;
+                    default:
+                        player.sendMessage(this.getUsageMessage());
+                        break;
+
                 }
+                break;
+            case "home":
+                if (args.length < 2){
+                    player.sendMessage(this.getUsageMessage());
+                    return true;
+                }
+
+                clan = this.checkForClan(player);
+                if (clan == null) break;
+
+                switch (args[1]){
+                    case "create":
+                    case "add":
+                        if (args.length < 3){
+                            player.sendMessage(this.getUsageMessage());
+                            return true;
+                        }
+
+                        clan.createHome(player, String.join(" ", Arrays.copyOfRange(args, 2, args.length)));
+                        break;
+                    case "remove":
+                        if (args.length < 3){
+                            player.sendMessage(this.getUsageMessage());
+                            return true;
+                        }
+
+                        clan.removeHome(player, String.join(" ", Arrays.copyOfRange(args, 2, args.length)));
+                        break;
+                    default:
+                        clan.teleportToHome(player, String.join(" ", Arrays.copyOfRange(args, 1, args.length)));
+                        break;
+                }
+                break;
+            case "listhome":
+                clan = this.checkForClan(player);
+                if (clan == null) break;
+                
+                int homeLimit = clan.getConfig().getInt("homeLimit");
+                player.sendMessage("§a"+clan.getName()+"§a Clan:\n" +
+                        "§3»§7 Homes: §a"+clan.getHomes().size()+"§7/§2"+homeLimit+"\n" +
+                        "§3»§7Home List: §e"+String.join(", ", clan.getHomes().keySet()));
                 break;
             default:
                 player.sendMessage(this.getUsageMessage());

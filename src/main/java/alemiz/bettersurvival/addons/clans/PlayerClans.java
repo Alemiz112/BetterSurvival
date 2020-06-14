@@ -37,6 +37,7 @@ public class PlayerClans extends Addon {
             configFile.set("clanCreatePayment", 80000);
 
             configFile.set("playerLimit", 10);
+            configFile.set("homeLimit", 10);
             configFile.set("moneyLimit", 400000);
 
             configFile.set("clanCreateMessage", "§6»§7New clan §6@{clan}§7 was created successfully!");
@@ -111,6 +112,7 @@ public class PlayerClans extends Addon {
         config.set("money", clanRevert);
         config.set("maxMoney", configFile.getInt("moneyLimit", 400000));
         config.set("playerLimit", configFile.getInt("playerLimit", 10));
+        config.set("homeLimit", configFile.getInt("homeLimit", 10));
         config.save();
 
         Clan clan = new Clan(rawName, name, config, this);
