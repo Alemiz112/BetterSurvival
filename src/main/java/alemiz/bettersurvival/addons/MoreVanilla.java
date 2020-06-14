@@ -358,7 +358,7 @@ public class MoreVanilla extends Addon{
             return;
         }
 
-        if (!executor.equals("console") && pexecutor != null && (!pexecutor.hasPermission(configFile.getString("permission-fly")) || !pexecutor.hasPermission(configFile.getString("permission-manage")))){
+        if (!executor.equals("console") && !executor.equals(player.getName()) && pexecutor != null && (!pexecutor.hasPermission(configFile.getString("permission-manage")) || !pexecutor.hasPermission(configFile.getString("permission-manage")))) {
             pexecutor.sendMessage("§cYou dont have permission to give fly!");
             return;
         }
@@ -387,7 +387,7 @@ public class MoreVanilla extends Addon{
             return;
         }
 
-        if (!executor.equals("console") && pexecutor != null && (!pexecutor.hasPermission(configFile.getString("permission-feed")) || !pexecutor.hasPermission(configFile.getString("permission-manage")))){
+        if (!executor.equals("console") && !executor.equals(player.getName()) && pexecutor != null && (!pexecutor.hasPermission(configFile.getString("permission-manage")) || !pexecutor.hasPermission(configFile.getString("permission-manage")))){
             pexecutor.sendMessage("§cYou dont have permission to give feed to player!");
             return;
         }
@@ -413,7 +413,7 @@ public class MoreVanilla extends Addon{
             return;
         }
 
-        if (!executor.equals("console") && pexecutor != null && (!pexecutor.hasPermission(configFile.getString("permission-heal")) || !pexecutor.hasPermission(configFile.getString("permission-manage")))){
+        if (!executor.equals("console") && !executor.equals(player.getName()) && pexecutor != null && (!pexecutor.hasPermission(configFile.getString("permission-manage")) || !pexecutor.hasPermission(configFile.getString("permission-manage")))){
             pexecutor.sendMessage("§cYou dont have permission to heal player!");
             return;
         }
