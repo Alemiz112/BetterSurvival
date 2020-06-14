@@ -276,7 +276,7 @@ public class ClanCommand extends Command {
             case "listhome":
                 clan = this.checkForClan(player);
                 if (clan == null) break;
-                
+
                 int homeLimit = clan.getConfig().getInt("homeLimit");
                 player.sendMessage("§a"+clan.getName()+"§a Clan:\n" +
                         "§3»§7 Homes: §a"+clan.getHomes().size()+"§7/§2"+homeLimit+"\n" +
