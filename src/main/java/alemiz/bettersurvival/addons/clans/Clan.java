@@ -1,16 +1,23 @@
 package alemiz.bettersurvival.addons.clans;
 
+import alemiz.bettersurvival.BetterSurvival;
 import alemiz.bettersurvival.addons.economy.BetterEconomy;
+import alemiz.bettersurvival.addons.myland.MyLandProtect;
 import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.ConfigManager;
 import alemiz.bettersurvival.utils.TextUtils;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.item.Item;
+import cn.nukkit.level.Level;
+import cn.nukkit.level.Position;
 import cn.nukkit.utils.Config;
+import cn.nukkit.utils.ConfigSection;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Clan {
 
@@ -23,6 +30,9 @@ public class Clan {
 
     private final String owner;
     private final List<String> players = new ArrayList<>();
+    private final List<String> admins = new ArrayList<>();
+
+    private final Map<String, Position> homes = new HashMap<>();
 
     private int money;
 
@@ -31,10 +41,13 @@ public class Clan {
         this.name = name;
         this.owner = config.getString("owner");
         this.players.addAll(config.getStringList("players"));
+        this.admins.addAll(config.getStringList("admins"));
         this.money = config.getInt("money");
 
         this.loader = loader;
         this.config = config;
+
+        this.loadHomes();
     }
 
     public void setMoney(int value){
@@ -58,16 +71,104 @@ public class Clan {
     }
 
     private void savePlayerList(){
-        config.set("players", players);
+        config.set("players", this.players);
+        config.set("admins", this.admins);
         config.save();
     }
 
-    //TODO: do not forget to clear all other pending invitations if any is accepted
-    //TODO: create and allow admins to invite player
-    public void invitePlayer(Player player, Player executor){
+    private void saveHomes(){
+        for (String homeName : this.homes.keySet()){
+            Position home = this.homes.get(homeName);
+            String homeString = home.getX()+","+home.getY()+","+home.getZ()+","+home.getLevel().getFolderName();
+
+            config.set("home."+homeName, homeString);
+        }
+        config.save();
+    }
+
+    private void loadHomes(){
+        ConfigSection section = config.getSection("home");
+        for (String home : section.getKeys(false)){
+            String homeString = section.getString(home);
+            String[] data = homeString.split(",");
+
+            Level level = Server.getInstance().getLevelByName(data[3]);
+            if (level == null) continue;
+
+            try {
+                this.homes.put(name.toLowerCase(), new Position(Double.parseDouble(data[0]), Double.parseDouble(data[1]), Double.parseDouble(data[2]), level));
+            }catch (Exception e){
+                BetterSurvival.getInstance().getLogger().warning("§cUnable to load home §4"+home+"§c for clan §4"+this.rawName);
+            }
+        }
+    }
+
+    public boolean isMember(Player player){
+        return player != null && this.isMember(player.getName());
+    }
+
+    public boolean isMember(String player){
+        return this.players.contains(player.toLowerCase());
+    }
+
+    public boolean isAdmin(Player player){
+        return player != null && this.isAdmin(player.getName());
+    }
+
+    public boolean isAdmin(String player){
+        return this.admins.contains(player.toLowerCase());
+    }
+
+    public void addAdmin(String player, Player executor){
         if (player == null) return;
 
         if (executor != null && !this.owner.equals(executor.getName())){
+            executor.sendMessage("§c»§7You do not have permission to manage clan admins!");
+            return;
+        }
+
+        if (this.isAdmin(player)){
+            if (executor != null) executor.sendMessage("§c»§7Player is already admin of your clan!");
+            return;
+        }
+
+        if (executor != null && executor.getName().equalsIgnoreCase(player)){
+            executor.sendMessage("§c»§7You can not add yourself as clan admin!");
+            return;
+        }
+
+        if (this.owner.equalsIgnoreCase(player)){
+            if (executor != null) executor.sendMessage("§c»§7You are clan owner! You can not be clan admin.!");
+            return;
+        }
+
+        this.admins.add(player.toLowerCase());
+        this.savePlayerList();
+        this.sendMessage("§2Player §6@"+player+"§2 was promoted to clan admin!");
+    }
+
+    public void removeAdmin(String player, Player executor){
+        if (player == null) return;
+
+        if (executor != null && !this.owner.equals(executor.getName())){
+            executor.sendMessage("§c»§7You do not have permission to manage clan admins!");
+            return;
+        }
+
+        if (!this.isAdmin(player.toLowerCase())){
+            if (executor != null) executor.sendMessage("§c»§7Player is not admin of your clan!");
+            return;
+        }
+
+        this.admins.remove(player.toLowerCase());
+        this.savePlayerList();
+        this.sendMessage("§4Player §6@"+player+"§4 was demoted to clan member!");
+    }
+
+    public void invitePlayer(Player player, Player executor){
+        if (player == null) return;
+
+        if (executor != null && !this.owner.equals(executor.getName()) && !this.isAdmin(executor)){
             executor.sendMessage("§c»§7You do not have permission to invite player to clan!");
             return;
         }
@@ -109,17 +210,19 @@ public class Clan {
         player.sendMessage("§6»§7You joined §6@"+this.name+"§7 Clan! Welcome to your new Home!");
     }
 
-    //TODO: create and allow admins to kick player
-    //TODO: do not allow admins to kick admin
     public void kickPlayer(String playerName, Player executor){
         if (playerName == null) return;
 
-        if (executor != null && !this.owner.equals(executor.getName())){
-            executor.sendMessage("§c»§7You do not have permission to invite player to Clan!");
+        boolean admin = executor != null && this.isAdmin(executor);
+        if (executor != null && !this.owner.equals(executor.getName()) && !admin){
+            executor.sendMessage("§c»§7You do not have permission to kick player from clan!");
             return;
         }
 
-        //TODO: admin check
+        if (this.isAdmin(playerName) && admin){
+            executor.sendMessage("§c»§7You do not have permission to kick clan admin!");
+            return;
+        }
 
         if (executor != null && executor.getName().equalsIgnoreCase(playerName)){
             executor.sendMessage("§c»§7You can not kick yourself from clan!");
@@ -127,16 +230,16 @@ public class Clan {
         }
 
         if (playerName.equalsIgnoreCase(this.owner)){
-            if (executor != null) executor.sendMessage("§c»§7You can not kick owner of Clan!");;
+            if (executor != null) executor.sendMessage("§c»§7You can not kick owner of clan!");;
             return;
         }
 
         if (!this.players.contains(playerName)){
-            if (executor != null) executor.sendMessage("§c»§7Player §6@"+playerName+" is not member in your Clan!");
+            if (executor != null) executor.sendMessage("§c»§7Player §6@"+playerName+" is not member in your clan!");
             return;
         }
 
-        this.sendMessage("Player §6@"+playerName+" was kicked from your Clan!");
+        this.sendMessage("Player §6@"+playerName+" was kicked from your clan!");
         this.players.remove(playerName);
         this.savePlayerList();
 
@@ -159,12 +262,11 @@ public class Clan {
         player.sendMessage("§6»§7You leaved §6@"+this.name+"§7 Clan!");
     }
 
-    //TODO: admins can do this too
     public void createBankNote(Player player, int value){
         if (player == null || value == 0) return;
 
-        if (!this.owner.equals(player.getName())){
-            player.sendMessage("§c»§7You do not have permission to invite player to Clan!");
+        if (!this.owner.equalsIgnoreCase(player.getName()) && !this.isAdmin(player)){
+            player.sendMessage("§c»§7You do not have permission to create clan bank note!");
             return;
         }
 
@@ -191,6 +293,92 @@ public class Clan {
             return;
         }
         economy.applyNote(player, item, true);
+    }
+
+    public void createLand(Player player){
+        if (player == null) return;
+
+        if (!this.owner.equalsIgnoreCase(player.getName())){
+            player.sendMessage("§c»§7You do not have permission to create clan land!");
+            return;
+        }
+
+        if (Addon.getAddon("mylandprotect") == null){
+            player.sendMessage("§c»§7MyLandProtect addon is not enabled!");
+        }
+
+        MyLandProtect landProtect = (MyLandProtect) Addon.getAddon("mylandprotect");
+        landProtect.createLand(player, "", true);
+    }
+
+    public void removeLand(Player player){
+        if (player == null) return;
+
+        if (!this.owner.equalsIgnoreCase(player.getName())){
+            player.sendMessage("§c»§7You do not have permission to remove clan land!");
+            return;
+        }
+
+        if (Addon.getAddon("mylandprotect") == null){
+            player.sendMessage("§c»§7MyLandProtect addon is not enabled!");
+        }
+
+        MyLandProtect landProtect = (MyLandProtect) Addon.getAddon("mylandprotect");
+        landProtect.removeClanLand(player);
+    }
+
+    public void createHome(Player player, String name){
+        if (player == null) return;
+
+        if (!this.owner.equalsIgnoreCase(player.getName()) && !this.isAdmin(player)){
+            player.sendMessage("§c»§7You do not have permission to create clan home!");
+            return;
+        }
+
+        int homeLimit = this.config.getInt("homeLimit", 10);
+        if (this.homes.size() >= homeLimit){
+            player.sendMessage("§c»§7Your clan has passed home limit which is §6"+homeLimit+"§7 homes!");
+            return;
+        }
+
+        if (this.homes.containsKey(name.toLowerCase())){
+            player.sendMessage("§c»§7Your clan has already home with same name!");
+            return;
+        }
+
+        this.homes.put(name.toLowerCase(), player.clone());
+        this.saveHomes();
+        player.sendMessage("§6»§7Your have successfully created clan home!");
+    }
+
+    public void removeHome(Player player, String home){
+        if (player == null) return;
+
+        if (!this.owner.equals(player.getName()) && !this.isAdmin(player)){
+            player.sendMessage("§c»§7You do not have permission to remove clan home!");
+            return;
+        }
+
+        if (!this.homes.containsKey(home.toLowerCase())){
+            player.sendMessage("§c»§7Clan home with name §6"+home+"§7 was not found!");
+            return;
+        }
+
+        this.homes.remove(home.toLowerCase());
+        this.saveHomes();
+        player.sendMessage("§6»§7Your have successfully removed clan home!");
+    }
+
+    public void teleportToHome(Player player, String home){
+        if (player == null) return;
+
+        if (!this.homes.containsKey(home.toLowerCase())){
+            player.sendMessage("§c»§7Clan home with name §6"+home+"§7 was not found!");
+            return;
+        }
+
+        player.teleport(this.homes.get(home.toLowerCase()));
+        player.sendMessage("§6»§7Woosh! Welcome at clan home §6"+home+" @"+player.getName()+"§7!");
     }
 
     //May be useful in feature
@@ -223,11 +411,19 @@ public class Clan {
     }
 
     public String buildTextInfo(){
+        int moneyLimit = this.config.getInt("maxMoney");
+        int playerLimit = this.config.getInt("playerLimit");
+        int homeLimit = this.config.getInt("homeLimit", 10);
+
         return "§a"+this.name+"§a Clan:\n" +
                 "§3»§7 Owner: "+this.owner+"\n" +
-                "§3»§7 Money: §e"+this.money+"§7/§6"+this.config.getInt("maxMoney")+"$\n" +
-                "§3»§7 Players: §c"+this.players.size()+"§7/§4"+this.config.getInt("playerLimit")+"\n" +
-                "§3»§7 Player List: "+String.join(", ", this.players);
+                "§3»§7 Money: §e"+this.money+"§7/§6"+moneyLimit+"$\n" +
+                "§3»§7 Land: §e"+(this.hasLand()? "Yes" : "No")+"\n" +
+                "§3»§7 Admin List: §e"+(this.admins.size() == 0? "None" : String.join(", ", this.admins))+"\n" +
+                "§3»§7 Players: §c"+this.players.size()+"§7/§4"+playerLimit+"\n" +
+                "§3»§7 Player List: §e"+String.join(", ", this.players)+"\n" +
+                "§3»§7 Homes: §a"+this.homes.size()+"§7/§2"+homeLimit+"\n" +
+                "§3»§7 Home List: §e"+String.join(", ", this.homes.keySet());
     }
 
     public String getRawName() {
@@ -256,5 +452,13 @@ public class Clan {
 
     public Config getConfig(){
         return config;
+    }
+
+    public boolean hasLand(){
+        return this.config.exists("land");
+    }
+
+    public Map<String, Position> getHomes() {
+        return this.homes;
     }
 }

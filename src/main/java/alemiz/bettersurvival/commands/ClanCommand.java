@@ -2,6 +2,8 @@ package alemiz.bettersurvival.commands;
 
 import alemiz.bettersurvival.addons.clans.Clan;
 import alemiz.bettersurvival.addons.clans.PlayerClans;
+import alemiz.bettersurvival.addons.myland.MyLandProtect;
+import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.Command;
 import alemiz.bettersurvival.utils.ConfigManager;
 import cn.nukkit.Player;
@@ -30,10 +32,16 @@ public class ClanCommand extends Command {
                 "§7/clan leave : Leave current clan\n" +
                 "§7/clan destroy : Destroy your clan. All clan values will be lost!\n" +
                 "§7/clan info : Shows info about your clan\n" +
+                "§7/clan admin add <player> : Adds admin to your clan\n" +
+                "§7/clan admin remove <player> : Removes admin from your clan\n" +
                 "§7/clan bank note <value> : Creates bank note signed by your clan\n" +
                 "§7/clan bank apply : Applies note from your hand to clan bank\n" +
                 "§7/clan bank donate <value> : Gives money to clan bank\n" +
                 "§7/clan bank status: Shows your clan bank status\n" +
+                "§7/clan land create: Creates clan land\n" +
+                "§7/clan land remove: Removes clan land\n" +
+                "§7/clan home <create|remove|home>: Classic clan homes\n" +
+                "§7/clan listhome : Lists all homes\n" +
                 "§aYou can use clan chat by starting message with §6%§a!";
         this.setUsage(getUsageMessage());
 
@@ -130,30 +138,43 @@ public class ClanCommand extends Command {
                 player.sendMessage("§6»§7You have denied invitation from clan §6"+args[1]+"§7!");
                 break;
             case "info":
-                clan = this.loader.getClan(player);
-                if (clan == null){
-                    player.sendMessage("§c»§7You are not in any clan!");
-                    break;
-                }
+                clan = this.checkForClan(player);
+                if (clan == null) break;
 
                 player.sendMessage(clan.buildTextInfo());
                 break;
             case "leave":
-                clan = this.loader.getClan(player);
-                if (clan == null){
-                    player.sendMessage("§c»§7You are not in any clan!");
-                    break;
-                }
+                clan = this.checkForClan(player);
+                if (clan == null) break;
 
                 clan.removePlayer(player);
                 break;
             case "destroy":
-                clan = this.loader.getClan(player);
-                if (clan == null){
-                    player.sendMessage("§c»§7You are not in any clan!");
-                    break;
-                }
+                clan = this.checkForClan(player);
+                if (clan == null) break;
+
                 this.loader.destroyClan(player, clan);
+                break;
+            case "admin":
+                if (args.length < 3){
+                    player.sendMessage(this.getUsageMessage());
+                    return true;
+                }
+
+                clan = this.checkForClan(player);
+                if (clan == null) break;
+
+                switch (args[1]){
+                    case "add":
+                        clan.addAdmin(args[2], player);
+                        break;
+                    case "remove":
+                        clan.removeAdmin(args[2], player);
+                        break;
+                    default:
+                        player.sendMessage(this.getUsageMessage());
+                        break;
+                }
                 break;
             case "bank":
                 if (args.length < 2){
@@ -161,11 +182,8 @@ public class ClanCommand extends Command {
                     return true;
                 }
 
-                clan = this.loader.getClan(player);
-                if (clan == null){
-                    player.sendMessage("§c»§7You are not in any clan!");
-                    break;
-                }
+                clan = this.checkForClan(player);
+                if (clan == null) break;
 
                 switch (args[1]){
                     case "status":
@@ -196,13 +214,88 @@ public class ClanCommand extends Command {
                         }catch (Exception e){
                             player.sendMessage("§c»§7Please provide numerical value!");
                         }
+                    default:
+                        player.sendMessage(this.getUsageMessage());
+                        break;
                 }
+                break;
+            case "land":
+                if (args.length < 2){
+                    player.sendMessage(this.getUsageMessage());
+                    return true;
+                }
+
+                clan = this.checkForClan(player);
+                if (clan == null) break;
+
+                switch (args[1]){
+                    case "create":
+                        clan.createLand(player);
+                        break;
+                    case "remove":
+                        clan.removeLand(player);
+                        break;
+                    default:
+                        player.sendMessage(this.getUsageMessage());
+                        break;
+
+                }
+                break;
+            case "home":
+                if (args.length < 2){
+                    player.sendMessage(this.getUsageMessage());
+                    return true;
+                }
+
+                clan = this.checkForClan(player);
+                if (clan == null) break;
+
+                switch (args[1]){
+                    case "create":
+                    case "add":
+                        if (args.length < 3){
+                            player.sendMessage(this.getUsageMessage());
+                            return true;
+                        }
+
+                        clan.createHome(player, String.join(" ", Arrays.copyOfRange(args, 2, args.length)));
+                        break;
+                    case "remove":
+                        if (args.length < 3){
+                            player.sendMessage(this.getUsageMessage());
+                            return true;
+                        }
+
+                        clan.removeHome(player, String.join(" ", Arrays.copyOfRange(args, 2, args.length)));
+                        break;
+                    default:
+                        clan.teleportToHome(player, String.join(" ", Arrays.copyOfRange(args, 1, args.length)));
+                        break;
+                }
+                break;
+            case "listhome":
+                clan = this.checkForClan(player);
+                if (clan == null) break;
+
+                int homeLimit = clan.getConfig().getInt("homeLimit");
+                player.sendMessage("§a"+clan.getName()+"§a Clan:\n" +
+                        "§3»§7 Homes: §a"+clan.getHomes().size()+"§7/§2"+homeLimit+"\n" +
+                        "§3»§7Home List: §e"+String.join(", ", clan.getHomes().keySet()));
                 break;
             default:
                 player.sendMessage(this.getUsageMessage());
                 break;
         }
         return true;
+    }
+
+    private Clan checkForClan(Player player){
+        Clan clan = this.loader.getClan(player);
+        if (clan == null){
+            player.sendMessage("§c»§7You are not in any clan!");
+            return null;
+        }
+        return clan;
     }
 
 }

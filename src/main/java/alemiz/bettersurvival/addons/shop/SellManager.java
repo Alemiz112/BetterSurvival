@@ -23,6 +23,7 @@ public class SellManager {
 
     public void sendForm(Player player){
         FormWindowSimple form = new FormWindowSimple("§l§8Sell Items", "§7Please select category.");
+        form.addButton(new ElementButton("§fSell All"));
 
         Collection<ShopCategory> categories = this.loader.getCategories().values();
         for (ShopCategory category : categories){
@@ -51,6 +52,11 @@ public class SellManager {
         if (form == null || player == null || form.getResponse() == null) return;
 
         String response = form.getResponse().getClickedButton().getText();
+        if (response.equals("Sell All")){
+            this.sellAll(player);
+            return;
+        }
+
         String categoryName = response.split("\n")[0].substring(2).toLowerCase();
         ShopCategory category = this.loader.getCategory(categoryName);
 
@@ -86,5 +92,42 @@ public class SellManager {
 
         Money.getInstance().addMoney(player, count * shopItem.getSellPrice());
         player.sendMessage("§a»§7"+item.getName()+" was sold successfully!");
+    }
+
+    private Integer sellItem(Player player, Item item){
+        if (player == null || item == null) return null;
+        ShopItem shopItem = null;
+
+        for (ShopCategory category : this.loader.getCategories().values()){
+            for (ShopItem sshopItem : category.getItems()){
+                if (!item.equals(sshopItem.getItemSample(), true, false)) continue;
+                shopItem = sshopItem;
+                break;
+            }
+        }
+
+        if (shopItem == null) return null;
+        int price = item.getCount() * shopItem.getSellPrice();
+
+        player.getInventory().removeItem(item);
+        return price;
+    }
+
+    public void sellAll(Player player){
+        if (player == null) return;
+        int totalPrice = 0;
+
+        for (Item item : player.getInventory().getContents().values()){
+            if (item.isArmor()) continue;
+
+            Integer price = this.sellItem(player, item);
+            if (price != null) totalPrice += price;
+        }
+
+        Money.getInstance().addMoney(player, totalPrice);
+
+        String message = this.loader.configFile.getString("sellAllMessage");
+        message = message.replace("{money}", String.valueOf(totalPrice));
+        player.sendMessage(message);
     }
 }

@@ -1,6 +1,7 @@
 package alemiz.bettersurvival.addons.shop;
 
 import alemiz.bettersurvival.addons.PlayerPermissions;
+import alemiz.bettersurvival.commands.SellAllCommand;
 import alemiz.bettersurvival.commands.SellCommand;
 import alemiz.bettersurvival.commands.ShopCommand;
 import alemiz.bettersurvival.utils.Addon;
@@ -93,6 +94,8 @@ public class SurvivalShop extends Addon {
 
             configFile.set("messageSuccess", "§a»§7You have successfully bought §6{item}§7!");
             configFile.set("messageFail", "§c»§7You dont have §e{money}§7 coins to buy §6{item}§7!");
+
+            configFile.set("sellAllMessage", "§6»§7All your inventory was sold. Total income: §e{money}§7!");
             configFile.save();
         }
 
@@ -122,6 +125,7 @@ public class SurvivalShop extends Addon {
     public void registerCommands() {
         registerCommand("shop", new ShopCommand("shop", this));
         registerCommand("sell", new SellCommand("sell", this));
+        registerCommand("sellall", new SellAllCommand("sellall", this));
     }
 
     @EventHandler
