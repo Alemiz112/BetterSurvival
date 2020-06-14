@@ -62,6 +62,7 @@ public class MoreVanilla extends Addon{
 
             configFile.set("chatFormat", "§6{player} §7> {message}");
             configFile.set("playerNotFound", "§6»§7Player {player} was not found!");
+            configFile.set("permission-manage", "bettersurvival.vanilla.manage");
 
             configFile.set("permission-fly", "bettersurvival.fly");
             configFile.set("flyMessage", "§6»§7Flying mode has been turned §6{state}§7!");
@@ -357,8 +358,8 @@ public class MoreVanilla extends Addon{
             return;
         }
 
-        if (!executor.equals("console") && pexecutor != null && !pexecutor.hasPermission(configFile.getString("permission-fly"))){
-            pexecutor.sendMessage("§cYou dont have permission to fly!");
+        if (!executor.equals("console") && pexecutor != null && (!pexecutor.hasPermission(configFile.getString("permission-fly")) || !pexecutor.hasPermission(configFile.getString("permission-manage")))){
+            pexecutor.sendMessage("§cYou dont have permission to give fly!");
             return;
         }
 
@@ -386,8 +387,8 @@ public class MoreVanilla extends Addon{
             return;
         }
 
-        if (!executor.equals("console") && pexecutor != null && !pexecutor.hasPermission(configFile.getString("permission-feed"))){
-            pexecutor.sendMessage("§cYou dont have permission to feed!");
+        if (!executor.equals("console") && pexecutor != null && (!pexecutor.hasPermission(configFile.getString("permission-feed")) || !pexecutor.hasPermission(configFile.getString("permission-manage")))){
+            pexecutor.sendMessage("§cYou dont have permission to give feed to player!");
             return;
         }
 
@@ -412,7 +413,7 @@ public class MoreVanilla extends Addon{
             return;
         }
 
-        if (!executor.equals("console") && pexecutor != null && !pexecutor.hasPermission(configFile.getString("permission-heal"))){
+        if (!executor.equals("console") && pexecutor != null && (!pexecutor.hasPermission(configFile.getString("permission-heal")) || !pexecutor.hasPermission(configFile.getString("permission-manage")))){
             pexecutor.sendMessage("§cYou dont have permission to heal player!");
             return;
         }
