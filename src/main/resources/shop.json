@@ -1038,7 +1038,7 @@
     "monster spawner": {
       "id": 52,
       "count": 1,
-      "price": 12500,
+      "price": 25000,
       "image": "blocks/mob_spawner",
       "sell": 4000
     }
