@@ -1,9 +1,11 @@
 package alemiz.bettersurvival.addons.clans;
 
+import alemiz.bettersurvival.addons.myland.MyLandProtect;
 import alemiz.bettersurvival.commands.ClanCommand;
 import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.ConfigManager;
 import alemiz.bettersurvival.utils.SuperConfig;
+import alemiz.bettersurvival.utils.TextUtils;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.event.EventHandler;
@@ -11,6 +13,7 @@ import cn.nukkit.event.player.PlayerChatEvent;
 import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.TextFormat;
+import me.onebone.economyapi.EconomyAPI;
 
 import java.io.File;
 import java.util.*;
@@ -31,6 +34,8 @@ public class PlayerClans extends Addon {
     public void loadConfig() {
         if (!configFile.exists("enable")) {
             configFile.set("enable", true);
+            configFile.set("clanCreatePayment", 80000);
+
             configFile.set("playerLimit", 10);
             configFile.set("moneyLimit", 400000);
 
@@ -69,7 +74,12 @@ public class PlayerClans extends Addon {
         String rawName = config.getName().split("\\.")[0];
         this.plugin.getLogger().info("§eLoading clan §3"+rawName+"§e!");
 
-        this.clans.put(rawName, new Clan(rawName, config.getString("formattedName"), config, this));
+        Clan clan = new Clan(rawName, config.getString("formattedName"), config, this);
+        this.clans.put(rawName, clan);
+
+        if (config.exists("land") && Addon.getAddon("mylandprotect") != null){
+            ((MyLandProtect) Addon.getAddon("mylandprotect")).loadClanLand(clan);
+        }
     }
 
     public Clan createClan(Player player, String name){
@@ -80,6 +90,17 @@ public class PlayerClans extends Addon {
             return null;
         }
 
+        int clanPrice = configFile.getInt("clanCreatePayment");
+        int clanRevert = (clanPrice / 100) * 75;
+
+        boolean success = EconomyAPI.getInstance().reduceMoney(player, clanPrice) >= 1;
+        if (!success){
+            player.sendMessage("§c»§7You do not have enough coins to pay clan fee." +
+                    " Clan fee consists of §e"+ TextUtils.formatBigNumber(clanPrice)+"$§7,\n" +
+                    "§c75%§f of this fee will be return to clan bank.");
+            return null;
+        }
+
         name = TextFormat.clean(name);
         String rawName = name.toLowerCase().replace(" ", "_");
         Config config = new Config(ConfigManager.PATH+"/clans/"+rawName+".yml", Config.YAML);
@@ -87,7 +108,7 @@ public class PlayerClans extends Addon {
         config.set("formattedName", name);
         config.set("owner", player.getName());
         config.set("players", new ArrayList<>(Collections.singletonList(player.getName())));
-        config.set("money", 0);
+        config.set("money", clanRevert);
         config.set("maxMoney", configFile.getInt("moneyLimit", 400000));
         config.set("playerLimit", configFile.getInt("playerLimit", 10));
         config.save();
