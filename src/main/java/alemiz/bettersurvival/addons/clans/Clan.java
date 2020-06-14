@@ -56,11 +56,12 @@ public class Clan {
         config.save();
     }
 
-    public void addMoney(int value){
+    public boolean addMoney(int value){
         int balance = this.money+value;
 
-        if (balance > this.config.getInt("maxMoney")) return;
+        if (balance > this.config.getInt("maxMoney")) return false;
         this.setMoney(balance);
+        return true;
     }
 
     public boolean reduceMoney(int value){
