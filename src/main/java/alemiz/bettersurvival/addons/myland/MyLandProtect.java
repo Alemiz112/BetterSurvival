@@ -322,7 +322,7 @@ public class MyLandProtect extends Addon {
 
         int landSize;
         if (clanMode){
-            landSize = 10*75; //TODO: calculate by clan player count & allow resizing
+            landSize = 5*75; //TODO: calculate by clan player count & allow resizing
         }else {
             landSize = configFile.getInt("landsLimitSize");
             if (player != null && player.hasPermission(PERM_VIP)){
