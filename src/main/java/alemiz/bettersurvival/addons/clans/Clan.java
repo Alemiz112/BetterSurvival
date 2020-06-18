@@ -109,7 +109,7 @@ public class Clan {
     }
 
     public boolean isMember(String player){
-        return this.players.contains(player.toLowerCase()) || this.owner.equalsIgnoreCase(player);
+        return this.players.contains(player) || this.owner.equalsIgnoreCase(player);
     }
 
     public boolean isAdmin(Player player){
