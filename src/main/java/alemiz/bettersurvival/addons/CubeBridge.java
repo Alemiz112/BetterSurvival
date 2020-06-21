@@ -61,6 +61,7 @@ public class CubeBridge extends Addon {
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-heal"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-near"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-jump"));
+            perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-keepInvAll"));
         }
 
         //VIP Perms
@@ -82,8 +83,11 @@ public class CubeBridge extends Addon {
             perms.add(Addon.getAddon("troller").configFile.getString("permission-troll"));
             perms.add(Addon.getAddon("troller").configFile.getString("permission-troll-advanced"));
             perms.add(Addon.getAddon("troller").configFile.getString("permission-invsee"));
+
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-mute"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-manage"));
+            perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-keepInvAll"));
+
             perms.add(Addon.getAddon("mylandprotect").configFile.getString("chestsAccessPermission"));
         }
 
