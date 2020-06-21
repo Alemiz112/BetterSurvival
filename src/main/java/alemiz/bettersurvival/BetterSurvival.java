@@ -85,7 +85,7 @@ public class BetterSurvival extends PluginBase implements Listener {
             }
         });
 
-        event.setCancelled(cancel.get());
+        if (cancel.get()) event.setCancelled(true);
     }
 
     public static BetterSurvival getInstance() {
