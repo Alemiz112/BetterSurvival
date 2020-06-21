@@ -81,10 +81,20 @@ public class ClanCommand extends Command {
                 this.loader.createClan(player, clanName);
                 break;
             case "invite":
+                if (args.length < 2){
+                    player.sendMessage(this.getUsageMessage());
+                    return true;
+                }
+
                 playerName = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
                 this.loader.invite(playerName, player);
                 break;
             case "kick":
+                if (args.length < 2){
+                    player.sendMessage(this.getUsageMessage());
+                    return true;
+                }
+
                 playerName = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
                 clan = this.loader.getClan(player);
 
@@ -98,6 +108,11 @@ public class ClanCommand extends Command {
                 this.loader.sendInvitationsMessage(player);
                 break;
             case "accept":
+                if (args.length < 2){
+                    player.sendMessage(this.getUsageMessage());
+                    return true;
+                }
+
                 clan = this.loader.getClan(player);
                 if (clan != null){
                     player.sendMessage("§c»§7You are already in clan! If you want to switch clan, leave your clan first!");
@@ -124,6 +139,11 @@ public class ClanCommand extends Command {
                 clan.addPlayer(player);
                 break;
             case "deny":
+                if (args.length < 2){
+                    player.sendMessage(this.getUsageMessage());
+                    return true;
+                }
+
                 config = ConfigManager.getInstance().loadPlayer(player);
                 List<String> invites = config.getStringList("clanInvites");
 
@@ -302,5 +322,4 @@ public class ClanCommand extends Command {
         }
         return clan;
     }
-
 }

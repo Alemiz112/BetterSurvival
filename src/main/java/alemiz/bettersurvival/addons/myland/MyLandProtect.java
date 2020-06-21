@@ -314,12 +314,42 @@ public class MyLandProtect extends Addon {
             return false;
         }
 
+        //1. Check if lanf is in spawn
         for (Block block : blocks){
             if (!block.getLevel().isInSpawnRadius(block)) continue;
             player.sendMessage("§c»§7You can not create land inside spawn area!");
             return false;
         }
 
+        //2. Check if land is in other land
+        LandRegion region = null;
+        for (Block block : blocks){
+            if ((region = this.getLandByPos(block)) != null){
+                break;
+            }
+        }
+
+        if (region != null && !region.owner.equalsIgnoreCase(player.getName()) && !player.hasPermission(PERM_ACCESS)){
+            boolean cancel = true;
+            if (Addon.getAddon("playerclans") != null && (region instanceof ClanLand)){
+                PlayerClans playerClans = (PlayerClans) Addon.getAddon("playerclans");
+                Clan clan = playerClans.getClan(player);
+                if (clan != null && clan.getName().equals(((ClanLand) region).getClan().getName())){
+                    cancel = false;
+                }
+            }
+
+            if (cancel){
+                String message = configFile.getString("landWarn");
+                message = message.replace("{land}", (region instanceof ClanLand)? "" : region.land);
+                message = message.replace("{player}", player.getName());
+                message = message.replace("{owner}", region.owner + ((region instanceof ClanLand)? " Clan" : ""));
+                player.sendMessage(message);
+                return false;
+            }
+        }
+
+        //3. Check land sizes
         int landSize;
         if (clanMode){
             landSize = 5*75; //TODO: calculate by clan player count & allow resizing
@@ -390,80 +420,84 @@ public class MyLandProtect extends Addon {
     }
 
     public void createLand(Player player, String land, boolean clanMode){
-        if (player == null || !player.isConnected()) return;
+        Runnable task = () -> {
+            if (player == null || !player.isConnected()) return;
+            Config config;
+            Clan clan = null;
+            if (clanMode){
+                clan = ((PlayerClans) Addon.getAddon("playerclans")).getClan(player);
+                if (clan == null) {
+                    player.sendMessage("§c»§7You are not in any clan!");
+                    return;
+                }
 
-        Config config;
-        Clan clan = null;
-        if (clanMode){
-            clan = ((PlayerClans) Addon.getAddon("playerclans")).getClan(player);
-            if (clan == null) {
-                player.sendMessage("§c»§7You are not in any clan!");
+                config = clan.getConfig();
+                if (config.exists("land")){
+                    String message = configFile.getString("landClanExists");
+                    message = message.replace("{clan}", clan.getName());
+                    player.sendMessage(message);
+                    return;
+                }
+            }else {
+                config = ConfigManager.getInstance().loadPlayer(player);
+                if (config == null) return;
+                int limit = configFile.getInt("landsLimit");
+
+                Set<String> lands = config.getSection("land").getKeys(false);
+                if (lands != null && lands.size() >= limit && !player.isOp()){
+                    String message = configFile.getString("landLimitWarn");
+                    message = message.replace("{land}", land);
+                    message = message.replace("{player}", player.getName());
+                    player.sendMessage(message);
+                    return;
+                }
+
+                if (lands != null && lands.contains(land.toLowerCase())){
+                    String message = configFile.getString("landWithNameExists");
+                    message = message.replace("{land}", land);
+                    message = message.replace("{player}", player.getName());
+                    player.sendMessage(message);
+                    return;
+                }
+            }
+
+            if (!this.selectors.containsKey(player.getName().toLowerCase())){
+                player.sendMessage(configFile.getString("landSetPos"));
                 return;
             }
 
-            config = clan.getConfig();
-            if (config.exists("land")){
-                String message = configFile.getString("landClanExists");
-                message = message.replace("{clan}", clan.getName());
-                player.sendMessage(message);
-                return;
-            }
-        }else {
-            config = ConfigManager.getInstance().loadPlayer(player);
-            if (config == null) return;
-            int limit = configFile.getInt("landsLimit");
+            player.sendMessage("§6»§r§7Validating land. Please wait...");
 
-            Set<String> lands = config.getSection("land").getKeys(false);
-            if (lands != null && lands.size() >= limit && !player.isOp()){
-                String message = configFile.getString("landLimitWarn");
-                message = message.replace("{land}", land);
-                message = message.replace("{player}", player.getName());
-                player.sendMessage(message);
+            List<Block> blocks = this.selectors.get(player.getName().toLowerCase());
+            if (!validateLand(blocks, player, clanMode)){
+                selectors.remove(player.getName().toLowerCase());
                 return;
             }
 
-            if (lands != null && lands.contains(land.toLowerCase())){
-                String message = configFile.getString("landWithNameExists");
-                message = message.replace("{land}", land);
-                message = message.replace("{player}", player.getName());
-                player.sendMessage(message);
-                return;
+            for (int i = 0; i < blocks.size(); i++){
+                Block block = blocks.get(i);
+                Double[] pos = {block.getX(), block.getY(), block.getZ()};
+
+                String index = clanMode? "land.pos"+i : "land."+land.toLowerCase()+".pos"+i;
+                config.set(index, pos);
             }
-        }
 
-        if (!this.selectors.containsKey(player.getName().toLowerCase())){
-            player.sendMessage(configFile.getString("landSetPos"));
-            return;
-        }
+            if (!clanMode) config.set("land."+land.toLowerCase()+".whitelist", new String[0]);
 
-        List<Block> blocks = this.selectors.get(player.getName().toLowerCase());
-        if (!validateLand(blocks, player, clanMode)){
-            selectors.remove(player.getName().toLowerCase());
-            return;
-        }
+            String message = configFile.getString("landCreate");
+            message = message.replace("{land}", (clanMode? clan.getName()+" land" : land));
+            message = message.replace("{player}", player.getName());
+            player.sendMessage(message);
 
-        for (int i = 0; i < blocks.size(); i++){
-            Block block = blocks.get(i);
-            Double[] pos = {block.getX(), block.getY(), block.getZ()};
+            this.selectors.remove(player.getName().toLowerCase());
+            config.save();
 
-            String index = clanMode? "land.pos"+i : "land."+land.toLowerCase()+".pos"+i;
-            config.set(index, pos);
-        }
-
-        if (!clanMode) config.set("land."+land.toLowerCase()+".whitelist", new String[0]);
-
-        String message = configFile.getString("landCreate");
-        message = message.replace("{land}", (clanMode? clan.getName()+" land" : land));
-        message = message.replace("{player}", player.getName());
-        player.sendMessage(message);
-
-        this.selectors.remove(player.getName().toLowerCase());
-        config.save();
-
-        LandRegion region = clanMode? new ClanLand(clan, player.getLevel()) : new LandRegion(player.getName().toLowerCase(), land.toLowerCase(), player.getLevel());
-        region.pos1 = blocks.get(0).asVector3f();
-        region.pos2 = blocks.get(1).asVector3f();
-        this.lands.put(clanMode? clan.getRawName() : player.getName().toLowerCase()+"-"+land.toLowerCase(), region);
+            LandRegion region = clanMode? new ClanLand(clan, player.getLevel()) : new LandRegion(player.getName().toLowerCase(), land.toLowerCase(), player.getLevel());
+            region.pos1 = blocks.get(0).asVector3f();
+            region.pos2 = blocks.get(1).asVector3f();
+            this.lands.put(clanMode? clan.getRawName() : player.getName().toLowerCase()+"-"+land.toLowerCase(), region);
+        };
+        this.plugin.getServer().getScheduler().scheduleTask(this.plugin, task, true);
     }
 
     public void removeLand(Player player, String land){

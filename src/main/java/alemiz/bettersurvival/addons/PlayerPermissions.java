@@ -15,11 +15,14 @@ import java.util.List;
 
 public class PlayerPermissions extends Addon {
 
+    private final List<String> defaultPermissions;
+
     /*
      TODO: Create permission groups
      */
     public PlayerPermissions(String path){
         super("playerpermissions", path);
+        this.defaultPermissions = configFile.getStringList("defaultPermissions");
     }
 
     @Override
@@ -40,9 +43,6 @@ public class PlayerPermissions extends Addon {
         loadDefaultPermissions(player);
     }
 
-    /**
-     * @param player
-     */
     public void checkExpiredPermissions(Player player){
         if (player == null) return;
 
@@ -66,9 +66,6 @@ public class PlayerPermissions extends Addon {
         });
     }
 
-    /**
-     * @param player
-     */
     public void loadDefaultPermissions(Player player){
         if (player == null) return;
 
@@ -86,22 +83,18 @@ public class PlayerPermissions extends Addon {
         for (String permission : config.getStringList("permissions")){
             player.addAttachment(plugin, permission, (!permission.startsWith("!")));
         }
+
+        for (String permission : this.defaultPermissions){
+            player.addAttachment(plugin, permission, (!permission.startsWith("!")));
+        }
     }
 
-    /**
-
-     * @param player
-     * @param permission
-     */
     public void addPermission(Player player, String permission){
         addPermission(player, permission, "");
     }
 
     /**
      * Date format "yyyy-MM-dd"
-     * @param player
-     * @param permission
-     * @param expiry
      */
     public void addPermission(Player player, String permission, String expiry){
         if (player == null) return;
@@ -122,10 +115,6 @@ public class PlayerPermissions extends Addon {
         player.addAttachment(plugin, permission, (!permission.startsWith("!")));
     }
 
-    /**
-     * @param player
-     * @param permission
-     */
     public void removePermission(Player player, String permission){
         if (player == null) return;
 
@@ -143,9 +132,6 @@ public class PlayerPermissions extends Addon {
 
     /**
      * Date format "yyyy-MM-dd"
-     * @param player
-     * @param permission
-     * @param date
      */
     public void setExpiryPermission(Player player, String permission, String date){
         if (player == null) return;
@@ -157,10 +143,6 @@ public class PlayerPermissions extends Addon {
         config.save();
     }
 
-    /**
-     * @param player
-     * @param permission
-     */
     public void removeFromExpiryList(Player player, String permission){
         if (player == null) return;
 
@@ -169,5 +151,17 @@ public class PlayerPermissions extends Addon {
 
         config.remove("expired-permissions."+permission.replace(".", "-"));
         config.save();
+    }
+
+    public void addDefaultPermission(String permission){
+        this.defaultPermissions.add(permission);
+    }
+
+    public void removeDefaultPermission(String permission){
+        this.defaultPermissions.remove(permission);
+    }
+
+    public List<String> getDefaultPermissions() {
+        return this.defaultPermissions;
     }
 }

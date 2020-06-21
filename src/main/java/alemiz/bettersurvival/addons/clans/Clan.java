@@ -204,7 +204,7 @@ public class Clan {
     public void addPlayer(Player player){
         if (player == null) return;
 
-        this.sendMessage("Player @6"+player.getName()+" joined your Clan!");
+        this.sendMessage("Player §6@"+player.getName()+" joined your Clan!");
         this.players.add(player.getName());
         this.savePlayerList();
 

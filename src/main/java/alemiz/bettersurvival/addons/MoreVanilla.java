@@ -4,9 +4,13 @@ import alemiz.bettersurvival.commands.*;
 import alemiz.bettersurvival.tasks.MuteCheckTask;
 import alemiz.bettersurvival.tasks.RandomTpTask;
 import alemiz.bettersurvival.utils.Addon;
+import alemiz.bettersurvival.utils.ConfigManager;
 import cn.nukkit.AdventureSettings;
 import cn.nukkit.Server;
+import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
+import cn.nukkit.blockentity.BlockEntity;
+import cn.nukkit.blockentity.BlockEntityChest;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.EventPriority;
 import cn.nukkit.event.block.BlockBreakEvent;
@@ -19,9 +23,11 @@ import cn.nukkit.item.Item;
 import cn.nukkit.level.*;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.protocol.PlaySoundPacket;
 import cn.nukkit.network.protocol.SpawnParticleEffectPacket;
 import cn.nukkit.potion.Effect;
+import cn.nukkit.utils.Config;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -49,6 +55,8 @@ public class MoreVanilla extends Addon{
     protected Map<String, Integer> randTpDelay = new HashMap<>();
     protected Map<String, Position> sleepPos = new HashMap<>();
 
+    protected Map<String, Boolean> keepInvCache = new HashMap<>();
+
     public MoreVanilla(String path){
         super("morevanilla", path);
 
@@ -60,8 +68,13 @@ public class MoreVanilla extends Addon{
         if (!configFile.exists("enable")){
             configFile.set("enable", true);
 
+            configFile.set("keepInvCommand", true);
+            configFile.set("keepInventoryMessage", "§6»§7You have turned KeepInventory §6{state}§7!");
+            configFile.set("permission-keepInvAll", "bettersurvival.vanilla.keepinvall");
+            configFile.set("permission-keepinvTools", "bettersurvival.vanilla.keepinvtools");
+
             configFile.set("chatFormat", "§6{player} §7> {message}");
-            configFile.set("playerNotFound", "§6»§7Player {player} was not found!");
+            configFile.set("playerNotFound", "§6»§7Player was not found!");
             configFile.set("permission-manage", "bettersurvival.vanilla.manage");
 
             configFile.set("permission-fly", "bettersurvival.fly");
@@ -118,6 +131,7 @@ public class MoreVanilla extends Addon{
         registerCommand("rand", new RandCommand("rand", this));
         registerCommand("mute", new MuteCommand("mute", this));
         registerCommand("unmute", new UnmuteCommand("unmute", this));
+        if (configFile.getBoolean("keepInvCommand")) registerCommand("keepinv", new KeepInvCommand("keepinv", this));
     }
 
     @EventHandler
@@ -137,6 +151,11 @@ public class MoreVanilla extends Addon{
         player.addAttachment(plugin, configFile.getString("permission-tpa"), true);
         player.addAttachment(plugin, configFile.getString("permission-back"), true);
         player.addAttachment(plugin, configFile.getString("permission-randtp"), true);
+
+        if (configFile.getBoolean("keepInvCommand")){
+            Config config = ConfigManager.getInstance().loadPlayer(player);
+            this.keepInvCache.put(player.getName(), config.getBoolean("keepInventory"));
+        }
     }
 
     @EventHandler
@@ -146,6 +165,7 @@ public class MoreVanilla extends Addon{
         this.back.remove(player.getName());
         this.randTpDelay.remove(player.getName());
         this.sleepPos.remove(player.getName());
+        this.keepInvCache.remove(player.getName());
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -189,7 +209,6 @@ public class MoreVanilla extends Addon{
     @EventHandler
     public void onWakeUp(PlayerBedLeaveEvent event){
         Player player = event.getPlayer();
-
         Position safeSpawn = this.sleepPos.getOrDefault(player.getName(), player.getLevel().getSafeSpawn(player.getSpawn()));
         player.teleport(safeSpawn);
     }
@@ -198,13 +217,17 @@ public class MoreVanilla extends Addon{
     public void onDeath(PlayerDeathEvent event){
         Player player = event.getEntity();
         this.back.put(player.getName(), player.clone());
+
+        if (configFile.getBoolean("keepInvCommand") && this.keepInventory(player)){
+            event.setKeepInventory(true);
+            this.dropDeathItems(player, event.getDrops());
+        }
     }
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event){
         Player player = event.getPlayer();
         Item item = event.getItem();
-
         if (event.getAction() != PlayerInteractEvent.Action.RIGHT_CLICK_AIR) return;
 
         if (changeArmor(player, item)){
@@ -290,6 +313,28 @@ public class MoreVanilla extends Addon{
             inv.addItem(changed);
         }
         return true;
+    }
+
+    private void dropDeathItems(Player player, Item[] oldDrops){
+        if (player.hasPermission(configFile.getString("permission-keepInvAll")) || player.isOp()){
+            return;
+        }
+
+        List<Item> keep = new ArrayList<>();
+        boolean keepTools = player.hasPermission(configFile.getString("permission-keepinvTools"));
+        System.out.println(keepTools);
+
+        PlayerInventory inv = player.getInventory();
+        inv.clearAll();
+
+        for (Item item : oldDrops){
+            if (item.isArmor() || (item.isTool() && keepTools)){
+                keep.add(item);
+            }else {
+                player.getLevel().dropItem(player, item, null, true, 40);
+            }
+        }
+        inv.addItem(keep.toArray(new Item[0]));
     }
 
     public void tpa(Player executor, String player){
@@ -590,12 +635,29 @@ public class MoreVanilla extends Addon{
         player.sendMessage(message);
     }
 
+    public void setKeepInventory(Player player, boolean enable){
+        if (player == null) return;
+
+        Config config = ConfigManager.getInstance().loadPlayer(player);
+        config.set("keepInventory", enable);
+        config.save();
+
+        this.keepInvCache.put(player.getName(), enable);
+
+        String message = configFile.getString("keepInventoryMessage");
+        message = message.replace("{player}", player.getName());
+        message = message.replace("{state}", enable? "on" : "off");
+        player.sendMessage(message);
+    }
+
+    public boolean keepInventory(Player player){
+        return player != null && this.keepInvCache.getOrDefault(player.getName(), false);
+    }
 
     public boolean checkForPlayer(Player player, Player pexecutor){
         if (player == null){
             if (pexecutor != null){
                 String message = configFile.getString("playerNotFound");
-                message = message.replace("{player}", player.getName());
                 pexecutor.sendMessage(message);
             }
             return false;
