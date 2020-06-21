@@ -228,9 +228,6 @@ public class MoreVanilla extends Addon{
     public void onInteract(PlayerInteractEvent event){
         Player player = event.getPlayer();
         Item item = event.getItem();
-
-        System.out.println(item.toString());
-
         if (event.getAction() != PlayerInteractEvent.Action.RIGHT_CLICK_AIR) return;
 
         if (changeArmor(player, item)){
