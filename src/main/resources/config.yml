@@ -1,3 +1,7 @@
 #BetterSurvival by Alemiz
 #Alemiz#3386
 
+#Enable auto-restart of server
+auto-restart: true
+#Auto-restart interval in minutes
+restartInterval: 120
