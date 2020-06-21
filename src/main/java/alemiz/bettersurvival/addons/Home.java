@@ -6,10 +6,8 @@ import alemiz.bettersurvival.commands.HomeCommand;
 import alemiz.bettersurvival.commands.SetHomeCommand;
 import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.ConfigManager;
-import alemiz.bettersurvival.utils.SuperConfig;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
-import cn.nukkit.math.Vector3;
 import cn.nukkit.Player;
 import cn.nukkit.utils.Config;
 
@@ -29,7 +27,7 @@ public class Home extends Addon {
             configFile.set("enable", true);
             configFile.set("homeLimit", 3);
             configFile.set("homeTeleport", "§6»§7Woosh! Welcome at {home} §6@{player}!");
-            configFile.set("homeSet", "§6»§7Your home §6{home}§7 has been saved!");
+            configFile.set("homeSet", "§6»§7Your home §6{home}§7 has been saved! You have §6{limit}§7 free homes!");
             configFile.set("homeDel", "§6»§7Your home §6{home}§7 was deleted!");
             configFile.save();
         }
@@ -53,7 +51,7 @@ public class Home extends Addon {
         int limit = configFile.getInt("homeLimit");
 
         Set<String> homes = config.getSection("home").getKeys(false);
-        if (homes != null && homes.size() >= limit && !player.isOp()){
+        if (homes.size() >= limit && !player.isOp()){
             player.sendMessage("§6»§7Home limit reached!");
             return;
         }
@@ -66,6 +64,7 @@ public class Home extends Addon {
         String message = configFile.getString("homeSet");
         message = message.replace("{player}", player.getName());
         message = message.replace("{home}", home);
+        message = message.replace("{limit}", player.isOp()? "unlimited" : String.valueOf(limit - homes.size()));
         player.sendMessage(message);
     }
 
