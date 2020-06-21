@@ -5,6 +5,7 @@ import alemiz.bettersurvival.addons.clans.PlayerClans;
 import alemiz.bettersurvival.addons.economy.BetterEconomy;
 import alemiz.bettersurvival.addons.myland.MyLandProtect;
 import alemiz.bettersurvival.addons.shop.SurvivalShop;
+import alemiz.bettersurvival.tasks.ServerRestartTask;
 import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.ConfigManager;
 import alemiz.bettersurvival.utils.enitity.FakeHuman;
@@ -28,18 +29,27 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BetterSurvival extends PluginBase implements Listener {
 
-    protected static BetterSurvival instance;
-    protected ConfigManager configManager;
+    private static BetterSurvival instance;
+    private ConfigManager configManager;
+
+    private boolean autoRestart;
+    /**
+     * Time in minutes until restart
+     */
+    private int restartTime;
 
     @Override
     public void onEnable() {
         instance = this;
         this.configManager = new ConfigManager(this);
 
-        this.loadAddons();
+        this.autoRestart = this.configManager.cfg.getBoolean("auto-restart");
+        this.restartTime = this.configManager.cfg.getInt("restartInterval", 120);
+        this.getServer().getScheduler().scheduleRepeatingTask(this, new ServerRestartTask(this), 20*60*10);
 
+        this.loadAddons();
         this.getServer().getPluginManager().registerEvents(this, this);
-        this.getLogger().info("§aEnabling BetterSurvival by §6Alemiz!");
+        this.getLogger().info("§aEnabled BetterSurvival by §6Alemiz!");
     }
 
     @Override
@@ -88,14 +98,6 @@ public class BetterSurvival extends PluginBase implements Listener {
         if (cancel.get()) event.setCancelled(true);
     }
 
-    public static BetterSurvival getInstance() {
-        return instance;
-    }
-
-    public ConfigManager getConfigManager() {
-        return configManager;
-    }
-
     public void loadAddons(){
         //Load permissions as first
         Addon.loadAddon(new PlayerPermissions("player_permissions.yml"));
@@ -116,5 +118,25 @@ public class BetterSurvival extends PluginBase implements Listener {
         //This must be last addon loaded
         Addon.loadAddon(new CubeBridge("cube_bridge.yml"));
         Addon.loadAddon(new BetterLobby("better_lobby.yml"));
+    }
+
+    public static BetterSurvival getInstance() {
+        return instance;
+    }
+
+    public ConfigManager getConfigManager() {
+        return configManager;
+    }
+
+    public boolean isAutoRestartEnabled() {
+        return this.autoRestart;
+    }
+
+    public void setRestartTime(int restartTime) {
+        this.restartTime = restartTime;
+    }
+
+    public int getRestartTime() {
+        return this.restartTime;
     }
 }

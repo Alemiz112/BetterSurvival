@@ -73,7 +73,7 @@ public class MyLandProtect extends Addon {
             configFile.set("landLimitWarn", "§6»§7Lands limit reached!");
             configFile.set("landHereNotFound", "§6»§7This land is free§7!");
 
-            configFile.set("landCreate", "§6»§7You have created new land §6{land}§7!");
+            configFile.set("landCreate", "§6»§7You have created new land §6{land}§7! You have §6{limit}§7 free lands!");
             configFile.set("landRemove", "§6»§7You have removed your land §6{land}§7!");
             configFile.set("landSetPos", "§6»§7Touch 2 blocks with wand to select border positions§7!");
             configFile.set("landWhitelist", "§6»§7Whitelist for §6{land}§7 saved§7!");
@@ -424,6 +424,8 @@ public class MyLandProtect extends Addon {
             if (player == null || !player.isConnected()) return;
             Config config;
             Clan clan = null;
+            int freeLands = 0;
+
             if (clanMode){
                 clan = ((PlayerClans) Addon.getAddon("playerclans")).getClan(player);
                 if (clan == null) {
@@ -442,9 +444,10 @@ public class MyLandProtect extends Addon {
                 config = ConfigManager.getInstance().loadPlayer(player);
                 if (config == null) return;
                 int limit = configFile.getInt("landsLimit");
-
                 Set<String> lands = config.getSection("land").getKeys(false);
-                if (lands != null && lands.size() >= limit && !player.isOp()){
+                freeLands = limit - lands.size();
+
+                if (freeLands < 1 && !player.isOp()){
                     String message = configFile.getString("landLimitWarn");
                     message = message.replace("{land}", land);
                     message = message.replace("{player}", player.getName());
@@ -487,6 +490,7 @@ public class MyLandProtect extends Addon {
             String message = configFile.getString("landCreate");
             message = message.replace("{land}", (clanMode? clan.getName()+" land" : land));
             message = message.replace("{player}", player.getName());
+            message = message.replace("{limit}", player.isOp()? "unlimited" : String.valueOf(freeLands));
             player.sendMessage(message);
 
             this.selectors.remove(player.getName().toLowerCase());
