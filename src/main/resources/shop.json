@@ -94,6 +94,7 @@
     },
     "cocoa beans": {
       "id": 351,
+      "meta": 3,
       "count": 8,
       "price": 150,
       "sell": 5,
