@@ -222,7 +222,7 @@ public class ClanCommand extends Command {
                     case "donate":
                         try {
                             int value = Integer.parseInt(args[2]);
-                            boolean success = (Money.getInstance().getMoney(player) - value) >= 0;
+                            boolean success = (Money.getInstance().getMoney(player, false) - value) >= 0;
 
                             if (!success){
                                 player.sendMessage("§c»§7You do not have enough coins to donate!");

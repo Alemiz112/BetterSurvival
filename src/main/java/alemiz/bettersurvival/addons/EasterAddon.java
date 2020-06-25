@@ -22,6 +22,7 @@ import cn.nukkit.level.Sound;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.Config;
 import cubemc.nukkit.connector.modules.npc.NpcModule;
+import cubemc.nukkit.connector.utils.exception.InvalidSkinException;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -171,10 +172,18 @@ public class EasterAddon extends Addon {
         if (player == null) return;
 
         String name = configFile.getString("eggTitle");
-        Skin skin = this.eggSkins.get(new Random().nextInt(this.eggSkins.size()));
         String geometryName = configFile.getString("eggGeometryName");
 
-        Entity entity = NpcModule.getInstance().createCustomEntity(player, skin, geometryName, name);
+        Entity entity;
+        try {
+            Skin skin = this.eggSkins.get(new Random().nextInt(this.eggSkins.size()));
+            entity = NpcModule.getInstance().createCustomEntity(player, skin, geometryName, name);
+        }catch (InvalidSkinException e){
+            player.sendMessage("§c»§7"+e.getMessage());
+            this.plugin.getLogger().error(e.getMessage(), e.getTrackedException());
+            return;
+        }
+
         if (pos != null){
             entity.teleport(pos.add(0.5, 0, 0.5));
         }
