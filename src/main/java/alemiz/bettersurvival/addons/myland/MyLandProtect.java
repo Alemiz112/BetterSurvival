@@ -521,7 +521,7 @@ public class MyLandProtect extends Addon {
         ((Map) config.get("land")).remove(land.toLowerCase());
         config.save();
 
-        this.lands.remove(player.getName().toLowerCase()+"-"+land);
+        this.lands.remove(player.getName().toLowerCase()+"-"+land.toLowerCase());
 
         String message = configFile.getString("landRemove");
         message = message.replace("{player}", player.getName());

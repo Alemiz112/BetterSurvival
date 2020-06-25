@@ -97,7 +97,7 @@ public class Clan {
             if (level == null) continue;
 
             try {
-                this.homes.put(name.toLowerCase(), new Position(Double.parseDouble(data[0]), Double.parseDouble(data[1]), Double.parseDouble(data[2]), level));
+                this.homes.put(home.toLowerCase(), new Position(Double.parseDouble(data[0]), Double.parseDouble(data[1]), Double.parseDouble(data[2]), level));
             }catch (Exception e){
                 BetterSurvival.getInstance().getLogger().warning("§cUnable to load home §4"+home+"§c for clan §4"+this.rawName);
             }
