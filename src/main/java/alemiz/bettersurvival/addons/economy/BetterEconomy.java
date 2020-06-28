@@ -295,15 +295,18 @@ public class BetterEconomy extends Addon {
 
     public void showItemInfo(Player player){
         if (player == null || !player.isConnected()) return;
-
-        BlockIterator iterator = new BlockIterator(player.getLevel(), player, player.getDirectionVector(), 1.5, 4);
         Block itemFrameBlock = null;
 
-        while (iterator.hasNext()){
-            Block block = iterator.next();
-            if (block.getId() == Block.ITEM_FRAME_BLOCK){
-                itemFrameBlock = block;
+        try {
+            BlockIterator iterator = new BlockIterator(player.getLevel(), player, player.getDirectionVector(), 1.5, 4);
+            while (iterator.hasNext()){
+                Block block = iterator.next();
+                if (block.getId() == Block.ITEM_FRAME_BLOCK){
+                    itemFrameBlock = block;
+                }
             }
+        }catch (Exception e){
+            //ignore
         }
 
         if (itemFrameBlock == null) return;
