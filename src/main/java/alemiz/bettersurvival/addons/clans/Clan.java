@@ -2,6 +2,7 @@ package alemiz.bettersurvival.addons.clans;
 
 import alemiz.bettersurvival.BetterSurvival;
 import alemiz.bettersurvival.addons.economy.BetterEconomy;
+import alemiz.bettersurvival.addons.myland.LandRegion;
 import alemiz.bettersurvival.addons.myland.MyLandProtect;
 import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.ConfigManager;
@@ -326,6 +327,16 @@ public class Clan {
 
         MyLandProtect landProtect = (MyLandProtect) Addon.getAddon("mylandprotect");
         landProtect.removeClanLand(player);
+    }
+
+    public ClanLand getLand(){
+        if (Addon.getAddon("mylandprotect") == null){
+            return null;
+        }
+
+        MyLandProtect landProtect = (MyLandProtect) Addon.getAddon("mylandprotect");
+        LandRegion land = landProtect.getLands().get(this.rawName);
+        return (land instanceof ClanLand)? (ClanLand) land : null;
     }
 
     public void createHome(Player player, String name){
