@@ -289,16 +289,6 @@ public class MyLandProtect extends Addon {
         for (LandRegion region : this.lands.values()){
             if (position.getLevel() != null && !region.level.getFolderName().equals(position.getLevel().getFolderName())) continue;
 
-            if (position.x >= Math.min(region.pos1.x, region.pos2.x) && position.x <= Math.max(region.pos1.x, region.pos2.x)
-                    && position.y >= Math.min(region.pos1.y, region.pos2.y) && position.y <= Math.max(region.pos1.y, region.pos2.y)
-                    && position.z >= Math.min(region.pos1.z, region.pos2.z) && position.z <= Math.max(region.pos1.z, region.pos2.z)){
-                foundregion = region;
-
-                if (!(region instanceof ClanLand)){
-                    break;
-                }
-            }
-
             if (position.x < Math.min(region.pos1.x, region.pos2.x) && position.x > Math.max(region.pos1.x, region.pos2.x)
                     && position.y < Math.min(region.pos1.y, region.pos2.y) && position.y > Math.max(region.pos1.y, region.pos2.y)
                     && position.z < Math.min(region.pos1.z, region.pos2.z) && position.z > Math.max(region.pos1.z, region.pos2.z)){
