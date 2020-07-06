@@ -4,7 +4,7 @@
       "id": 260,
       "count": 10,
       "price": 200,
-      "sell": 7
+      "sell": 10
     },
     "bread": {
       "id": 297,
@@ -15,70 +15,70 @@
     "steak": {
       "id": 364,
       "count": 10,
-      "price": 250,
+      "price": 175,
       "image": "items/beef_cooked",
-      "sell": 8
+      "sell": 7
     },
     "cookie": {
       "id": 357,
       "count": 10,
-      "price": 200,
-      "sell": 5
+      "price": 125,
+      "sell": 4
     },
     "cooked porkchop": {
       "id": 320,
       "count": 10,
-      "price": 250,
+      "price": 175,
       "image": "items/porkchop_cooked",
-      "sell": 8
+      "sell": 7
     },
     "cooked mutton": {
       "id": 424,
       "count": 10,
-      "price": 250,
+      "price": 175,
       "image": "items/mutton_cooked",
-      "sell": 8
+      "sell": 7
     },
     "cooked chicken": {
       "id": 366,
       "count": 10,
-      "price": 250,
+      "price": 175,
       "image": "items/chicken_cooked",
-      "sell": 8
+      "sell": 7
     },
     "cooked rabbit": {
       "id": 412,
       "count": 10,
-      "price": 250,
+      "price": 175,
       "image": "items/rabbit_cooked",
-      "sell": 8
+      "sell": 7
     },
     "pumpkin pie": {
       "id": 400,
       "count": 10,
       "price": 250,
       "image": "items/pumpkin_pie",
-      "sell": 10
+      "sell": 12
     },
     "cake": {
       "id": 354,
       "count": 1,
-      "price": 50,
-      "sell": 15
+      "price": 100,
+      "sell": 25
     }
   },
   "farmable": {
     "melon": {
       "id": 360,
       "count": 10,
-      "price": 200,
+      "price": 150,
       "sell": 5
     },
     "potato": {
       "id": 392,
       "count": 10,
       "price": 150,
-      "sell": 6
+      "sell": 5
     },
     "carrot": {
       "id": 391,
@@ -89,29 +89,29 @@
     "sugar": {
       "id": 353,
       "count": 8,
-      "price": 150,
-      "sell": 5
+      "price": 180,
+      "sell": 6
     },
     "cocoa beans": {
       "id": 351,
       "meta": 3,
       "count": 8,
-      "price": 150,
-      "sell": 5,
+      "price": 120,
+      "sell": 4,
       "image": false
     },
     "pumpkin": {
       "id": 86,
       "count": 8,
-      "price": 125,
-      "sell": 6,
+      "price": 150,
+      "sell": 8,
       "image": "items/seeds_pumpkin"
     },
     "seeds": {
       "id": 295,
       "count": 8,
-      "price": 150,
-      "sell": 4,
+      "price": 100,
+      "sell": 2,
       "image": "items/seeds_wheat"
     }
   },
@@ -125,7 +125,7 @@
     "egg": {
       "id": 344,
       "count": 8,
-      "price": 125,
+      "price": 150,
       "sell": 5
     },
     "milk": {
@@ -140,7 +140,7 @@
     "iron": {
       "id": 265,
       "count": 5,
-      "price": 400,
+      "price": 325,
       "image": "items/iron_ingot",
       "sell": 20
     },
@@ -170,12 +170,12 @@
       "count": 5,
       "price": 350,
       "image": "items/emerald",
-      "sell": 30
+      "sell": 50
     },
     "nether quartz": {
       "id": 406,
       "count": 18,
-      "price": 250,
+      "price": 400,
       "image": "items/quartz",
       "sell": 5
     }
@@ -186,7 +186,7 @@
       "count": 8,
       "price": 250,
       "image": "items/leather",
-      "sell": 8
+      "sell": 7
     },
     "string": {
       "id": 287,
@@ -560,7 +560,7 @@
       "id": 383,
       "count": 1,
       "meta": 19,
-      "price": 1000,
+      "price": 500,
       "image": "items/spawn_egg",
       "sell": 250
     },
@@ -600,7 +600,7 @@
       "id": 383,
       "count": 1,
       "meta": 26,
-      "price": 2500,
+      "price": 5000,
       "image": "items/spawn_egg",
       "sell": 250
     },
@@ -608,7 +608,7 @@
       "id": 383,
       "count": 1,
       "meta": 27,
-      "price": 2500,
+      "price": 5000,
       "image": "items/spawn_egg",
       "sell": 500
     },
@@ -632,7 +632,7 @@
       "id": 383,
       "count": 1,
       "meta": 30,
-      "price": 1500,
+      "price": 2000,
       "image": "items/spawn_egg",
       "sell": 250
     },
@@ -664,7 +664,7 @@
       "id": 383,
       "count": 1,
       "meta": 32,
-      "price": 2500,
+      "price": 1200,
       "image": "items/spawn_egg",
       "sell": 500
     },
@@ -672,7 +672,7 @@
       "id": 383,
       "count": 1,
       "meta": 35,
-      "price": 2500,
+      "price": 1200,
       "image": "items/spawn_egg",
       "sell": 500
     },
@@ -680,9 +680,105 @@
       "id": 383,
       "count": 1,
       "meta": 34,
-      "price": 2500,
+      "price": 1200,
       "image": "items/spawn_egg",
       "sell": 250
+    },
+    "bee spawn egg": {
+      "id": 383,
+      "count": 1,
+      "meta": 122,
+      "price": 7500,
+      "image": "items/spawn_egg",
+      "sell": 2500
+    },
+    "villager spawn egg": {
+      "id": 383,
+      "count": 1,
+      "meta": 15,
+      "price": 3000,
+      "image": "items/spawn_egg",
+      "sell": 1000
+    },
+    "zombie villager spawn egg": {
+      "id": 383,
+      "count": 1,
+      "meta": 44,
+      "price": 1250,
+      "image": "items/spawn_egg",
+      "sell": 500
+    },
+    "enderman spawn egg": {
+      "id": 383,
+      "count": 1,
+      "meta": 38,
+      "price": 12500,
+      "image": "items/spawn_egg",
+      "sell": 7500
+    },
+    "blaze spawn egg": {
+      "id": 383,
+      "count": 1,
+      "meta": 43,
+      "price": 4000,
+      "image": "items/spawn_egg",
+      "sell": 500
+    },
+    "guardian spawn egg": {
+      "id": 383,
+      "count": 1,
+      "meta": 49,
+      "price": 7500,
+      "image": "items/spawn_egg",
+      "sell": 500
+    },
+    "elder guardianr spawn egg": {
+      "id": 383,
+      "count": 1,
+      "meta": 50,
+      "price": 12500,
+      "image": "items/spawn_egg",
+      "sell": 500
+    },
+    "ravager spawn egg": {
+      "id": 383,
+      "count": 1,
+      "meta": 59,
+      "price": 4500,
+      "image": "items/spawn_egg",
+      "sell": 500
+    },
+    "phantom spawn egg": {
+      "id": 383,
+      "count": 1,
+      "meta": 58,
+      "price": 6500,
+      "image": "items/spawn_egg",
+      "sell": 500
+    },
+    "turtle spawn egg": {
+      "id": 383,
+      "count": 1,
+      "meta": 74,
+      "price": 2500,
+      "image": "items/spawn_egg",
+      "sell": 500
+    },
+    "fix spawn egg": {
+      "id": 383,
+      "count": 1,
+      "meta": 121,
+      "price": 3500,
+      "image": "items/spawn_egg",
+      "sell": 500
+    },
+    "zombie villager spawn egg": {
+      "id": 383,
+      "count": 1,
+      "meta": 44,
+      "price": 1250,
+      "image": "items/spawn_egg",
+      "sell": 500
     }
   },
   "dyes": {
