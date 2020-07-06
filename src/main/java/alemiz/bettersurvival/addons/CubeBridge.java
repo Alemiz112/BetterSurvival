@@ -62,6 +62,8 @@ public class CubeBridge extends Addon {
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-near"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-jump"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-keepInvAll"));
+
+            perms.add(Addon.getAddon("home").configFile.getString("permission-vip"));
         }
 
         //VIP Perms
@@ -74,6 +76,8 @@ public class CubeBridge extends Addon {
 
             perms.add(Addon.getAddon("mylandprotect").configFile.getString("landsVipPermission"));
             perms.add(Addon.getAddon("survivalshop").configFile.getString("shopVipPermission"));
+
+            perms.add(Addon.getAddon("home").configFile.getString("permission-vip"));
         }
 
         //STAFF Perms here
