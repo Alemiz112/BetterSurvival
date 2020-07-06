@@ -14,6 +14,7 @@ import cn.nukkit.blockentity.BlockEntityChest;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.EventPriority;
 import cn.nukkit.event.block.BlockBreakEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.level.LevelLoadEvent;
 import cn.nukkit.event.player.*;
 import cn.nukkit.Player;
@@ -218,7 +219,9 @@ public class MoreVanilla extends Addon{
         Player player = event.getEntity();
         this.back.put(player.getName(), player.clone());
 
-        if (configFile.getBoolean("keepInvCommand") && this.keepInventory(player)){
+        if (configFile.getBoolean("keepInvCommand") && this.keepInventory(player) &&
+                (player.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK ||
+                player.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION)){
             event.setKeepInventory(true);
             this.dropDeathItems(player, event.getDrops());
         }
@@ -322,7 +325,6 @@ public class MoreVanilla extends Addon{
 
         List<Item> keep = new ArrayList<>();
         boolean keepTools = player.hasPermission(configFile.getString("permission-keepinvTools"));
-        System.out.println(keepTools);
 
         PlayerInventory inv = player.getInventory();
         inv.clearAll();

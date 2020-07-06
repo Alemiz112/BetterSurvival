@@ -10,6 +10,7 @@ import alemiz.bettersurvival.utils.TextUtils;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
+import cn.nukkit.block.BlockItemFrame;
 import cn.nukkit.blockentity.BlockEntityItemFrame;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.EventPriority;
@@ -19,6 +20,7 @@ import cn.nukkit.event.player.PlayerQuitEvent;
 import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
+import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cubemc.nukkit.connector.modules.Money;
@@ -295,7 +297,7 @@ public class BetterEconomy extends Addon {
 
     public void showItemInfo(Player player){
         if (player == null || !player.isConnected()) return;
-
+        BlockFace direction = player.getDirection();
         Block itemFrameBlock = null;
 
         try {
@@ -303,7 +305,11 @@ public class BetterEconomy extends Addon {
             while (iterator.hasNext()){
                 Block block = iterator.next();
                 if (block.getId() == Block.ITEM_FRAME_BLOCK){
-                    itemFrameBlock = block;
+                    BlockItemFrame frameBlock = (BlockItemFrame) block;
+
+                    if (frameBlock.getFacing() == direction) {
+                        itemFrameBlock = block;
+                    }
                 }
             }
         }catch (Exception e){

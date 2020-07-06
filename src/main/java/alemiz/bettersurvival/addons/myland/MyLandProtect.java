@@ -9,6 +9,7 @@ import alemiz.bettersurvival.utils.ConfigManager;
 import alemiz.bettersurvival.utils.SuperConfig;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityChest;
 import cn.nukkit.blockentity.BlockEntitySign;
@@ -28,6 +29,8 @@ import java.util.*;
 
 public class MyLandProtect extends Addon {
 
+    private static final BitSet INTERACT_BLOCKS = new BitSet();
+
     private Map<String, List<Block>> selectors = new HashMap<>();
     private Map<String, LandRegion> lands = new HashMap<>();
 
@@ -35,6 +38,16 @@ public class MyLandProtect extends Addon {
     public static String PERM_VIP = "bettersurvival.land.vip";
     public static String PERM_ACCESS = "bettersurvival.land.access";
     public static String PERM_ACCESS_CHEST = "bettersurvival.chest.access";
+
+    static {
+        INTERACT_BLOCKS.set(BlockID.CHEST);
+        INTERACT_BLOCKS.set(BlockID.TRAPPED_CHEST);
+        INTERACT_BLOCKS.set(BlockID.ENDER_CHEST);
+        INTERACT_BLOCKS.set(BlockID.SHULKER_BOX);
+        INTERACT_BLOCKS.set(BlockID.UNDYED_SHULKER_BOX);
+        INTERACT_BLOCKS.set(BlockID.ANVIL);
+        INTERACT_BLOCKS.set(BlockID.BEDROCK);
+    }
 
     public MyLandProtect(String path){
         super("mylandprotect", path);
@@ -128,8 +141,8 @@ public class MyLandProtect extends Addon {
             return;
         }
 
-        LandRegion region = getLandByPos(event.getBlock());
-        if (!interact(player, region)) {
+        LandRegion region = this.getLandByPos(block, true);
+        if (!this.interact(player, region, block)) {
             event.setCancelled(true);
             return;
         }
@@ -230,14 +243,27 @@ public class MyLandProtect extends Addon {
     }
 
     public boolean interact(Player player, LandRegion region){
+        return this.interact(player, region, null);
+    }
+
+    public boolean interact(Player player, LandRegion region, Block block){
         if (region == null) return true;
         if (region.owner.equals(player.getName().toLowerCase()) || region.whitelist.contains(player.getName().toLowerCase())) return true;
         if (player.isOp() || player.hasPermission(PERM_ACCESS)) return true;
 
         boolean clanLand = region instanceof ClanLand;
-        if (clanLand){
-            Clan clan = ((ClanLand) region).getClan();
-            if (clan != null && clan.isMember(player)) return true;
+        Clan clan;
+        if (clanLand && (clan = ((ClanLand) region).getClan()) != null){
+            if (block != null && ((ClanLand) region).isRestrictionEnabled()){
+                if (clan.isAdmin(player) || (clan.isMember(player) && !INTERACT_BLOCKS.get(block.getId()))){
+                    return true;
+                }else if (clan.isMember(player)){
+                    player.sendMessage("§c»§7Your clan restricted access to some blocks in clan land!");
+                    return false;
+                }
+            }else if (clan.isMember(player)){
+                return true;
+            }
         }
 
         String message = configFile.getString("landWarn");
@@ -249,16 +275,44 @@ public class MyLandProtect extends Addon {
     }
 
     public LandRegion getLandByPos(Position position){
+        return this.getLandByPos(position, false);
+    }
+
+    /**
+     * Returns regions by priority
+     * Highest priority have player regions and than clan regions
+     * Priority helps in clan land block restriction
+     */
+    public LandRegion getLandByPos(Position position, boolean prioritize){
+        LandRegion foundregion = null;
+
         for (LandRegion region : this.lands.values()){
             if (position.getLevel() != null && !region.level.getFolderName().equals(position.getLevel().getFolderName())) continue;
 
             if (position.x >= Math.min(region.pos1.x, region.pos2.x) && position.x <= Math.max(region.pos1.x, region.pos2.x)
                     && position.y >= Math.min(region.pos1.y, region.pos2.y) && position.y <= Math.max(region.pos1.y, region.pos2.y)
-                    && position.z >= Math.min(region.pos1.z, region.pos2.z) && position.z <= Math.max(region.pos1.z, region.pos2.z))
+                    && position.z >= Math.min(region.pos1.z, region.pos2.z) && position.z <= Math.max(region.pos1.z, region.pos2.z)){
+                foundregion = region;
+
+                if (!(region instanceof ClanLand)){
+                    break;
+                }
+            }
+
+            if (position.x < Math.min(region.pos1.x, region.pos2.x) && position.x > Math.max(region.pos1.x, region.pos2.x)
+                    && position.y < Math.min(region.pos1.y, region.pos2.y) && position.y > Math.max(region.pos1.y, region.pos2.y)
+                    && position.z < Math.min(region.pos1.z, region.pos2.z) && position.z > Math.max(region.pos1.z, region.pos2.z)){
+                continue;
+            }
+
+            if (!prioritize || !(region instanceof ClanLand)){
                 return region;
+            }
+
+            foundregion = region;
         }
 
-        return null;
+        return foundregion;
     }
 
     public boolean interactChest(Player player, BlockEntityChest chest){
@@ -410,6 +464,8 @@ public class MyLandProtect extends Addon {
 
         data = config.getIntegerList("land.pos1");
         region.pos2 = new Vector3f(data.get(0), data.get(1), data.get(2));
+
+        region.setRestriction(config.getBoolean("land.playerRestriction", false));
 
         this.lands.put(clan.getRawName(), region);
         region.save();
@@ -710,5 +766,9 @@ public class MyLandProtect extends Addon {
         message = message.replace("{lands}", String.join(", ", lands));
         message = message.replace("{player}", player.getName());
         player.sendMessage(message);
+    }
+
+    public Map<String, LandRegion> getLands() {
+        return this.lands;
     }
 }
