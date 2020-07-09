@@ -193,7 +193,7 @@ public class Home extends Addon {
         Config config = ConfigManager.getInstance().loadPlayer(player);
         if (config == null) return;
 
-        if (!config.exists("warp."+name.toLowerCase())){
+        if (!config.exists("warps."+name.toLowerCase())){
             player.sendMessage("§c»§7You are not owner of §6"+name+"§7 warp!");
             return;
         }
