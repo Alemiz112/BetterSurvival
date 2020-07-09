@@ -61,7 +61,11 @@ public class ConfigManager {
         List<SuperConfig> configs = new ArrayList<>();
         if (listFiles != null){
             for (File file: listFiles){
-                configs.add(new SuperConfig(file, Config.YAML));
+                try {
+                    configs.add(new SuperConfig(file, Config.YAML));
+                }catch (Exception e){
+                    BetterSurvival.getInstance().getLogger().error("Unable to load '"+file.getName()+"' file!", e);
+                }
             }
         }
         return configs;
