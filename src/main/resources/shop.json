@@ -167,7 +167,8 @@
       "price": 120,
       "image": "items/bucket_milk",
       "sell": 42
-    },
+    }
+  },
   "resources": {
     "iron": {
       "id": 265,
@@ -366,7 +367,8 @@
       "price": 2500,
       "image": "items/spawn_egg",
       "sell": 875
-    },
+    }
+  },
   "items": {
     "snowball": {
       "id": 332,
@@ -661,7 +663,7 @@
       "sell": 87
     }
   },
-  "mob spawn eggs": {
+  "mob eggs": {
     "chicken spawn egg": {
       "id": 383,
       "count": 2,
@@ -903,7 +905,7 @@
       "sell": 875
     }
   },
-  "monster spawn eggs": {
+  "monster eggs": {
     "zombie spawn egg": {
       "id": 383,
       "count": 1,
