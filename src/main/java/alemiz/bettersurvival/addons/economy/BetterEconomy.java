@@ -205,7 +205,13 @@ public class BetterEconomy extends Addon {
     }
 
     public void createNote(Player player, int price, boolean clanMode){
-        if (player == null || price == 0) return;
+        if (player == null) return;
+
+        if (price < 1){
+            player.sendMessage("§c»§Please enter valid coins value!");
+            return;
+        }
+
         int limit = configFile.getInt("maxWithdrawAmount", 50000);
 
         if (price > limit){

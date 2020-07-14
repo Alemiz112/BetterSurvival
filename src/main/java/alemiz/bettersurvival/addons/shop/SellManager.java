@@ -52,7 +52,7 @@ public class SellManager {
         if (form == null || player == null || form.getResponse() == null) return;
 
         String response = form.getResponse().getClickedButton().getText();
-        if (response.equals("Sell All")){
+        if (response.equals("§fSell All")){
             this.sellAll(player);
             return;
         }

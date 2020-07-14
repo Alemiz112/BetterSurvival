@@ -84,6 +84,7 @@ public class SurvivalShop extends Addon {
 
             configFile.set("signTitle", "§f[Shop]");
 
+            configFile.set("shopCreatePermission", "bettersurvival.shop.create");
             configFile.set("shopRemovePermission", "bettersurvival.shop.remove");
             configFile.set("shopVipPermission", "bettersurvival.shop.vip");
             configFile.set("shopManagePermission", "bettersurvival.shop.manage");
