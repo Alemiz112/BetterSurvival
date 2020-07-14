@@ -241,6 +241,7 @@ public class ClanCommand extends Command {
                         }catch (Exception e){
                             player.sendMessage("§c»§7Please provide numerical value!");
                         }
+                        break;
                     default:
                         player.sendMessage(this.getUsageMessage());
                         break;

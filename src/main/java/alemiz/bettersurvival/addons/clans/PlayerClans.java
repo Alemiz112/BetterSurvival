@@ -133,6 +133,10 @@ public class PlayerClans extends Addon {
             return;
         }
 
+        if (clan.hasLand()){
+            clan.removeLand(player);
+        }
+
         clan.sendMessage("§cYour clan was destroyed!");
         this.clans.remove(clan.getRawName());
 
