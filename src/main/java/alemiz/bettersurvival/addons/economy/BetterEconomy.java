@@ -266,6 +266,7 @@ public class BetterEconomy extends Addon {
         }
 
         int value = item.getNamedTag().getInt("economy_value");
+        int money;
         Clan clan = null;
 
         if (clanMode && Addon.getAddon("playerclans") != null){
@@ -277,7 +278,9 @@ public class BetterEconomy extends Addon {
 
             clan.addMoney(value);
             clan.onApplyNote(player, value);
+            money = clan.getMoney();
         }else {
+            money = Money.getInstance().getMoney(player, false) + value;
             Money.getInstance().addMoney(player, value);
         }
 
@@ -286,7 +289,7 @@ public class BetterEconomy extends Addon {
 
         String message = configFile.getString(clanMode? "noteApplyMessageClan" : "noteApplyMessage");
         message = message.replace("{player}", player.getName());
-        message = message.replace("{money}", TextUtils.formatBigNumber((clanMode && clan != null)? clan.getMoney() : Money.getInstance().getMoney(player, false)));
+        message = message.replace("{money}", TextUtils.formatBigNumber(money));
         player.sendMessage(message);
     }
 
