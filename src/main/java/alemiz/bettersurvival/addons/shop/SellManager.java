@@ -7,9 +7,11 @@ import cn.nukkit.form.element.ElementLabel;
 import cn.nukkit.form.element.ElementStepSlider;
 import cn.nukkit.form.window.FormWindowCustom;
 import cn.nukkit.form.window.FormWindowSimple;
+import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.item.Item;
 import me.onebone.economyapi.EconomyAPI;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -133,24 +135,41 @@ public class SellManager {
 
     public void sellHand(Player player){
         if (player == null) return;
-        Item handItem = player.getInventory().getItemInHand();
+        PlayerInventory inv = player.getInventory();
+        Item handItem = inv.getItemInHand();
 
         if (handItem.getId() == Item.AIR){
             player.sendMessage("§c»§7Please hold an item in your hand!");
             return;
         }
 
-        int count = 0;
-        Integer price = this.sellItem(player, handItem);
-        if (price == null) return;
-
-        for (Item item : player.getInventory().getContents().values()){
-            if (item.equals(item, true)){
-                count++;
+        ShopItem shopItem = null;
+        for (ShopCategory category : this.loader.getCategories().values()){
+            for (ShopItem sshopItem : category.getItems()){
+                if (!handItem.equals(sshopItem.getItemSample(), true, false)) continue;
+                shopItem = sshopItem;
+                break;
             }
         }
 
-        int totalPrice = count * price;
+        if (shopItem == null){
+            player.sendMessage("§c»§7Unknown item! Can not sold item in your hand.");
+            return;
+        }
+
+        int basePrice = shopItem.getSellPrice();
+        int count =0;
+
+        for (Item item : new ArrayList<>(inv.getContents().values())){
+            if (item.equals(item, true, false)){
+                count += item.getCount();
+                inv.removeItem(item);
+            }
+        }
+
+        inv.removeItem(handItem);
+
+        int totalPrice = count * basePrice;
         EconomyAPI.getInstance().addMoney(player, totalPrice);
 
         String message = this.loader.configFile.getString("sellHandMessage");
