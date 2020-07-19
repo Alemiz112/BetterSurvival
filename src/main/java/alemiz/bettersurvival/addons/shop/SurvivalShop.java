@@ -218,11 +218,17 @@ public class SurvivalShop extends Addon {
     public void onInteract(PlayerInteractEvent event){
         Player player = event.getPlayer();
 
-        if (this.smithShop != null && event.getItem() != null){
-            CompoundTag namedTag = event.getItem().getNamedTag();
-            if (namedTag != null && namedTag.getByte("enchant_orb") == 1){
+        if (this.smithShop != null){
+            if (event.getBlock().getId() == Block.ANVIL){
                 event.setCancelled(true);
-                return;
+            }
+
+            if (event.getItem() != null){
+                CompoundTag namedTag = event.getItem().getNamedTag();
+                if (namedTag != null && namedTag.getByte("enchant_orb") == 1){
+                    event.setCancelled(true);
+                    return;
+                }
             }
         }
 
