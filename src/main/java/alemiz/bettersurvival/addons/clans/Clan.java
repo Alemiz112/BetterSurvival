@@ -258,10 +258,10 @@ public class Clan {
         }
 
         this.players.remove(player.getName());
-        this.sendMessage("Player @6"+player.getName()+" leaved your Clan!");
+        this.sendMessage("Player @6"+player.getName()+" left your Clan!");
         this.savePlayerList();
 
-        player.sendMessage("§6»§7You leaved §6@"+this.name+"§7 Clan!");
+        player.sendMessage("§6»§7You left §6@"+this.name+"§7 Clan!");
     }
 
     public void createBankNote(Player player, int value){

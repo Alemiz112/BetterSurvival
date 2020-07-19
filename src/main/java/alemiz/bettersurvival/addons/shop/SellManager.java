@@ -76,7 +76,7 @@ public class SellManager {
 
         ShopItem shopItem = category.getItem(itemIndex);
         if (shopItem == null){
-            player.sendMessage("§c»§7Unable to shell item. Item not found!");
+            player.sendMessage("§c»§7Unable to sell item. Item not found!");
             return;
         }
 
@@ -84,7 +84,7 @@ public class SellManager {
         item.setCount(count);
 
         if (!player.getInventory().contains(item)){
-            player.sendMessage("§c»§7Unable to shell item. You do not own this item!");
+            player.sendMessage("§c»§7Unable to sell item. You do not own this item!");
             return;
         }
 
@@ -127,6 +127,33 @@ public class SellManager {
         EconomyAPI.getInstance().addMoney(player, totalPrice);
 
         String message = this.loader.configFile.getString("sellAllMessage");
+        message = message.replace("{money}", String.valueOf(totalPrice));
+        player.sendMessage(message);
+    }
+
+    public void sellHand(Player player){
+        if (player == null) return;
+        Item handItem = player.getInventory().getItemInHand();
+
+        if (handItem.getId() == Item.AIR){
+            player.sendMessage("§c»§7Please hold an item in your hand!");
+            return;
+        }
+
+        int count = 0;
+        Integer price = this.sellItem(player, handItem);
+        if (price == null) return;
+
+        for (Item item : player.getInventory().getContents().values()){
+            if (item.equals(item, true)){
+                count++;
+            }
+        }
+
+        int totalPrice = count * price;
+        EconomyAPI.getInstance().addMoney(player, totalPrice);
+
+        String message = this.loader.configFile.getString("sellHandMessage");
         message = message.replace("{money}", String.valueOf(totalPrice));
         player.sendMessage(message);
     }
