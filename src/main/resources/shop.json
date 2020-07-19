@@ -128,6 +128,13 @@
       "price": 300,
       "sell": 7,
       "image": false
+    },
+    "bamboo": {
+      "id": -163,
+      "count": 8,
+      "price": 175,
+      "image": false,
+      "sell": 5
     }
   },
   "ingredients": {
@@ -425,6 +432,13 @@
       "price": 100,
       "image": false,
       "sell": 8
+    },
+    "ink sac": {
+      "id": 351,
+      "count": 4,
+      "price": 100,
+      "image": false,
+      "sell": 6
     }
   },
   "mechanism": {
@@ -569,13 +583,6 @@
       "price": 10000,
       "image": false,
       "sell": 3500
-    },
-    "monster spawner": {
-      "id": 52,
-      "count": 1,
-      "price": 32000,
-      "image": "blocks/mob_spawner",
-      "sell": 11200
     }
   },
   "equipments": {
@@ -1335,6 +1342,27 @@
       "price": 350,
       "image": false,
       "sell": 15
+    },
+    "bell": {
+      "id": -206,
+      "count": 1,
+      "price": 300,
+      "image": "blocks/bell_side",
+      "sell": 105
+    },
+    "lantern": {
+      "id": -208,
+      "count": 6,
+      "price": 300,
+      "image": "items/lantern",
+      "sell": 8
+    },
+    "camp fire": {
+      "id": -209,
+      "count": 2,
+      "price": 75,
+      "image": "items/campfire",
+      "sell": 7
     }
   },
   "natural": {
@@ -1400,7 +1428,7 @@
       "image": false,
       "sell": 6
     },
-    "oak sapling ": {
+    "oak sapling": {
       "id": 6,
       "meta": 0,
       "count": 2,
@@ -1408,7 +1436,7 @@
       "image": false,
       "sell": 10
     },
-    "spruce sapling ": {
+    "spruce sapling": {
       "id": 6,
       "meta": 1,
       "count": 2,
@@ -1416,7 +1444,7 @@
       "image": false,
       "sell": 6
     },
-    "birch sapling ": {
+    "birch sapling": {
       "id": 6,
       "meta": 2,
       "count": 2,
@@ -1424,7 +1452,7 @@
       "image": false,
       "sell": 8
     },
-    "jungle sapling ": {
+    "jungle sapling": {
       "id": 6,
       "meta": 3,
       "count": 2,
@@ -1432,7 +1460,7 @@
       "image": false,
       "sell": 6
     },
-    "acacia sapling ": {
+    "acacia sapling": {
       "id": 6,
       "meta": 4,
       "count": 2,
@@ -1440,13 +1468,62 @@
       "image": false,
       "sell": 8
     },
-    "dark oak sapling ": {
+    "dark oak sapling": {
       "id": 6,
       "meta": 5,
       "count": 2,
       "price": 100,
       "image": false,
       "sell": 6
+    },
+    "sea grass": {
+      "id": -130,
+      "count": 8,
+      "price": 200,
+      "image": "blocks/seagrass_carried",
+      "sell": 9
+    },
+    "coral": {
+      "id": -131,
+      "count": 4,
+      "price": 200,
+      "image": "blocks/coral_plant_blue",
+      "sell": 17
+    },
+    "fan coral": {
+      "id": -133,
+      "count": 4,
+      "price": 200,
+      "image": "blocks/coral_fan_blue",
+      "sell": 17
+    },
+    "dead fan coral": {
+      "id": -134,
+      "count": 4,
+      "price": 200,
+      "image": "blocks/coral_fan_blue_dead",
+      "sell": 17
+    },
+    "sea pickle": {
+      "id": -156,
+      "count": 4,
+      "price": 200,
+      "image": "items/sea_pickle",
+      "sell": 17
+    },
+    "kelp": {
+      "id": 335,
+      "count": 4,
+      "price": 200,
+      "image": false,
+      "sell": 17
+    },
+    "coral block": {
+      "id": -132,
+      "count": 4,
+      "price": 200,
+      "image": false,
+      "sell": 17
     }
   },
   "potions": {
@@ -1516,36 +1593,43 @@
     }
   },
   "weekly offers": {
-    "green shulker box": {
-      "id": 229,
+    "monster spawner": {
+      "id": 52,
       "count": 1,
-      "meta": 13,
-      "price": 5500,
+      "price": 28000,
+      "image": "mob_spawner",
+      "sell": 105000
+    },
+    "bone": {
+      "id": 352,
+      "count": 8,
+      "price": 115,
+      "image": "items/bone",
+      "sell": 12
+    },
+    "birch sapling": {
+      "id": 6,
+      "count": 6,
+      "meta": 2,
+      "price": 150,
       "image": false,
-      "sell": 750
+      "sell": 12
     },
-    "Steaks": {
-      "id": 364,
-      "count": 32,
-      "price": 450,
-      "image": "items/beed_cooked",
-      "sell": 9
+    "chicken spawn egg": {
+      "id": 383,
+      "count": 2,
+      "meta": 10,
+      "price": 750,
+      "image": "items/egg_chicken",
+      "sell": 350
     },
-    "witchs spawn egg": {
+    "ocelot spawn egg": {
       "id": 383,
       "count": 1,
-      "meta": 45,
-      "price": 1000,
-      "image": "items/egg_witch",
-      "sell": 875
-    },
-    "pink dyes": {
-      "id": 351,
-      "count": 16,
-      "meta": 9,
-      "price": 200,
-      "image": "items/dye_powder_pink",
-      "sell": 9
+      "meta": 22,
+      "price": 750,
+      "image": "items/egg_ocelot",
+      "sell": 350
     }
   }
 }

@@ -151,7 +151,7 @@ public class SellManager {
         }
 
         int totalPrice = count * price;
-        EconomyAPI.getInstance().addMoney(player, totalPrice);
+        Money.getInstance().addMoney(player, totalPrice);
 
         String message = this.loader.configFile.getString("sellHandMessage");
         message = message.replace("{money}", String.valueOf(totalPrice));
