@@ -50,7 +50,6 @@ public class CubeBridge extends Addon {
         //Subscriber Features
         if (player.hasPermission(SUBSCRIBER_PERM) || isStaff){
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-feed"));
-            perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-near"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-jump"));
             //perms.add(Addon.getAddon("levelvote").configFile.getString("permission-vote"));
         }
@@ -58,9 +57,7 @@ public class CubeBridge extends Addon {
         //Cube+ Freatures
         if (player.hasPermission(PLUS_PERM) || isStaff){
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-feed"));
-            perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-heal"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-near"));
-            perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-jump"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-keepInvAll"));
 
             perms.add(Addon.getAddon("home").configFile.getString("permission-vip"));
@@ -68,16 +65,13 @@ public class CubeBridge extends Addon {
 
         //VIP Perms
         if (player.hasPermission(VIP_PERM) || isStaff){
-            perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-feed"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-heal"));
+            perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-fly"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-near"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-jump"));
-            perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-fly"));
 
             perms.add(Addon.getAddon("mylandprotect").configFile.getString("landsVipPermission"));
             perms.add(Addon.getAddon("survivalshop").configFile.getString("shopVipPermission"));
-
-            perms.add(Addon.getAddon("home").configFile.getString("permission-vip"));
         }
 
         //STAFF Perms here
