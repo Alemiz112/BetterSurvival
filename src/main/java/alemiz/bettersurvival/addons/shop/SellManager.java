@@ -160,8 +160,8 @@ public class SellManager {
         int basePrice = shopItem.getSellPrice();
         int count =0;
 
-        for (Item item : new ArrayList<>(inv.getContents().values())){
-            if (item.equals(item, true, false)){
+        for (Item item : inv.getContents().values()){
+            if (item.equals(handItem, true, false)){
                 count += item.getCount();
                 inv.removeItem(item);
             }
