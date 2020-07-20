@@ -115,13 +115,6 @@
       "sell": 3,
       "image": "items/seeds_wheat"
     },
-    "beetroot seeds": {
-      "id": 435,
-      "count": 16,
-      "price": 175,
-      "sell": 4,
-      "image": "items/seeds_beetroot"
-    },
     "sugar cane": {
       "id": 338,
       "count": 16,
@@ -153,12 +146,6 @@
     "pumpkin": {
       "id": 86,
       "count": 8,
-      "price": 235,
-      "sell": 5
-    },
-    "beetroot": {
-      "id": 434,
-      "count": 16,
       "price": 235,
       "sell": 5
     },
@@ -422,9 +409,9 @@
     "book and quill": {
       "id": 386,
       "count": 2,
-      "price": 100,
+      "price": 250,
       "image": "items/book_writable",
-      "sell": 17
+      "sell": 60
     },
     "fire charge": {
       "id": 385,
@@ -438,7 +425,7 @@
       "count": 4,
       "price": 100,
       "image": false,
-      "sell": 6
+      "sell": 12
     }
   },
   "mechanism": {
