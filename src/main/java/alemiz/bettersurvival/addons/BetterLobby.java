@@ -44,7 +44,10 @@ public class BetterLobby extends Addon {
 
     public BetterLobby(String path){
         super("betterlobby", path);
+    }
 
+    @Override
+    public void postLoad() {
         this.broadcastMessages = configFile.getStringList("broadcast");
         this.broadcastInterval = configFile.getInt("broadcastInterval");
         this.joinMessage = configFile.getString("joinMessage");
@@ -57,6 +60,11 @@ public class BetterLobby extends Addon {
 
         if (configFile.getBoolean("enableRules")){
             this.rulesParticle = this.createRulesParticles();
+        }
+
+        String motd = configFile.getString("motd");
+        if (!motd.equals("")){
+            plugin.getServer().getNetwork().setName(motd);
         }
     }
 
@@ -105,14 +113,6 @@ public class BetterLobby extends Addon {
             }
         };
         plugin.getServer().getScheduler().scheduleRepeatingTask(task, broadcastInterval);
-    }
-
-    @Override
-    public void postLoad() {
-        String motd = configFile.getString("motd");
-        if (!motd.equals("")){
-            plugin.getServer().getNetwork().setName(motd);
-        }
     }
 
     @EventHandler

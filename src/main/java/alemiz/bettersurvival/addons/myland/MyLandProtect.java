@@ -51,14 +51,17 @@ public class MyLandProtect extends Addon {
 
     public MyLandProtect(String path){
         super("mylandprotect", path);
+    }
 
+    @Override
+    public void postLoad() {
         WAND = configFile.getString("wandName");
         PERM_VIP = configFile.getString("landsVipPermission");
         PERM_ACCESS = configFile.getString("landsAccessPermission");
         PERM_ACCESS_CHEST = configFile.getString("chestsAccessPermission");
 
         for (SuperConfig config : ConfigManager.getInstance().loadAllPlayers()){
-            loadLand(config);
+            this.loadLand(config);
         }
     }
 

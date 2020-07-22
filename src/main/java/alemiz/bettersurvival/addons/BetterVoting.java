@@ -45,7 +45,10 @@ public class BetterVoting extends Addon {
 
     public BetterVoting(String path){
         super("bettervoting", path);
+    }
 
+    @Override
+    public void postLoad() {
         this.enableVoteCrate = configFile.getBoolean("voteCrate");
         if (this.enableVoteCrate){
             String key = configFile.getString("voteCrateKey");
