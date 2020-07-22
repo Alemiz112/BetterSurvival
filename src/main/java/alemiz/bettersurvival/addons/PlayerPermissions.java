@@ -15,13 +15,17 @@ import java.util.List;
 
 public class PlayerPermissions extends Addon {
 
-    private final List<String> defaultPermissions;
+    private List<String> defaultPermissions;
 
     /*
      TODO: Create permission groups
      */
     public PlayerPermissions(String path){
         super("playerpermissions", path);
+    }
+
+    @Override
+    public void postLoad() {
         this.defaultPermissions = configFile.getStringList("defaultPermissions");
     }
 

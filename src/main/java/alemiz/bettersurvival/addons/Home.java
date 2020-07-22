@@ -20,9 +20,16 @@ public class Home extends Addon {
 
     public Home(String path){
         super("home", path);
+    }
 
+    @Override
+    public void postLoad() {
         for (SuperConfig config : ConfigManager.getInstance().loadAllPlayers()){
-            this.loadWarps(config);
+            try {
+                this.loadWarps(config);
+            }catch (Exception e){
+                this.plugin.getLogger().error("Unable to load warp for "+config.getName()+"!", e);
+            }
         }
     }
 

@@ -5,10 +5,12 @@ import cn.nukkit.Server;
 import cn.nukkit.event.Listener;
 import cn.nukkit.utils.Config;
 
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
 public abstract class Addon implements Listener{
+
     public String PATH = null;
     public Config configFile = null;
     protected boolean enabled = false;
@@ -20,12 +22,25 @@ public abstract class Addon implements Listener{
         return addons;
     }
 
-    public static void loadAddon(Addon addon) {
-        Addon.addons.put(addon.name, addon);
+    public static void loadAddon(Class<?> clazz, String configName){
+        try {
+            Constructor<?> constructor = clazz.getConstructor(String.class);
+            Addon addon = (Addon) constructor.newInstance(configName);
+            addon.setEnabled(addon.configFile.getBoolean("enable", false));
+            Addon.addons.put(addon.name, addon);
+        }catch (Exception e){
+            BetterSurvival.getInstance().getLogger().error("Unable to enable addon: §3"+clazz.getSimpleName(), e);
+        }
     }
 
-    public static Addon getAddon(String name) {
+    public static Addon getAddon(String name){
         return Addon.addons.getOrDefault(name, null);
+    }
+
+    public static void disableAddons(){
+        for (Addon addon : Addon.addons.values()){
+            addon.setEnabled(false);
+        }
     }
 
 
@@ -38,18 +53,23 @@ public abstract class Addon implements Listener{
         this.name = name;
         this.plugin = BetterSurvival.getInstance();
         this.configFile = ConfigManager.getInstance().loadAddon(this);
-        loadConfig();
+        this.loadConfig();
+    }
 
-        this.enabled = configFile.getBoolean("enable", false);
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
 
-        if (this.enabled && preLoad()){
-            plugin.getLogger().info("§eLoading BetterSurvival addon: §3"+name);
-            Server.getInstance().getPluginManager().registerEvents(this, plugin);
+        if (this.enabled && this.preLoad()){
+            this.plugin.getLogger().info("§eLoading BetterSurvival addon: §3"+name);
+            Server.getInstance().getPluginManager().registerEvents(this, this.plugin);
 
-            loadListeners();
-            registerCommands();
+            this.loadListeners();
+            this.registerCommands();
+            this.postLoad();
+        }else {
+            this.plugin.getLogger().info("§eUnloading BetterSurvival addon: §3"+name);
+            this.onUnload();
         }
-        postLoad();
     }
 
     public abstract void loadConfig();
@@ -59,11 +79,11 @@ public abstract class Addon implements Listener{
     }
 
     public void registerCommand(String fallbackPrefix, Command command){
-        registerCommand(fallbackPrefix, command, true);
+        this.registerCommand(fallbackPrefix, command, true);
     }
 
     public boolean registerCommand(String fallbackPrefix, Command command, boolean map){
-        boolean registered = plugin.getServer().getCommandMap().register(fallbackPrefix, command);;
+        boolean registered = this.plugin.getServer().getCommandMap().register(fallbackPrefix, command);;
 
         if (registered && map) this.commands.put(fallbackPrefix, command);
         return registered;
@@ -81,6 +101,10 @@ public abstract class Addon implements Listener{
     }
 
     public void postLoad(){
+        //Implemented by parent
+    }
+
+    public void onUnload(){
         //Implemented by parent
     }
 

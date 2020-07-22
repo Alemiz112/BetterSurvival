@@ -49,7 +49,10 @@ public class BetterEconomy extends Addon {
 
     public BetterEconomy(String path) {
         super("bettereconomy", path);
+    }
 
+    @Override
+    public void postLoad() {
         this.plugin.getServer().getScheduler().scheduleRepeatingTask(plugin, () -> {
             for (Player player : this.plugin.getServer().getOnlinePlayers().values()){
                 this.showItemInfo(player);

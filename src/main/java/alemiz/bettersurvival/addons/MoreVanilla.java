@@ -60,7 +60,10 @@ public class MoreVanilla extends Addon{
 
     public MoreVanilla(String path){
         super("morevanilla", path);
+    }
 
+    @Override
+    public void postLoad() {
         plugin.getServer().getScheduler().scheduleRepeatingTask(new MuteCheckTask(this), 20*60, true);
     }
 

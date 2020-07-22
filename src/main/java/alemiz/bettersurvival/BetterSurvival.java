@@ -59,7 +59,8 @@ public class BetterSurvival extends PluginBase implements Listener {
 
     @Override
     public void onDisable() {
-        getLogger().info("§aDisabling BetterSurvival by §6Alemiz!");
+        this.getLogger().info("§aDisabling BetterSurvival by §6Alemiz!");
+        Addon.disableAddons();
     }
 
     @EventHandler
@@ -100,24 +101,24 @@ public class BetterSurvival extends PluginBase implements Listener {
 
     public void loadAddons(){
         //Load permissions as first
-        Addon.loadAddon(new PlayerPermissions("player_permissions.yml"));
+        Addon.loadAddon(PlayerPermissions.class, "player_permissions.yml");
 
-        Addon.loadAddon(new Home("homes.yml"));
-        Addon.loadAddon(new MoreVanilla("more_vanilla.yml"));
-        Addon.loadAddon(new MyLandProtect("my_land_protect.yml"));
-        Addon.loadAddon(new Troller("troll_addon.yml"));
-        Addon.loadAddon(new BetterVoting("better_voting.yml"));
-        Addon.loadAddon(new LevelVote("level_vote.yml"));
-        Addon.loadAddon(new SurvivalShop("survival_shop.yml"));
-        Addon.loadAddon(new BetterEconomy("better_economy.yml"));
-        Addon.loadAddon(new PlayerClans("player_clans.yml"));
+        Addon.loadAddon(Home.class, "homes.yml");
+        Addon.loadAddon(MoreVanilla.class, "more_vanilla.yml");
+        Addon.loadAddon(MyLandProtect.class, "my_land_protect.yml");
+        Addon.loadAddon(Troller.class, "troll_addon.yml");
+        Addon.loadAddon(BetterVoting.class, "better_voting.yml");
+        Addon.loadAddon(LevelVote.class, "level_vote.yml");
+        Addon.loadAddon(SurvivalShop.class, "survival_shop.yml");
+        Addon.loadAddon(BetterEconomy.class, "better_economy.yml");
+        Addon.loadAddon(PlayerClans.class, "player_clans.yml");
 
         //CubeMC addons
-        Addon.loadAddon(new EasterAddon("easter_addon.yml"));
+        Addon.loadAddon(EasterAddon.class, "easter_addon.yml");
 
         //This must be last addon loaded
-        Addon.loadAddon(new CubeBridge("cube_bridge.yml"));
-        Addon.loadAddon(new BetterLobby("better_lobby.yml"));
+        Addon.loadAddon(CubeBridge.class, "cube_bridge.yml");
+        Addon.loadAddon(BetterLobby.class, "better_lobby.yml");
     }
 
     public static BetterSurvival getInstance() {
