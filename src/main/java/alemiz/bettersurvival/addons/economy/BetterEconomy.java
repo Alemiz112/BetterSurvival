@@ -268,7 +268,7 @@ public class BetterEconomy extends Addon {
             return;
         }
 
-        int value = item.getNamedTag().getInt("economy_value");
+        int value = item.getNamedTag().getInt("economy_value") * item.getCount();
         int money;
         Clan clan = null;
 
