@@ -42,6 +42,7 @@ public class ClanCommand extends Command {
                 "§7/clan land create: Creates clan land\n" +
                 "§7/clan land remove: Removes clan land\n" +
                 "§7/clan land access <on|off>: Allow clan members open chests\n" +
+                "§7/clan land whitelist <add|remove|list|on|off> <value - optional>: Allow clan members open chests\n" +
                 "§7/clan home <create|remove|home>: Classic clan homes\n" +
                 "§7/clan listhome : Lists all homes\n" +
                 "§aYou can use clan chat by starting message with §6%§a!";
@@ -283,6 +284,13 @@ public class ClanCommand extends Command {
                         land.setRestriction(state);
                         land.save();
                         player.sendMessage("§a»§7Land restrictions has been turned §6"+(state? "on" : "off")+"§7!");
+                        break;
+                    case "whitelist":
+                        if (args.length < 3){
+                            player.sendMessage(this.getUsageMessage());
+                            break;
+                        }
+                        clan.landWhitelist(player, args[2], Arrays.copyOfRange(args, 3, args.length));
                         break;
                     default:
                         player.sendMessage(this.getUsageMessage());
