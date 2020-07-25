@@ -1,4 +1,4 @@
-package alemiz.bettersurvival.addons;
+package alemiz.bettersurvival.addons.myhomes;
 
 import alemiz.bettersurvival.commands.*;
 import alemiz.bettersurvival.utils.Addon;
@@ -8,22 +8,27 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.Player;
 import cn.nukkit.utils.Config;
+import cn.nukkit.utils.ConfigSection;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-public class Home extends Addon {
+public class MyHomes extends Addon {
 
     private final Map<String, Position> playerWarps = new HashMap<>();
+    private final Map<String, WarpCategory> warpCategories = new HashMap<>();
 
-    public Home(String path){
-        super("home", path);
+    public MyHomes(String path){
+        super("myhome", path);
     }
 
     @Override
     public void postLoad() {
+        List<String> categories = configFile.getStringList("warpCategories");
+        for (String category : categories){
+            this.warpCategories.put(category.toLowerCase(), new WarpCategory(category));
+        }
+        this.warpCategories.put("other", new WarpCategory("Other"));
+
         for (SuperConfig config : ConfigManager.getInstance().loadAllPlayers()){
             try {
                 this.loadWarps(config);
@@ -46,6 +51,7 @@ public class Home extends Addon {
             configFile.set("homeSet", "§6»§7Your home §6{home}§7 has been saved! You have §6{limit}§7 free homes!");
             configFile.set("homeDel", "§6»§7Your home §6{home}§7 was deleted!");
 
+            configFile.set("warpCategories", new ArrayList<>(Arrays.asList("Shop", "Farm", "Social", "Storage", "Game", "Guild", "Creations")));
             configFile.set("warpCreate", "§6»§7Your warp §6{warp}§7 has been created! You have §6{limit}§7 free public warps!");
             configFile.set("warpDelete", "§6»§7Your warp §6{warp}§7 was deleted!");
             configFile.set("warpTeleport", "§6»§7Welcome to §6{warp}§7 destination!");
@@ -66,21 +72,27 @@ public class Home extends Addon {
 
     private void loadWarps(SuperConfig config){
         if (config == null) return;
+        String owner = config.getName().substring(0, config.getName().lastIndexOf("."));
 
-        Set<String> warps = config.getSection("warps").getKeys(false);
+        ConfigSection section = config.getSection("pwarps");
+        Set<String> warps = section.getKeys(false);
         for (String warp : warps){
-            String rawPos = config.getString("warps."+warp);
-            String[] data = rawPos.split(",");
+            ConfigSection data = section.getSection(warp);
 
-            Level level = this.plugin.getServer().getLevelByName(data[3]);
-            if (level == null) continue;
+            String name = data.getString("name");
+            String categoryName = data.getString("category");
+            String rawPos = data.getString("pos");
+            String levelName = data.getString("level");
 
-            try {
-                Position pos = new Position(Integer.parseInt(data[0]), Integer.parseInt(data[1]), Integer.parseInt(data[2]), level);
-                this.playerWarps.put(warp.toLowerCase(), pos);
-            }catch (NumberFormatException e){
-                this.plugin.getLogger().info("§eUnable to load player warp §6"+warp+"§e for player §6"+config.getName()+"§e!");
-            }
+            WarpCategory category = this.getWarpCategory(categoryName);
+            Level level = this.plugin.getServer().getLevelByName(levelName);
+            if (category == null || level == null) continue;
+
+            String[] posData = rawPos.split(",");
+            Position pos = new Position(Integer.parseInt(posData[0]), Integer.parseInt(posData[1]), Integer.parseInt(posData[2]), level);
+
+            PlayerWarp playerWarp = new PlayerWarp(name, categoryName, owner, pos);
+            category.addWarp(playerWarp);
         }
     }
 
@@ -158,10 +170,15 @@ public class Home extends Addon {
     }
 
 
-    public void createWarp(Player player, String name){
+    public void createWarp(Player player, String name, WarpCategory category){
         if (player == null || name == null) return;
 
-        if (this.playerWarps.get(name.toLowerCase()) != null){
+        if (category == null){
+            player.sendMessage("§c»§7Unknown warp category. Can not register warp!!");
+            return;
+        }
+
+        if (category.getWarp(name) != null){
             player.sendMessage("§c»§7Warp with this name has been already registered!");
             return;
         }
@@ -170,17 +187,17 @@ public class Home extends Addon {
         if (config == null) return;
         int limit = player.hasPermission(configFile.getString("permission-vip"))? configFile.getInt("homeLimitVip") : configFile.getInt("homeLimit");
 
-        Set<String> warps = config.getSection("warps").getKeys(false);
+        Set<String> warps = config.getSection("pwarps").getKeys(false);
         if (warps.size() >= limit && !player.isOp()){
             player.sendMessage("§c»§7Player Warps limit reached!");
             return;
         }
 
-        String rawPos = (int) player.getX()+","+ (int) player.getY()+","+ (int) player.getZ()+","+player.getLevel().getFolderName();
-        config.set("warps."+name.toLowerCase(), rawPos);
+        PlayerWarp playerWarp = new PlayerWarp(name, category.getName(), player.getName(), player.clone());
+        config.set("pwarps."+playerWarp.getRawName(), playerWarp.save());
         config.save();
 
-        this.playerWarps.put(name.toLowerCase(), player.clone());
+        category.addWarp(playerWarp);
 
         String message = configFile.getString("warpCreate");
         message = message.replace("{player}", player.getName());
@@ -192,22 +209,24 @@ public class Home extends Addon {
     public void deleteWarp(Player player, String name){
         if (player == null || name == null) return;
 
-        if (!this.playerWarps.containsKey(name.toLowerCase())){
+        PlayerWarp playerWarp = this.getWarp(name);
+        if (playerWarp == null){
             player.sendMessage("§c»§7Warp §6"+name+"§7 doesnt exist!");
             return;
         }
 
-        Config config = ConfigManager.getInstance().loadPlayer(player);
-        if (config == null) return;
-
-        if (!config.exists("warps."+name.toLowerCase())){
+        if (!playerWarp.getOwner().equalsIgnoreCase(player.getName())){
             player.sendMessage("§c»§7You are not owner of §6"+name+"§7 warp!");
             return;
         }
 
-        this.playerWarps.remove(name.toLowerCase());
+        WarpCategory category = this.getWarpCategory(playerWarp.getCategory());
+        category.removeWarp(playerWarp);
 
-        ((Map) config.get("warps")).remove(name.toLowerCase());
+        Config config = ConfigManager.getInstance().loadPlayer(player);
+        if (config == null) return;
+
+        ((Map) config.get("pwarps")).remove(playerWarp.getRawName());
         config.save();
 
         String message = configFile.getString("warpDelete");
@@ -219,13 +238,13 @@ public class Home extends Addon {
     public void teleportToWarp(Player player, String name){
         if (player == null || name == null) return;
 
-        Position warp = this.playerWarps.get(name.toLowerCase());
-        if (warp == null){
+        PlayerWarp playerWarp = this.getWarp(name);
+        if (playerWarp == null){
             player.sendMessage("§c»§7Warp §6"+name+"§7 doesnt exist!");
             return;
         }
 
-        player.teleport(warp);
+        playerWarp.teleport(player);
 
         String message = configFile.getString("warpTeleport");
         message = message.replace("{player}", player.getName());
@@ -233,11 +252,25 @@ public class Home extends Addon {
         player.sendMessage(message);
     }
 
-    public void listWarps(Player player){
+    public void showWarpMenu(Player player){
         if (player == null) return;
+        new WarpMenu(player, this).buildForm().sendForm();
+    }
 
-        String message = "§6Available Warps:\n§7"+String.join(", ",this.playerWarps.keySet());
-        player.sendMessage(message);
+    public Map<String, WarpCategory> getWarpCategories() {
+        return this.warpCategories;
+    }
+
+    public WarpCategory getWarpCategory(String name){
+        return this.warpCategories.get(name.toLowerCase());
+    }
+
+    public PlayerWarp getWarp(String name){
+        for (WarpCategory category : this.warpCategories.values()){
+            PlayerWarp warp = category.getWarp(name);
+            if (warp != null) return warp;
+        }
+        return null;
     }
 
     public Set<String> getHomes(Player player){

@@ -1,6 +1,6 @@
 package alemiz.bettersurvival.commands;
 
-import alemiz.bettersurvival.addons.Home;
+import alemiz.bettersurvival.addons.myhomes.MyHomes;
 import cn.nukkit.Player;
 import alemiz.bettersurvival.utils.Command;
 import cn.nukkit.command.CommandSender;
@@ -8,9 +8,9 @@ import cn.nukkit.command.data.CommandParameter;
 
 public class DelHomeCommand extends Command {
 
-    public Home loader;
+    public MyHomes loader;
 
-    public DelHomeCommand(String name, Home loader) {
+    public DelHomeCommand(String name, MyHomes loader) {
         super(name, "Remove your home", "");
 
         this.usage = "§7/delhome <home - optional> : Remove your home";

@@ -1,6 +1,6 @@
 package alemiz.bettersurvival.commands;
 
-import alemiz.bettersurvival.addons.Home;
+import alemiz.bettersurvival.addons.myhomes.MyHomes;
 import cn.nukkit.Player;
 import alemiz.bettersurvival.utils.Command;
 import cn.nukkit.command.CommandSender;
@@ -9,9 +9,9 @@ import cn.nukkit.command.data.CommandParameter;
 
 public class SetHomeCommand extends Command {
 
-    public Home loader;
+    public MyHomes loader;
 
-    public SetHomeCommand(String name, Home loader) {
+    public SetHomeCommand(String name, MyHomes loader) {
         super(name, "Save your home location", "");
 
         this.usage = "§7/sethome <home - optional> : Save your home location";
