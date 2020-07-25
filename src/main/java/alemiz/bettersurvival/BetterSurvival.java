@@ -3,6 +3,7 @@ package alemiz.bettersurvival;
 import alemiz.bettersurvival.addons.*;
 import alemiz.bettersurvival.addons.clans.PlayerClans;
 import alemiz.bettersurvival.addons.economy.BetterEconomy;
+import alemiz.bettersurvival.addons.myhomes.MyHomes;
 import alemiz.bettersurvival.addons.myland.MyLandProtect;
 import alemiz.bettersurvival.addons.shop.SurvivalShop;
 import alemiz.bettersurvival.tasks.ServerRestartTask;
@@ -11,12 +12,14 @@ import alemiz.bettersurvival.utils.ConfigManager;
 import alemiz.bettersurvival.utils.enitity.FakeHuman;
 import alemiz.bettersurvival.utils.fakeChest.FakeInventory;
 import alemiz.bettersurvival.utils.fakeChest.FakeInventoryManager;
+import alemiz.bettersurvival.utils.form.Form;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.inventory.InventoryCloseEvent;
 import cn.nukkit.event.inventory.InventoryTransactionEvent;
+import cn.nukkit.event.player.PlayerFormRespondedEvent;
 import cn.nukkit.inventory.transaction.action.InventoryAction;
 import cn.nukkit.inventory.transaction.action.SlotChangeAction;
 import cn.nukkit.plugin.PluginBase;
@@ -99,11 +102,18 @@ public class BetterSurvival extends PluginBase implements Listener {
         if (cancel.get()) event.setCancelled(true);
     }
 
+    @EventHandler
+    public void onForm(PlayerFormRespondedEvent event){
+        if (!(event.getWindow() instanceof Form)) return;
+        Form form = (Form) event.getWindow();
+        form.handle(event.getPlayer());
+    }
+
     public void loadAddons(){
         //Load permissions as first
         Addon.loadAddon(PlayerPermissions.class, "player_permissions.yml");
 
-        Addon.loadAddon(Home.class, "homes.yml");
+        Addon.loadAddon(MyHomes.class, "my_homes.yml");
         Addon.loadAddon(MoreVanilla.class, "more_vanilla.yml");
         Addon.loadAddon(MyLandProtect.class, "my_land_protect.yml");
         Addon.loadAddon(Troller.class, "troll_addon.yml");

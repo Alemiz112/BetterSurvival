@@ -7,6 +7,7 @@ import alemiz.bettersurvival.commands.LandCommand;
 import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.ConfigManager;
 import alemiz.bettersurvival.utils.SuperConfig;
+import alemiz.bettersurvival.utils.exception.CancelException;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
@@ -29,7 +30,7 @@ import java.util.*;
 
 public class MyLandProtect extends Addon {
 
-    private static final BitSet INTERACT_BLOCKS = new BitSet();
+    public static final BitSet INTERACT_BLOCKS = new BitSet();
 
     private Map<String, List<Block>> selectors = new HashMap<>();
     private Map<String, LandRegion> lands = new HashMap<>();
@@ -81,7 +82,7 @@ public class MyLandProtect extends Addon {
             configFile.set("landsAccessPermission", "bettersurvival.land.access");
             configFile.set("chestsAccessPermission", "bettersurvival.chest.access");
 
-            configFile.set("landNotExists", "§6»§7Land §6{land}§7 not found!");
+            configFile.set("landNotExists", "§6»§7Land not found!");
             configFile.set("landWithNameExists", "§6»§7Land §6{land}§7 already exists§7!");
             configFile.set("landWarn", "§6»§7Hey §6@{player}§7, this is not your region! Ask §6@{owner} §7to access §6{land}§7!");
             configFile.set("landTooBig", "§6»§7Selected land is bigger than maximum allowed limit §6{limit} blocks§7!");
@@ -251,30 +252,27 @@ public class MyLandProtect extends Addon {
 
     public boolean interact(Player player, LandRegion region, Block block){
         if (region == null) return true;
-        if (region.owner.equals(player.getName().toLowerCase()) || region.whitelist.contains(player.getName().toLowerCase())) return true;
+        if (region.owner.equals(player.getName().toLowerCase())) return true;
         if (player.isOp() || player.hasPermission(PERM_ACCESS)) return true;
 
         boolean clanLand = region instanceof ClanLand;
-        Clan clan;
-        if (clanLand && (clan = ((ClanLand) region).getClan()) != null){
-            if (block != null && ((ClanLand) region).isRestrictionEnabled()){
-                if (clan.isAdmin(player) || (clan.isMember(player) && !INTERACT_BLOCKS.get(block.getId()))){
-                    return true;
-                }else if (clan.isMember(player)){
-                    player.sendMessage("§c»§7Your clan restricted access to some blocks in clan land!");
-                    return false;
-                }
-            }else if (clan.isMember(player)){
-                return true;
-            }
+        boolean canInteract;
+
+        try {
+            canInteract = region.onInteract(player, block);
+        }catch (CancelException e){
+            //Using CancelException we can prevent notify message
+            return e.getValue() instanceof Boolean && (Boolean) e.getValue();
         }
 
-        String message = configFile.getString("landWarn");
-        message = message.replace("{land}", clanLand? "" : region.land);
-        message = message.replace("{player}", player.getName());
-        message = message.replace("{owner}", region.owner + (clanLand? " Clan" : ""));
-        player.sendMessage(message);
-        return false;
+        if (!canInteract){
+            String message = configFile.getString("landWarn");
+            message = message.replace("{land}", clanLand? "" : region.land);
+            message = message.replace("{player}", player.getName());
+            message = message.replace("{owner}", region.owner + (clanLand? " Clan" : ""));
+            player.sendMessage(message);
+        }
+        return canInteract;
     }
 
     public LandRegion getLandByPos(Position position){
@@ -361,7 +359,7 @@ public class MyLandProtect extends Addon {
             return false;
         }
 
-        //1. Check if lanf is in spawn
+        //1. Check if land is in spawn
         for (Block block : blocks){
             if (!block.getLevel().isInSpawnRadius(block)) continue;
             player.sendMessage("§c»§7You can not create land inside spawn area!");
@@ -376,7 +374,7 @@ public class MyLandProtect extends Addon {
             }
         }
 
-        if (region != null && !region.owner.equalsIgnoreCase(player.getName()) && !player.hasPermission(PERM_ACCESS)){
+        if (region != null && !region.canManage(player.getName()) && !player.hasPermission(PERM_ACCESS)){
             boolean cancel = true;
             if (Addon.getAddon("playerclans") != null && (region instanceof ClanLand)){
                 PlayerClans playerClans = (PlayerClans) Addon.getAddon("playerclans");
@@ -459,6 +457,9 @@ public class MyLandProtect extends Addon {
         region.pos2 = new Vector3f(data.get(0), data.get(1), data.get(2));
 
         region.setRestriction(config.getBoolean("land.playerRestriction", false));
+
+        region.setWhitelistEnabled(config.getBoolean("land.whitelistEnabled", false));
+        region.whitelist = config.getStringList("land.whitelist");
 
         this.lands.put(clan.getRawName(), region);
         region.save();
@@ -622,18 +623,15 @@ public class MyLandProtect extends Addon {
 
     }
 
-    public void whitelist(Player owner, String player, String land, String action){
-        LandRegion region = this.lands.get(owner.getName().toLowerCase()+"-"+land.toLowerCase());
-
+    public void whitelist(Player owner, String player, LandRegion region, String action){
         if (region == null){
             String message = configFile.getString("landNotExists");
-            message = message.replace("{land}", land);
             message = message.replace("{player}", owner.getName());
             owner.sendMessage(message);
             return;
         }
 
-        if (!region.owner.equals(owner.getName().toLowerCase())){
+        if (!region.canManage(owner.getName())){
             String message = configFile.getString("landWarn");
             message = message.replace("{land}", region.land);
             message = message.replace("{player}", owner.getName());
@@ -653,7 +651,7 @@ public class MyLandProtect extends Addon {
                 String players = String.join(", ", region.whitelist);
 
                 String message = configFile.getString("landWhitelistList");
-                message = message.replace("{land}", region.land);
+                message = message.replace("{land}", region instanceof ClanLand? "§7Clan land" : region.land);
                 message = message.replace("{player}", owner.getName());
                 message = message.replace("{players}", players);
                 owner.sendMessage(message);
@@ -661,7 +659,7 @@ public class MyLandProtect extends Addon {
         }
 
         String message = configFile.getString("landWhitelist");
-        message = message.replace("{land}", region.land);
+        message = message.replace("{land}", region instanceof ClanLand? "clan land" : region.land);
         message = message.replace("{player}", owner.getName());
         owner.sendMessage(message);
     }

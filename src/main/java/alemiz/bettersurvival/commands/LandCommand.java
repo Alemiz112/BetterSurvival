@@ -76,15 +76,18 @@ public class LandCommand extends Command {
                 this.loader.findLand(player);
                 break;
             case "whitelist":
+                LandRegion region;
                 if (args.length < 4){
                     if (args.length == 3 && args[1].equals(LandRegion.WHITELIST_LIST)){
-                        this.loader.whitelist(player, "", args[2], args[1]);
+                        region = this.loader.getLands().get(player.getName().toLowerCase()+"-"+args[2]);
+                        this.loader.whitelist(player, "", region, args[1]);
                     }else {
                         player.sendMessage(getUsageMessage());
                     }
                     break;
                 }
-                this.loader.whitelist(player, args[3], args[2], args[1]);
+                region = this.loader.getLands().get(player.getName().toLowerCase()+"-"+args[2]);
+                this.loader.whitelist(player, args[3], region, args[1]);
                 break;
             case "list":
                 this.loader.listLands(player);

@@ -200,6 +200,7 @@ public class Clan {
         config.save();
 
         player.sendMessage("§6»§7You was invited to join §6@"+this.name+" Clan! Use §6/clan accept <name> §7or§6 /clan deny <name> §7to manage your invite!");
+        if (executor != null) executor.sendMessage("§6»§7You have invited §6@"+player.getName()+"§7 to your clan!");
     }
 
     public void addPlayer(Player player){
@@ -329,6 +330,40 @@ public class Clan {
         landProtect.removeClanLand(player);
     }
 
+    public void landWhitelist(Player player, String action, String[] args){
+        ClanLand land = this.getLand();
+        if (land == null){
+            player.sendMessage("§c»§7Your clan has not land!");
+            return;
+        }
+
+        if (!this.owner.equalsIgnoreCase(player.getName())){
+            player.sendMessage("§c»§7Land settings can be configured by clan owner only!");
+            return;
+        }
+
+        if (Addon.getAddon("mylandprotect") == null){
+            player.sendMessage("§c»§7MyLandProtect addon is not enabled!");
+        }
+
+        MyLandProtect landProtect = (MyLandProtect) Addon.getAddon("mylandprotect");
+
+        if (!action.equals("on") && !action.equals("off")){
+            if (args.length < 1 && !action.equals(LandRegion.WHITELIST_LIST)){
+                player.sendMessage("§c»§7Command can not be proceed! Please provide additional value to complete this command!");
+                return;
+            }
+
+            landProtect.whitelist(player, String.join(" ", args), land, action);
+            return;
+        }
+
+        boolean state = action.equalsIgnoreCase("on");
+        land.setWhitelistEnabled(state);
+        land.save();
+        player.sendMessage("§a»§7Land whitelist has been turned §6"+(state? "on" : "off")+"§7!");
+    }
+
     public ClanLand getLand(){
         if (Addon.getAddon("mylandprotect") == null){
             return null;
@@ -435,7 +470,7 @@ public class Clan {
                 "§3»§7 Players: §c"+this.players.size()+"§7/§4"+playerLimit+"\n" +
                 "§3»§7 Player List: §e"+String.join(", ", this.players)+"\n" +
                 "§3»§7 Homes: §a"+this.homes.size()+"§7/§2"+homeLimit+"\n" +
-                "§3»§7 Home List: §e"+String.join(", ", this.homes.keySet());
+                "§3»§7 Home List: §e"+(this.homes.size() == 0? "None" : String.join(", ", this.homes.keySet()));
     }
 
     public String getRawName() {

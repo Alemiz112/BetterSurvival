@@ -1,6 +1,6 @@
 package alemiz.bettersurvival.commands;
 
-import alemiz.bettersurvival.addons.Home;
+import alemiz.bettersurvival.addons.myhomes.MyHomes;
 import cn.nukkit.Player;
 import alemiz.bettersurvival.utils.Command;
 import cn.nukkit.command.CommandSender;
@@ -10,9 +10,9 @@ import java.util.Set;
 
 public class GetHomeCommand extends Command {
 
-    public Home loader;
+    public MyHomes loader;
 
-    public GetHomeCommand(String name, Home loader) {
+    public GetHomeCommand(String name, MyHomes loader) {
         super(name, "Prints your homes", "", new String[]{"listhome"});
         this.commandParameters.clear();
 
