@@ -127,7 +127,7 @@
       "count": 8,
       "price": 175,
       "image": false,
-      "sell": 5
+      "sell": 6
     }
   },
   "ingredients": {
@@ -206,7 +206,7 @@
       "count": 8,
       "price": 200,
       "image": "items/leather",
-      "sell": 9
+      "sell": 8
     },
     "string": {
       "id": 287,
@@ -241,7 +241,7 @@
       "count": 4,
       "price": 175,
       "image": "items/gunpowder",
-      "sell": 15
+      "sell": 9
     },
     "slimeball": {
       "id": 341,
@@ -425,7 +425,7 @@
       "count": 4,
       "price": 100,
       "image": false,
-      "sell": 12
+      "sell": 11
     }
   },
   "mechanism": {
@@ -714,14 +714,6 @@
       "image": "items/egg_mushroomcow",
       "sell": 612
     },
-    "squid spawn egg": {
-      "id": 383,
-      "count": 1,
-      "meta": 17,
-      "price": 1300,
-      "image": "items/egg_squid",
-      "sell": 455
-    },
     "rabbit spawn egg": {
       "id": 383,
       "count": 2,
@@ -908,14 +900,6 @@
       "image": "items/egg_zombie",
       "sell": 612
     },
-    "creeper spawn egg": {
-      "id": 383,
-      "count": 1,
-      "meta": 33,
-      "price": 2500,
-      "image": "items/egg_creeper",
-      "sell": 875
-    },
     "skeleton spawn egg": {
       "id": 383,
       "count": 1,
@@ -988,7 +972,7 @@
       "image": "items/egg_stray",
       "sell": 437
     },
-    "husl spawn egg": {
+    "husk spawn egg": {
       "id": 383,
       "count": 1,
       "meta": 47,
@@ -1580,43 +1564,41 @@
     }
   },
   "weekly offers": {
-    "monster spawner": {
-      "id": 52,
-      "count": 1,
-      "price": 28000,
-      "image": "mob_spawner",
-      "sell": 25000
+    "melon": {
+      "id": 360,
+      "count": 16,
+      "price": 200,
+      "sell": 7
     },
-    "bone": {
-      "id": 352,
+    "spider spawn egg": {
+      "id": 383,
+      "count": 1,
+      "meta": 35,
+      "price": 1250,
+      "image": "items/egg_spider",
+      "sell": 800
+    },
+    "dead fan coral": {
+      "id": -134,
+      "count": 4,
+      "price": 120,
+      "image": "blocks/coral_fan_blue_dead",
+      "sell": 30
+    },
+    "pink dye": {
+      "id": 351,
       "count": 8,
-      "price": 115,
-      "image": "items/bone",
-      "sell": 12
+      "meta": 9,
+      "price": 120,
+      "image": "items/dye_powder_pink",
+      "sell": 10
     },
-    "birch sapling": {
-      "id": 6,
-      "count": 6,
-      "meta": 2,
-      "price": 150,
-      "image": false,
-      "sell": 12
-    },
-    "chicken spawn egg": {
-      "id": 383,
-      "count": 2,
-      "meta": 10,
-      "price": 750,
-      "image": "items/egg_chicken",
-      "sell": 350
-    },
-    "ocelot spawn egg": {
-      "id": 383,
-      "count": 1,
-      "meta": 22,
-      "price": 750,
-      "image": "items/egg_ocelot",
-      "sell": 350
+    "nether quartz": {
+      "id": 406,
+      "count": 32,
+      "price": 250,
+      "image": "items/quartz",
+      "sell": 5
     }
   }
 }
