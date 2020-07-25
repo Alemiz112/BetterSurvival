@@ -60,7 +60,7 @@ public class CubeBridge extends Addon {
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-near"));
             perms.add(Addon.getAddon("morevanilla").configFile.getString("permission-keepInvAll"));
 
-            perms.add(Addon.getAddon("home").configFile.getString("permission-vip"));
+            perms.add(Addon.getAddon("myhome").configFile.getString("permission-vip"));
         }
 
         //VIP Perms
