@@ -135,6 +135,11 @@ public class SmithShop {
         if (player == null || form.getResponse() == null) return;
         String customName = form.getResponse().getInputResponse(1);
 
+        if (customName.length() > 16){
+            player.sendMessage("§c»§r§7The name length limit has been reached! Please use maximum 16 characters!");
+            return;
+        }
+
         Item item = player.getInventory().getItemInHand();
         if (item.getId() == Item.AIR){
             player.sendMessage("§c»§r§7Can not change name of air!");
