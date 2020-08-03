@@ -1564,41 +1564,40 @@
     }
   },
   "weekly offers": {
-    "melon": {
-      "id": 360,
-      "count": 16,
+    "oak sapling": {
+      "id": 6,
+      "meta": 0,
+      "count": 6,
       "price": 200,
-      "sell": 7
+      "sell": 12
     },
-    "spider spawn egg": {
-      "id": 383,
-      "count": 1,
-      "meta": 35,
-      "price": 1250,
-      "image": "items/egg_spider",
-      "sell": 800
-    },
-    "dead fan coral": {
-      "id": -134,
-      "count": 4,
-      "price": 120,
-      "image": "blocks/coral_fan_blue_dead",
-      "sell": 30
-    },
-    "pink dye": {
-      "id": 351,
+    "bone": {
+      "id": 352,
       "count": 8,
-      "meta": 9,
-      "price": 120,
-      "image": "items/dye_powder_pink",
+      "price": 125,
+      "image": "items/bone",
       "sell": 10
     },
-    "nether quartz": {
-      "id": 406,
-      "count": 32,
-      "price": 250,
-      "image": "items/quartz",
-      "sell": 5
+    "birch log": {
+      "id": 17,
+      "count": 16,
+      "price": 300,
+      "image": false,
+      "sell": 10
+    },
+    "leather": {
+      "id": 334,
+      "count": 8,
+      "price": 165,
+      "sell": 10
+    },
+    "zombie villager egg": {
+      "id": 383,
+      "meta": 44,
+      "count": 1,
+      "price": 800,
+      "image": "items/egg_zombievillager",
+      "sell": 600
     }
   }
 }
