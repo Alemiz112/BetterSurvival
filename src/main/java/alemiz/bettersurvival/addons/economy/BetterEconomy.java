@@ -23,6 +23,7 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.nbt.tag.StringTag;
 import me.onebone.economyapi.EconomyAPI;
 import cn.nukkit.utils.BlockIterator;
 import org.apache.commons.lang3.ArrayUtils;
@@ -140,16 +141,27 @@ public class BetterEconomy extends Addon {
         Item item = event.getItem();
 
         BlockEntityItemFrame itemFrame = event.getItemFrame();
-        if (!itemFrame.namedTag.contains("trade_price") || !itemFrame.namedTag.contains("trade_owner")) return;
-        event.setCancelled(true);
+        if (!itemFrame.namedTag.contains("trade_owner")) return;
 
         CompoundTag tag = itemFrame.namedTag;
         String owner = tag.getString("trade_owner");
-        int price = tag.getInt("trade_price");
 
+        //In this case bank note is in item frame
+        if (!itemFrame.namedTag.contains("trade_price")){
+            if (!player.getName().equals(owner)){
+                player.sendMessage("§c»§7Bank note can pickup only trade owner!");
+                event.setCancelled(true);
+            }else {
+                tag.remove("trade_owner");
+            }
+            return;
+        }
+
+        event.setCancelled(true);
+        int price = tag.getInt("trade_price");
         if (player.getName().equals(owner)){
             Vector3 vector = player.temporalVector.setComponents(itemFrame.x + 0.5, itemFrame.y, itemFrame.z + 0.5);
-            this.dropItem(itemFrame, vector, item);
+            this.dropItem(itemFrame, vector, item, true);
             itemFrame.setItem(new ItemBlock(Block.get(BlockID.AIR)));
             itemFrame.setItemRotation(0);
             return;
@@ -172,7 +184,7 @@ public class BetterEconomy extends Addon {
         }
 
         Vector3 vector = player.temporalVector.setComponents(itemFrame.x + 0.5, itemFrame.y, itemFrame.z + 0.5);
-        this.dropItem(itemFrame, vector, item);
+        this.dropItem(itemFrame, vector, item, false);
 
         Item bankNote = this.buildNote(player.getName(), price);
         itemFrame.setItem(bankNote);
@@ -184,7 +196,7 @@ public class BetterEconomy extends Addon {
         player.sendMessage(message);
     }
 
-    private void dropItem(BlockEntityItemFrame itemFrame, Vector3 source, Item item){
+    private void dropItem(BlockEntityItemFrame itemFrame, Vector3 source, Item item, boolean clearAll){
         CompoundTag tag = itemFrame.namedTag;
 
         if (tag.contains("trade_item_name")){
@@ -195,8 +207,8 @@ public class BetterEconomy extends Addon {
 
         item.setCount(tag.getInt("trade_count"));
 
+        if (clearAll) tag.remove("trade_owner");
         tag.remove("trade_price");
-        tag.remove("trade_owner");
         tag.remove("trade_count");
         tag.remove("trade_item_name");
 
@@ -211,7 +223,7 @@ public class BetterEconomy extends Addon {
         if (player == null) return;
 
         if (price < 1){
-            player.sendMessage("§c»§Please enter valid coins value!");
+            player.sendMessage("§c»§7Please enter valid coins value!");
             return;
         }
 
