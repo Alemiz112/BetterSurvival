@@ -34,7 +34,7 @@ public abstract class Addon implements Listener{
     }
 
     public static Addon getAddon(String name){
-        return Addon.addons.getOrDefault(name, null);
+        return Addon.addons.get(name);
     }
 
     public static void disableAddons(){
@@ -42,7 +42,6 @@ public abstract class Addon implements Listener{
             addon.setEnabled(false);
         }
     }
-
 
 
     public String name;
