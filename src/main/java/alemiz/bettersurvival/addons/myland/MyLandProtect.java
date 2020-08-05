@@ -13,13 +13,16 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityChest;
+import cn.nukkit.blockentity.BlockEntityHopper;
 import cn.nukkit.blockentity.BlockEntitySign;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.block.BlockBreakEvent;
 import cn.nukkit.event.block.BlockPlaceEvent;
 import cn.nukkit.event.block.ItemFrameDropItemEvent;
 import cn.nukkit.event.entity.EntityExplodeEvent;
+import cn.nukkit.event.inventory.InventoryMoveItemEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
+import cn.nukkit.inventory.ChestInventory;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3f;
@@ -61,9 +64,21 @@ public class MyLandProtect extends Addon {
         PERM_ACCESS = configFile.getString("landsAccessPermission");
         PERM_ACCESS_CHEST = configFile.getString("chestsAccessPermission");
 
-        for (SuperConfig config : ConfigManager.getInstance().loadAllPlayers()){
-            this.loadLand(config);
+        List<SuperConfig> playerEntries = ConfigManager.getInstance().loadAllPlayers();
+        int successLands = 0;
+        int failedAttempts = 0;
+
+        for (SuperConfig config : playerEntries){
+            int lands = this.loadLands(config);
+            if (lands < 0){
+                failedAttempts++;
+            }else {
+                successLands += lands;
+            }
         }
+
+        this.plugin.getLogger().info("§eAll lands loaded! Entries: §3"+playerEntries.size());
+        this.plugin.getLogger().info("§eTotal Lands: §3"+successLands+" §eFailed: §c"+failedAttempts);
     }
 
     @Override
@@ -229,9 +244,20 @@ public class MyLandProtect extends Addon {
     @EventHandler
     public void onExplode(EntityExplodeEvent event){
         for (Position block : event.getBlockList()){
-            if (getLandByPos(block) == null) continue;
+            if (!this.isPrivateChest(block) && this.getLandByPos(block) == null) continue;
             event.setBlockList(new ArrayList<>());
             return;
+        }
+    }
+
+    @EventHandler
+    public void onInventoryMove(InventoryMoveItemEvent event){
+        if (!(event.getSource() instanceof BlockEntityHopper) || !(event.getInventory() instanceof ChestInventory)) return;
+        ChestInventory inv = (ChestInventory) event.getInventory();
+        BlockEntityChest chest = inv.getHolder();
+
+        if (this.isPrivateChest(chest)){
+            event.setCancelled(true);
         }
     }
 
@@ -422,25 +448,32 @@ public class MyLandProtect extends Addon {
         return true;
     }
 
-    public void loadLand(SuperConfig config){
+    public int loadLands(SuperConfig config){
        String owner = config.getName().substring(0, config.getName().lastIndexOf("."));
-       this.plugin.getLogger().info("§eLoading lands for player §3"+owner+"§e!");
+       int count = 0;
 
        for (String land : config.getSection("land").getKeys(false)){
-           Level level = this.plugin.getServer().getLevelByName(config.getString("land."+land+"level"));
-           LandRegion region = new LandRegion(owner, land, level);
+           try {
+               Level level = this.plugin.getServer().getLevelByName(config.getString("land."+land+"level"));
+               LandRegion region = new LandRegion(owner, land, level);
 
-           List<Integer> data = config.getIntegerList("land."+land+".pos0");
-           region.pos1 = new Vector3f(data.get(0), data.get(1), data.get(2));
+               List<Integer> data = config.getIntegerList("land."+land+".pos0");
+               region.pos1 = new Vector3f(data.get(0), data.get(1), data.get(2));
 
-           data = config.getIntegerList("land."+land+".pos1");
-           region.pos2 = new Vector3f(data.get(0), data.get(1), data.get(2));
+               data = config.getIntegerList("land."+land+".pos1");
+               region.pos2 = new Vector3f(data.get(0), data.get(1), data.get(2));
 
-           region.whitelist = config.getStringList("land."+land+".whitelist");
-           this.lands.put(owner.toLowerCase()+"-"+land, region);
+               region.whitelist = config.getStringList("land."+land+".whitelist");
+               this.lands.put(owner.toLowerCase()+"-"+land, region);
 
-           region.save();
+               region.save();
+               count++;
+           }catch (Exception e){
+               this.plugin.getLogger().warning("§cCan not land §4"+land+"§c for player §4"+owner+"§c!");
+               return -1;
+           }
        }
+       return count;
     }
 
     public void loadClanLand(Clan clan){
