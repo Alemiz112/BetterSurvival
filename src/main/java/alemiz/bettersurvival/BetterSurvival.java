@@ -2,6 +2,7 @@ package alemiz.bettersurvival;
 
 import alemiz.bettersurvival.addons.*;
 import alemiz.bettersurvival.addons.clans.PlayerClans;
+import alemiz.bettersurvival.addons.cubemc.CubeBridge;
 import alemiz.bettersurvival.addons.economy.BetterEconomy;
 import alemiz.bettersurvival.addons.myhomes.MyHomes;
 import alemiz.bettersurvival.addons.myland.MyLandProtect;
