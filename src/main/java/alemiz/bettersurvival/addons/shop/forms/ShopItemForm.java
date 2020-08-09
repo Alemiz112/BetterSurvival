@@ -35,7 +35,7 @@ public class ShopItemForm extends CustomForm {
         int stackCount = Integer.parseInt(this.getResponse().getStepSliderResponse(1).getElementContent());
 
         boolean success = item.buyItem(player, stackCount);
-        String message = this.loader.messageFormat(player, (success? "messageSuccess" : "messageFail"), item.getPrice());
+        String message = this.loader.messageFormat(player, (success? "messageSuccess" : "messageFail"), item.getStackPrice(stackCount));
         message = message.replace("{item}", item.getName());
         player.sendMessage(message);
     }
