@@ -316,7 +316,7 @@
       "sell": 3
     },
     "magma block": {
-      "id": 89,
+      "id": 213,
       "count": 16,
       "price": 150,
       "image": false,
@@ -1564,40 +1564,43 @@
     }
   },
   "weekly offers": {
-    "oak sapling": {
-      "id": 6,
-      "meta": 0,
-      "count": 6,
+    "beacon": {
+      "id": 138,
+      "count": 1,
+      "price": 7200,
+      "sell": 5000,
+      "image": false
+    },
+    "magma cube spawn egg": {
+      "id": 383,
+      "count": 1,
+      "meta": 42,
+      "price": 1250,
+      "image": "items/spawn_egg",
+      "sell": 875
+    },
+    "purple dye": {
+      "id": 351,
+      "count": 12,
+      "meta": 5,
       "price": 200,
+      "image": "items/dye_powder_purple",
       "sell": 12
     },
-    "bone": {
-      "id": 352,
-      "count": 8,
-      "price": 125,
-      "image": "items/bone",
-      "sell": 10
-    },
-    "birch log": {
-      "id": 17,
+    "sea grass": {
+      "id": -130,
       "count": 16,
-      "price": 300,
-      "image": false,
+      "price": 200,
+      "image": "blocks/seagrass_carried",
       "sell": 10
     },
-    "leather": {
-      "id": 334,
-      "count": 8,
-      "price": 165,
-      "sell": 10
-    },
-    "zombie villager egg": {
+    "guardian spawn egg": {
       "id": 383,
-      "meta": 44,
       "count": 1,
-      "price": 800,
-      "image": "items/egg_zombievillager",
-      "sell": 600
+      "meta": 49,
+      "price": 2000,
+      "image": "items/egg_guardian",
+      "sell": 875
     }
   }
 }
