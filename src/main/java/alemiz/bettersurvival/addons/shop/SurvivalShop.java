@@ -17,13 +17,8 @@ import cn.nukkit.event.block.BlockBreakEvent;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntitySpawnEvent;
-import cn.nukkit.event.player.PlayerFormRespondedEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerJoinEvent;
-import cn.nukkit.form.response.FormResponseSimple;
-import cn.nukkit.form.window.FormWindowCustom;
-import cn.nukkit.form.window.FormWindowModal;
-import cn.nukkit.form.window.FormWindowSimple;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -129,10 +124,10 @@ public class SurvivalShop extends Addon {
 
     @Override
     public void registerCommands() {
-        registerCommand("shop", new ShopCommand("shop", this));
-        registerCommand("sell", new SellCommand("sell", this));
-        registerCommand("sellall", new SellAllCommand("sellall", this));
-        registerCommand("sellhand", new SellHandCommand("sellhand", this));
+        this.registerCommand("shop", new ShopCommand("shop", this));
+        this.registerCommand("sell", new SellCommand("sell", this));
+        this.registerCommand("sellall", new SellAllCommand("sellall", this));
+        this.registerCommand("sellhand", new SellHandCommand("sellhand", this));
     }
 
     @EventHandler
@@ -276,72 +271,6 @@ public class SurvivalShop extends Addon {
         category.sendForm(player);
     }
 
-    @EventHandler
-    public void onForm(PlayerFormRespondedEvent event){
-        if ((event.getWindow() instanceof FormWindowCustom)){
-            String title = ((FormWindowCustom) event.getWindow()).getTitle();
-
-            if ("§l§8Rename Item".equals(title) && this.smithShop != null) {
-                this.smithShop.handleRenameForm((FormWindowCustom) event.getWindow(), event.getPlayer());
-                return;
-            }
-
-            if (title.startsWith("§l§8Sell")){
-                this.sellManager.handleSellForm((FormWindowCustom) event.getWindow(), event.getPlayer());
-            }
-            return;
-        }
-
-        if (event.getWindow() instanceof FormWindowModal){
-            String title = ((FormWindowModal) event.getWindow()).getTitle();
-
-            if ("§l§8Smith Repair".equals(title) && this.smithShop != null) {
-                this.smithShop.handleRepairForm((FormWindowModal) event.getWindow(), event.getPlayer());
-                return;
-            }
-        }
-
-        if (!(event.getWindow() instanceof FormWindowSimple)) return;
-
-        Player player = event.getPlayer();
-        FormWindowSimple form = (FormWindowSimple) event.getWindow();
-        FormResponseSimple response = (FormResponseSimple) event.getResponse();
-
-        switch (form.getTitle()){
-            case "§l§8Smith the Man":
-                if (this.smithShop != null) this.smithShop.handleMenu(form, event.getPlayer());
-                return;
-            case "§l§8Enchants Shop":
-                if (this.smithShop != null) this.smithShop.handleEnchantsForm(form, event.getPlayer());
-                return;
-            case "§l§8Sell Items":
-                this.sellManager.handleForm(form, player);
-                return;
-
-        }
-
-        if (form.getTitle().startsWith("§l§8Levels of ") && this.smithShop != null){
-            this.smithShop.handleEnchantLevelForm(form, event.getPlayer());
-            return;
-        }
-
-        if (!form.getTitle().startsWith("§l§8Shop")){
-            return;
-        }
-
-        if (response == null) return;
-
-        ShopCategory category = this.getCategory(form.getTitle().substring(9).toLowerCase());
-        ShopItem item = category.getItem(response.getClickedButtonId());
-
-        if (item == null) return;
-        boolean success = item.buyItem(player);
-
-        String message = this.messageFormat(player, (success? "messageSuccess" : "messageFail"), item.getPrice());
-        message = message.replace("{item}", item.getName());
-        player.sendMessage(message);
-    }
-
     public void setShopSpawn(Position pos){
         DecimalFormat format = new DecimalFormat("0.0");
 
@@ -402,11 +331,11 @@ public class SurvivalShop extends Addon {
         return npcRemovers;
     }
 
-    protected String messageFormat(Player player, String messageKey){
+    public String messageFormat(Player player, String messageKey){
         return this.messageFormat(player, messageKey, Money.getInstance().getMoney(player, false));
     }
 
-    protected String messageFormat(Player player, String messageKey, int money){
+    public String messageFormat(Player player, String messageKey, int money){
         if (player == null || messageKey == null || configFile.getString(messageKey).equals("")) return "";
 
         String message = configFile.getString(messageKey);

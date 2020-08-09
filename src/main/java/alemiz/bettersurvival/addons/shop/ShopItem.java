@@ -29,8 +29,13 @@ public class ShopItem {
     }
 
     public boolean buyItem(Player player){
-        if (player == null || !Money.getInstance().reduceMoney(player, this.price)) return false;
-        player.getInventory().addItem(this.buildItem());
+        return this.buyItem(player, 1);
+    }
+
+    public boolean buyItem(Player player, int stackCount){
+        if (player == null || !Money.getInstance().reduceMoney(player, this.getStackPrice(stackCount))) return false;
+
+        player.getInventory().addItem(this.buildItem(stackCount));
         return true;
     }
 
@@ -64,8 +69,20 @@ public class ShopItem {
         return builder.substring(0, builder.length()-1);
     }
 
+    public int getStackPrice(int stackCount){
+        return this.price * stackCount;
+    }
+
+    public int getStackCount(int stackCount){
+        return this.count * stackCount;
+    }
+
     public Item buildItem(){
-        return Item.get(this.itemId, this.meta, this.count);
+        return this.buildItem(1);
+    }
+
+    public Item buildItem(int stackCount){
+        return Item.get(this.itemId, this.meta, this.getStackCount(stackCount));
     }
 
     public String getName() {

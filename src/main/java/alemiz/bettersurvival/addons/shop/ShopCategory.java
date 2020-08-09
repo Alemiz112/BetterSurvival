@@ -1,10 +1,7 @@
 package alemiz.bettersurvival.addons.shop;
 
+import alemiz.bettersurvival.addons.shop.forms.ShopItemListForm;
 import cn.nukkit.Player;
-import cn.nukkit.form.element.ElementButton;
-import cn.nukkit.form.element.ElementButtonImageData;
-import cn.nukkit.form.window.FormWindowSimple;
-import cubemc.nukkit.connector.modules.Money;
 import net.minidev.json.JSONObject;
 
 import java.util.ArrayList;
@@ -39,37 +36,22 @@ public class ShopCategory {
     }
 
     public void sendForm(Player player){
-        FormWindowSimple form = new FormWindowSimple("§l§8Shop "+this.category.substring(0, 1).toUpperCase()+this.category.substring(1), "");
-        form.setContent("§7Pickup item by your own choice. Your coins: §8"+ Money.getInstance().getMoney(player, false)+"$");
-
-
-        for (ShopItem item : this.items){
-            ElementButton button = new ElementButton("§5"+item.getFormattedName()+"\n§7Count: §8"+item.getCount()+" §7Price: §8"+item.getPrice()+"$");
-
-            if (item.canUseImage()){
-                String image = item.getCustomImage();
-                if (image.equals("")){
-                    image = "textures/items/"+item.buildItem().getName().replace(" ", "_").toLowerCase();
-                }
-
-                button.addImage(new ElementButtonImageData(item.getImageType(), image));
-            }
-
-            form.addButton(button);
-        }
-
-        player.showFormWindow(form);
+        new ShopItemListForm(player, this).buildForm().sendForm();
     }
 
     public String getCategoryName() {
-        return category;
+        return this.category;
     }
 
     public List<ShopItem> getItems() {
-        return items;
+        return this.items;
     }
 
     public ShopItem getItem(int index){
         return this.items.get(index);
+    }
+
+    public SurvivalShop getLoader() {
+        return this.loader;
     }
 }

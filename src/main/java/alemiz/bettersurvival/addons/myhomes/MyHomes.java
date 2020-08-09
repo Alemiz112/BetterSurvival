@@ -215,7 +215,8 @@ public class MyHomes extends Addon {
             return;
         }
 
-        if (!playerWarp.getOwner().equalsIgnoreCase(player.getName())){
+        boolean isOwner = playerWarp.getOwner().equalsIgnoreCase(player.getName());
+        if (!isOwner && !player.isOp()){
             player.sendMessage("§c»§7You are not owner of §6"+name+"§7 warp!");
             return;
         }
@@ -223,7 +224,7 @@ public class MyHomes extends Addon {
         WarpCategory category = this.getWarpCategory(playerWarp.getCategory());
         category.removeWarp(playerWarp);
 
-        Config config = ConfigManager.getInstance().loadPlayer(player);
+        Config config = ConfigManager.getInstance().loadPlayer(isOwner? player.getName() : playerWarp.getOwner());
         if (config == null) return;
 
         ((Map) config.get("pwarps")).remove(playerWarp.getRawName());
