@@ -1,23 +1,22 @@
 package alemiz.bettersurvival.addons.shop;
 
+import alemiz.bettersurvival.addons.shop.forms.*;
 import alemiz.bettersurvival.commands.EnchCommand;
 import alemiz.bettersurvival.utils.ConfigManager;
 import alemiz.bettersurvival.utils.Items;
 import alemiz.bettersurvival.utils.enitity.FakeHuman;
+import alemiz.bettersurvival.utils.form.CustomForm;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.form.element.ElementButton;
 import cn.nukkit.form.element.ElementInput;
 import cn.nukkit.form.element.ElementLabel;
-import cn.nukkit.form.window.FormWindowCustom;
-import cn.nukkit.form.window.FormWindowModal;
 import cn.nukkit.form.window.FormWindowSimple;
 import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
-import me.onebone.economyapi.EconomyAPI;
 import net.minidev.json.JSONObject;
 
 import java.util.*;
@@ -85,34 +84,7 @@ public class SmithShop {
 
     public void sendMenuForm(Player player){
         if (player == null) return;
-
-        FormWindowSimple form = new FormWindowSimple("§l§8Smith the Man", "§7Select one of mine tools!");
-        form.addButton(new ElementButton("§aRename Item\n§7»Click to open!"));
-        form.addButton(new ElementButton("§eBuy Enchants\n§7»Click to open!"));
-        form.addButton(new ElementButton("§6Repair Item\n§7»Click to open!"));
-        form.addButton(new ElementButton("§cHelp\n§7»Click to open!"));
-
-        player.showFormWindow(form);
-    }
-
-    public void handleMenu(FormWindowSimple form, Player player){
-        if (player == null || form.getResponse() == null) return;
-        String response = form.getResponse().getClickedButton().getText().split("\n")[0];
-
-        switch (response){
-            case "§aRename Item":
-                this.sendRenameForm(player);
-                break;
-            case "§eBuy Enchants":
-                this.sendEnchantsForm(player);
-                break;
-            case "§6Repair Item":
-                this.sendRepairForm(player);
-                break;
-            case "§cHelp":
-                this.sendHelpForm(player);
-                break;
-        }
+        new SmithMenuForm(player, this).buildForm().sendForm();
     }
 
     public void sendRenameForm(Player player){
@@ -123,109 +95,17 @@ public class SmithShop {
             player.sendMessage("§c»§r§7You do not hold any item!");
             return;
         }
-
-        FormWindowCustom form = new FormWindowCustom("§l§8Rename Item");
-        form.addElement(new ElementLabel("§7Item in your hand will be renamed!"));
-        form.addElement(new ElementInput("§7Enter new name:", item.getCustomName().equals("") ? item.getName() : item.getCustomName()));
-
-        player.showFormWindow(form);
-    }
-
-    public void handleRenameForm(FormWindowCustom form, Player player){
-        if (player == null || form.getResponse() == null) return;
-        String customName = form.getResponse().getInputResponse(1);
-
-        if (customName.length() > 16){
-            player.sendMessage("§c»§r§7The name length limit has been reached! Please use maximum 16 characters!");
-            return;
-        }
-
-        Item item = player.getInventory().getItemInHand();
-        if (item.getId() == Item.AIR){
-            player.sendMessage("§c»§r§7Can not change name of air!");
-            return;
-        }
-
-        item.setCustomName("§r§f"+customName);
-        player.getInventory().setItemInHand(item);
-        player.sendMessage("§a»§r§7Your item was renamed!");
-        player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_RANDOM_ANVIL_USE);
+        new SmithRenameForm(player).buildForm().sendForm();
     }
 
     public void sendEnchantsForm(Player player){
         if (player == null) return;
-
-        FormWindowSimple form = new FormWindowSimple("§l§8Enchants Shop", "§7You can add special powers to items by enchanting them. TIP: Click on enchant to buy it.");
-        for (Enchant enchant : this.enchants){
-            form.addButton(new ElementButton("§5"+enchant.getFormattedName()+"\n§7Starting at: §8"+enchant.getBasePrice()+"$"));
-        }
-
-        form.addButton(new ElementButton("Exit"));
-        player.showFormWindow(form);
-    }
-
-    public void handleEnchantsForm(FormWindowSimple form, Player player){
-        if (player == null || form.getResponse() == null) return;
-        int response = form.getResponse().getClickedButtonId();
-
-        if (response >= this.enchants.size()) return;
-
-        Enchant enchant = this.enchants.get(response);
-        if (enchant == null){
-            player.sendMessage("§c»§7Enchantment was not found!");
-            return;
-        }
-
-        this.sendEnchantLevelForm(player, enchant);
+        new SmithEnchantsForm(player, this).buildForm().sendForm();
     }
 
     public void sendEnchantLevelForm(Player player, Enchant enchant){
         if (player == null || enchant == null) return;
-
-        FormWindowSimple form = new FormWindowSimple("§l§8Levels of "+enchant.getFormattedName(), "§7Please select enchantment level.");
-        for (int i = 0; i < enchant.prices.length; i++){
-            int level = i+1;
-            form.addButton(new ElementButton("§fLevel: "+level+"§7 Price: §8"+enchant.getPrice(level)+"$\n§7»Click to Buy!"));
-        }
-
-        form.addButton(new ElementButton("Exit"));
-        player.showFormWindow(form);
-    }
-
-    public void handleEnchantLevelForm(FormWindowSimple form, Player player){
-        if (player == null || form.getResponse() == null || form.getResponse().getClickedButton().getText().equals("Exit")) return;
-
-        int level = form.getResponse().getClickedButtonId()+1;
-        String enchantName = form.getTitle().substring(14);
-
-        Enchant enchant = null;
-        for (Enchant enchant1 : this.enchants){
-            if (!enchant1.getFormattedName().equals(enchantName)) continue;
-            enchant = enchant1;
-            break;
-        }
-
-        if (enchant == null){
-            player.sendMessage("§c»§7Enchantment was not found!");
-            return;
-        }
-
-        if (level > enchant.prices.length){
-            player.sendMessage("§c»§7You chose highest level than maximum allowed!");
-            return;
-        }
-
-        int price = enchant.getPrice(level);
-        boolean success = EconomyAPI.getInstance().reduceMoney(player, price) >= 1;
-
-        if (success){
-            Item item = enchant.getEnchantItem(level);
-            player.getInventory().addItem(item);
-        }
-
-        String message = this.loader.messageFormat(player, (success? "messageSuccess" : "messageFail"), price);
-        message = message.replace("{item}", enchantName+" Enchant");
-        player.sendMessage(message);
+        new SmithEnchantLevelForm(player, enchant, this).buildForm().sendForm();
     }
 
     public void sendHelpForm(Player player){
@@ -313,64 +193,7 @@ public class SmithShop {
 
     public void sendRepairForm(Player player){
         if (player == null) return;
-
-        Item item = player.getInventory().getItemInHand();
-        if (item.getId() == Item.AIR){
-            player.sendMessage("§c»§r§7You do not hold any item!");
-            return;
-        }
-
-        float damage = ((float) item.getDamage() / item.getMaxDurability()) * 100;
-        int price = this.getPriceByDamage(damage);
-
-        if (price == 0){
-            player.sendMessage("§c»§r§7This item can not be repaired!");
-            return;
-        }
-
-        FormWindowModal form = new FormWindowModal("§l§8Smith Repair", "§7Item in your hand will be repaired! Price is based on item damage.\n" +
-                "§7Price: §l"+price+" emeralds§r\n" +
-                "§7Would you like to repair it?",
-                "Yes",
-                "Exit");
-
-        player.showFormWindow(form);
-    }
-
-    public void handleRepairForm(FormWindowModal form, Player player){
-        if (player == null || form == null || form.getResponse() == null || form.getResponse().getClickedButtonText().equals("Exit")) return;
-        PlayerInventory inv = player.getInventory();
-
-
-        Item item = inv.getItemInHand();
-        float damage = ((float) item.getDamage() / item.getMaxDurability()) * 100;
-        int price = this.getPriceByDamage(damage);
-
-        if (price == 0){
-            player.sendMessage("§c»§r§7This item can not be repaired!");
-            return;
-        }
-
-        Item emerald = Item.get(Item.EMERALD, 0, 1);
-        int balance = 0;
-        for(Item slot : inv.getContents().values()){
-            if (slot.getId() != emerald.getId() || !slot.getName().equals(emerald.getName())) continue;
-            balance += slot.getCount();
-        }
-
-        if (balance < price){
-            player.sendMessage("§c»§r§7You do not have enough emeralds to repair item!");
-            return;
-        }
-
-        emerald.setCount(price);
-        inv.removeItem(emerald);
-
-        item.setDamage(0);
-        inv.setItemInHand(item);
-
-        player.sendMessage("§a»§r§7Your item was successfully repaired!");
-        player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_RANDOM_ANVIL_USE);
+        new SmithRepairForm(player, this).buildForm().sendForm();
     }
 
     public Enchant getEnchant(int id){

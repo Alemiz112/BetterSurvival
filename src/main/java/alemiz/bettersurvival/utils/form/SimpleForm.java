@@ -31,4 +31,8 @@ public class SimpleForm extends FormWindowSimple implements Form {
     public void sendForm() {
         if (player != null) this.player.showFormWindow(this);
     }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
 }
