@@ -14,6 +14,7 @@ import cn.nukkit.blockentity.BlockEntityChest;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.EventPriority;
 import cn.nukkit.event.block.BlockBreakEvent;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.level.LevelLoadEvent;
 import cn.nukkit.event.player.*;
@@ -215,6 +216,19 @@ public class MoreVanilla extends Addon{
         Player player = event.getPlayer();
         Position safeSpawn = this.sleepPos.getOrDefault(player.getName(), player.getLevel().getSafeSpawn(player.getSpawn()));
         player.teleport(safeSpawn);
+    }
+
+    @EventHandler
+    public void onDamageByEntity(EntityDamageByEntityEvent event){
+        if (!(event.getDamager() instanceof Player) || !(event.getEntity() instanceof Player)) return;
+        Player player = (Player) event.getDamager();
+
+        boolean canFly = player.getAdventureSettings().get(AdventureSettings.Type.ALLOW_FLIGHT);
+        if (!player.isCreative() && canFly){
+            player.getAdventureSettings().set(AdventureSettings.Type.ALLOW_FLIGHT, false);
+            player.getAdventureSettings().update();
+            player.sendMessage("§c»§7You can not attack player while flying!");
+        }
     }
 
     @EventHandler
@@ -540,8 +554,9 @@ public class MoreVanilla extends Addon{
         packet.position = player.asVector3f();
         packet.dimensionId = player.getLevel().getDimension();
         packet.identifier = "minecraft:water_evaporation_bucket_emitter";
-        for (Player pplayer : player.getLevel().getPlayers().values()) pplayer.dataPacket(packet);
-
+        for (Player pplayer : player.getViewers().values()){
+            pplayer.dataPacket(packet);
+        }
 
         player.addEffect(Effect.getEffect(Effect.DAMAGE_RESISTANCE).setAmplifier(100).setDuration(20*5).setVisible(false));
         player.setMotion(motion);
