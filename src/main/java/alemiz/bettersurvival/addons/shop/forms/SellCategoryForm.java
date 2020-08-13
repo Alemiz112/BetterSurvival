@@ -41,9 +41,13 @@ public class SellCategoryForm extends SimpleForm {
             return;
         }
 
-        int response = this.getResponse().getClickedButtonId();
-        ShopCategory category = categories.get(response);
+        int response = this.getResponse().getClickedButtonId()-1;
+        if (response > this.categories.size()){
+            player.sendMessage("§c»§7Please choose right category!");
+            return;
+        }
 
+        ShopCategory category = this.categories.get(response);
         if (category != null){
             this.sellManager.sendSellForm(category, player);
         }
