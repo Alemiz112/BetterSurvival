@@ -31,6 +31,7 @@ public class BetterLobby extends Addon {
 
     private String joinMessage = "";
     private String quitMessage = "";
+    private String broadcastPrefix = "";
     private int broadcastInterval = 1200;
     private List<String> broadcastMessages = new ArrayList<>();
 
@@ -49,6 +50,7 @@ public class BetterLobby extends Addon {
 
     @Override
     public void postLoad() {
+        this.broadcastPrefix = configFile.getString("broadcastPrefix");
         this.broadcastMessages = configFile.getStringList("broadcast");
         this.broadcastInterval = configFile.getInt("broadcastInterval");
         this.joinMessage = configFile.getString("joinMessage");
@@ -75,6 +77,7 @@ public class BetterLobby extends Addon {
             configFile.set("enable", true);
             configFile.set("motd", "§bCube§6Mc §3Survival");
 
+            configFile.set("broadcastPrefix", "§6[§e!§6]");
             configFile.set("broadcast", Arrays.asList("§eDid you find hacker? Use §b/report§e to report him!", "§eDo people actually read these?", "§aCheck out our youtube channel §cCubeMC Official§a!", "§bVote for us and get §eSubscriber §brank!", "§2Tips for commands can be found on §a/spawn§2!"));
             configFile.set("broadcastInterval", 1800);
             configFile.set("joinMessage", "§6»§7Be careful, §6@{player}§7 joined!");
@@ -105,19 +108,16 @@ public class BetterLobby extends Addon {
     }
 
     public void loadBroadcaster(){
-        Task task = new Task() {
-            @Override
-            public void onRun(int i) {
-                String message = broadcastMessages.get(nextMessage);
-
-                for (Player player : Server.getInstance().getOnlinePlayers().values()){
-                    player.sendMessage(message.replace("{player}", player.getName()));
-                }
-
-                if (nextMessage >= (broadcastMessages.size() - 1)){
-                    nextMessage = 0;
-                }else nextMessage++;
+        Runnable task = () -> {
+            String message = this.broadcastMessages.get(this.nextMessage);
+            for (Player player : Server.getInstance().getOnlinePlayers().values()){
+                String msg = message.replace("{player}", player.getName());
+                player.sendMessage(this.broadcastPrefix+msg);
             }
+
+            if (this.nextMessage >= (this.broadcastMessages.size() - 1)){
+                this.nextMessage = 0;
+            }else this.nextMessage++;
         };
         plugin.getServer().getScheduler().scheduleRepeatingTask(task, broadcastInterval);
     }
