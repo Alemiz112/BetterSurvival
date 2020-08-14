@@ -105,7 +105,7 @@ public class BetterLobby extends Addon {
             String message = this.broadcastMessages.get(this.nextMessage);
             for (Player player : Server.getInstance().getOnlinePlayers().values()){
                 String msg = message.replace("{player}", player.getName());
-                player.sendMessage(this.broadcastPrefix+msg);
+                player.sendMessage(this.broadcastPrefix+" "+msg);
             }
 
             if (this.nextMessage >= (this.broadcastMessages.size() - 1)){
