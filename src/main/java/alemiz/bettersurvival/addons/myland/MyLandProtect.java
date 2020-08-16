@@ -266,9 +266,9 @@ public class MyLandProtect extends Addon {
         Position pos = event.getItemFrame();
         Player player = event.getPlayer();
 
-        LandRegion region = getLandByPos(pos);
-        if (!interact(player, region)){
-            event.setCancelled();
+        LandRegion region = this.getLandByPos(pos);
+        if (!this.interact(player, region)){
+            event.setCancelled(true);
         }
     }
 

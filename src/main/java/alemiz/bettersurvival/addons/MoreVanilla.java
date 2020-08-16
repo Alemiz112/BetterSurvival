@@ -624,7 +624,7 @@ public class MoreVanilla extends Addon{
         calendar.add(Calendar.MINUTE, minutes);
         calendar.add(Calendar.SECOND, seconds);
 
-        this.mutedPlayers.put(player.getName(), calendar.getTime());
+        this.mutedPlayers.put(player.getName().toLowerCase(), calendar.getTime());
 
         String message = configFile.getString("muteMessage");
         message = message.replace("{player}", player.getName());
@@ -646,7 +646,7 @@ public class MoreVanilla extends Addon{
             pexecutor.sendMessage("§6»§7You unmuted §6@"+player.getName()+"§7!");
         }
 
-        this.mutedPlayers.remove(playerName);
+        this.mutedPlayers.remove(playerName.toLowerCase());
         if (player == null) return;
 
         String message = configFile.getString("unmuteMessage");

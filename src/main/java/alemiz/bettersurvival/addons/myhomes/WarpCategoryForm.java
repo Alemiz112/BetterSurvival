@@ -1,8 +1,10 @@
 package alemiz.bettersurvival.addons.myhomes;
 
+import alemiz.bettersurvival.BetterSurvival;
 import alemiz.bettersurvival.utils.form.Form;
 import alemiz.bettersurvival.utils.form.SimpleForm;
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.form.element.ElementButton;
 
 import java.util.ArrayList;
@@ -24,7 +26,7 @@ public class WarpCategoryForm extends SimpleForm {
     @Override
     public Form buildForm() {
         this.setTitle(this.category.getFormattedName() + " Warps");
-        this.setContent("§7Select warp you want to visit.");
+        this.setContent("§7Select warp you want to visit.\n§cYou may be killed by player once you will be teleported.");
 
         this.warps = new ArrayList<>(this.category.getWarps().values());
         if (this.warps.isEmpty()){
@@ -47,14 +49,17 @@ public class WarpCategoryForm extends SimpleForm {
             new AddWarpForm(player, this.loader).buildForm().sendForm();
             return;
         }
+        Server.getInstance().getScheduler().scheduleDelayedTask(this.loader.plugin, () -> {
+            int index = this.getResponse().getClickedButtonId();
+            PlayerWarp warp = this.warps.get(index);
+            warp.teleport(player);
 
-        int index = this.getResponse().getClickedButtonId();
-        PlayerWarp warp = this.warps.get(index);
-        warp.teleport(player);
+            String message = this.loader.configFile.getString("warpTeleport");
+            message = message.replace("{player}", player.getName());
+            message = message.replace("{warp}", warp.getName());
+            player.sendMessage(message);
+        }, 20*3);
 
-        String message = this.loader.configFile.getString("warpTeleport");
-        message = message.replace("{player}", player.getName());
-        message = message.replace("{warp}", warp.getName());
-        player.sendMessage(message);
+        player.sendMessage("§6»§cYou may be killed once you teleport. Get ready!");
     }
 }
