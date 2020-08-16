@@ -198,13 +198,11 @@ public class BetterEconomy extends Addon {
 
     private void dropItem(BlockEntityItemFrame itemFrame, Vector3 source, Item item, boolean clearAll){
         CompoundTag tag = itemFrame.namedTag;
-
         if (tag.contains("trade_item_name")){
             item.setCustomName(tag.getString("trade_item_name"));
         }else{
             item.clearCustomName();
         }
-
         item.setCount(tag.getInt("trade_count"));
 
         if (clearAll) tag.remove("trade_owner");
