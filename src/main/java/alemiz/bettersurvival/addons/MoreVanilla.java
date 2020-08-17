@@ -177,7 +177,7 @@ public class MoreVanilla extends Addon{
     public void onChat(PlayerChatEvent event){
         Player player = event.getPlayer();
 
-        if (this.mutedPlayers.containsKey(player.getName())){
+        if (this.mutedPlayers.containsKey(player.getName().toLowerCase())){
             String message = configFile.getString("muteChatMessage");
             message = message.replace("{player}", player.getName());
 
