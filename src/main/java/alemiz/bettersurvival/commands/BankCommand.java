@@ -66,7 +66,8 @@ public class BankCommand extends Command {
                     break;
                 }
 
-                this.loader.applyNote(player, item);
+                Item result = this.loader.applyNote(player, item);
+                if (result != null) player.getInventory().setItemInHand(result);
                 break;
             default:
                 player.sendMessage(this.getUsageMessage());

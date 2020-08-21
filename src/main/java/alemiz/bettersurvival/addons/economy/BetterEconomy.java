@@ -36,17 +36,24 @@ import java.util.Map;
 public class BetterEconomy extends Addon {
 
     private static final Item bankNote;
+    private static final Item bankNoteInvalid;
 
     static {
         Item item = Item.get(Item.PAPER, 0, 1);
         item.setCustomName("§r§eBank Note");
         item.getNamedTag().putByte("economy_note", 1);
         item.setLore("§r§5Use §d/bank apply§5 to apply note");
-        bankNote = item;
+        bankNote = Items.deepCopy(item);
+
+        item.setCustomName("§r§cInvalid Bank Note");
+        item.getNamedTag().putByte("note_invalid", 1);
+        item.setLore("§r§5Your bank note is expired!");
+        bankNoteInvalid = Items.deepCopy(item);
     }
 
     private final Map<String, Integer> tradeCreators = new HashMap<>();
     private final List<String> traders = new ArrayList<>();
+    private int bankNoteVersion;
 
     public BetterEconomy(String path) {
         super("bettereconomy", path);
@@ -54,6 +61,8 @@ public class BetterEconomy extends Addon {
 
     @Override
     public void postLoad() {
+        this.bankNoteVersion = configFile.getInt("noteVersion");
+
         this.plugin.getServer().getScheduler().scheduleRepeatingTask(plugin, () -> {
             for (Player player : this.plugin.getServer().getOnlinePlayers().values()){
                 this.showItemInfo(player);
@@ -68,6 +77,7 @@ public class BetterEconomy extends Addon {
 
             configFile.set("enableWithdraw", true);
             configFile.set("maxWithdrawAmount", 50000);
+            configFile.set("noteVersion", 1);
 
             configFile.set("noteCreateMessage", "§6»§7You have successfully created Bank Note with price §e{money}$§7!");
             configFile.set("noteApplyMessage", "§6»§7Bank Note was applied to your global balance. Your new balance is §e{money}$§7!");
@@ -266,26 +276,36 @@ public class BetterEconomy extends Addon {
         player.sendMessage(message);
     }
 
-    public void applyNote(Player player, Item item){
-        this.applyNote(player, item, false);
+    public Item applyNote(Player player, Item item){
+        return this.applyNote(player, item, false);
     }
 
-    public void applyNote(Player player, Item item, boolean clanMode){
-        if (player == null || item == null) return;
+    public Item applyNote(Player player, Item item, boolean clanMode){
+        if (player == null || item == null || !item.hasCompoundTag()) return null;
 
-        if (!item.hasCompoundTag() || item.getNamedTag().getByte("economy_note") != 1 || !item.getNamedTag().contains("economy_value")){
+        if (item.getNamedTag().getByte("note_invalid") == 1){
+            player.sendMessage("§c»§7Your bank note has expired! Please use another one!");
+            return null;
+        }
+
+        if (item.getNamedTag().getByte("economy_note") != 1 || !item.getNamedTag().contains("economy_value")){
             player.sendMessage("§c»§7This is not right, applicable Bank Note! Please hold your Bank Note in hand!");
-            return;
+            return null;
         }
 
         int value = item.getNamedTag().getInt("economy_value");
-        Clan clan = null;
+        int version = item.getNamedTag().getInt("note_version");
+        if (version < this.bankNoteVersion){
+            player.sendMessage("§c»§7Your bank note has expired!");
+            return this.buildInvalidNote(player.getName(), value);
+        }
 
+        Clan clan = null;
         if (clanMode && Addon.getAddon("playerclans") != null){
             clan = ((PlayerClans) Addon.getAddon("playerclans")).getClan(player);
             if (clan == null) {
                 player.sendMessage("§c»§7You are not in any clan!");
-                return;
+                return null;
             }
 
             clan.addMoney(value);
@@ -294,13 +314,11 @@ public class BetterEconomy extends Addon {
             EconomyAPI.getInstance().addMoney(player, value);
         }
 
-        PlayerInventory inv = player.getInventory();
-        inv.clear(inv.getHeldItemIndex());
-
         String message = configFile.getString(clanMode? "noteApplyMessageClan" : "noteApplyMessage");
         message = message.replace("{player}", player.getName());
         message = message.replace("{money}", TextUtils.formatBigNumber((clanMode && clan != null)? clan.getMoney() : EconomyAPI.getInstance().myMoney(player)));
         player.sendMessage(message);
+        return Item.get(Item.AIR);
     }
 
     public Item buildNote(String owner, int price){
@@ -308,6 +326,16 @@ public class BetterEconomy extends Addon {
         item.setCustomName(item.getCustomName()+" §6"+TextUtils.formatBigNumber(price)+"$");
         item.setLore(ArrayUtils.addAll(new String[]{"§r§5Value: "+price+"$", "§r§5Created For: §d"+owner}, item.getLore()));
 
+        CompoundTag tag = item.getNamedTag();
+        tag.putInt("economy_value", price);
+        tag.putInt("note_version", this.bankNoteVersion);
+        item.setNamedTag(tag);
+        return item;
+    }
+
+    public Item buildInvalidNote(String owner, int price){
+        Item item = getBankNoteInvalid();
+        item.setLore(ArrayUtils.addAll(new String[]{"§r§5Value: "+price+"$", "§r§5Created For: §d"+owner}, item.getLore()));
         CompoundTag tag = item.getNamedTag();
         tag.putInt("economy_value", price);
         item.setNamedTag(tag);
@@ -387,5 +415,9 @@ public class BetterEconomy extends Addon {
 
     public static Item getBankNote(){
         return Items.deepCopy(bankNote);
+    }
+
+    public static Item getBankNoteInvalid() {
+        return Items.deepCopy(bankNoteInvalid);
     }
 }
