@@ -316,7 +316,7 @@
       "sell": 3
     },
     "magma block": {
-      "id": 213,
+      "id": 89,
       "count": 16,
       "price": 150,
       "image": false,
@@ -1301,7 +1301,7 @@
       "sell": 13
     },
     "anvil": {
-      "id": 145,
+      "id": 47,
       "count": 1,
       "price": 200,
       "image": false,
@@ -1564,43 +1564,42 @@
     }
   },
   "weekly offers": {
-    "beacon": {
-      "id": 138,
-      "count": 1,
-      "price": 7200,
-      "sell": 5000,
-      "image": false
-    },
-    "magma cube spawn egg": {
-      "id": 383,
-      "count": 1,
-      "meta": 42,
-      "price": 1250,
-      "image": "items/spawn_egg",
-      "sell": 875
-    },
-    "purple dye": {
+    "orange dye": {
       "id": 351,
-      "count": 12,
-      "meta": 5,
-      "price": 200,
-      "image": "items/dye_powder_purple",
-      "sell": 12
-    },
-    "sea grass": {
-      "id": -130,
       "count": 16,
+      "meta": 14,
       "price": 200,
-      "image": "blocks/seagrass_carried",
-      "sell": 10
+      "image": "items/dye_powder_orange",
+      "sell": 11
     },
-    "guardian spawn egg": {
+    "witch spawn egg": {
       "id": 383,
       "count": 1,
-      "meta": 49,
-      "price": 2000,
-      "image": "items/egg_guardian",
-      "sell": 875
+      "meta": 45,
+      "price": 1800,
+      "image": "items/egg_witch",
+      "sell": 1000
+    },
+    "hopper": {
+      "id": 154,
+      "count": 8,
+      "price": 250,
+      "image": "items/hopper",
+      "sell": 25
+    },
+    "ender chest": {
+      "id": 130,
+      "count": 1,
+      "price": 320,
+      "image": false,
+      "sell": 200
+    },
+    "sponge": {
+      "id": 19,
+      "count": 8,
+      "price": 200,
+      "image": false,
+      "sell": 20
     }
   }
 }
