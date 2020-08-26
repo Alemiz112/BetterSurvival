@@ -3,6 +3,8 @@ package alemiz.bettersurvival.addons.economy;
 import alemiz.bettersurvival.addons.clans.Clan;
 import alemiz.bettersurvival.addons.clans.PlayerClans;
 import alemiz.bettersurvival.commands.BankCommand;
+import alemiz.bettersurvival.commands.SpawnerCommand;
+import alemiz.bettersurvival.commands.SpawnerInfoCommand;
 import alemiz.bettersurvival.commands.TradeCommand;
 import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.Items;
@@ -24,6 +26,7 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.StringTag;
+import cn.nukkit.utils.ConfigSection;
 import cubemc.nukkit.connector.modules.Money;
 import cn.nukkit.utils.BlockIterator;
 import org.apache.commons.lang3.ArrayUtils;
@@ -55,6 +58,8 @@ public class BetterEconomy extends Addon {
     private final List<String> traders = new ArrayList<>();
     private int bankNoteVersion;
 
+    public EconomySpawners economySpawners;
+
     public BetterEconomy(String path) {
         super("bettereconomy", path);
     }
@@ -68,6 +73,10 @@ public class BetterEconomy extends Addon {
                 this.showItemInfo(player);
             }
         }, 20);
+
+        if (configFile.getBoolean("economySpawners")){
+            this.economySpawners = new EconomySpawners(this);
+        }
     }
 
     @Override
@@ -90,6 +99,28 @@ public class BetterEconomy extends Addon {
             configFile.set("tradeShopCreate", "§a»§7Trade item frame with price value §6{price}§7 was created!");
             configFile.set("tradeFailMessage", "§c»§7You do not have enough coins to buy this item!");
             configFile.set("tradeBuyMessage", "§a»§7You have successfully bought §6{item}§7!");
+
+            configFile.set("economySpawners", true);
+            configFile.set("spawnerUpgradeMessage", "§a»§7Your spawner has updated to level §6{level}§7!");
+            configFile.set("spawnerUpgradeBuyMessage", "§a»§7You have successfully bought spawner upgrade level §6{level}§7!");
+            configFile.set("spawnerInfoMessage", "§a»§7Spawner level: §e§l{level} §r§7Average delay: §l§a{delay}§r§7!");
+
+            configFile.set("spawnerDefaultMin", 125);
+            configFile.set("spawnerDefaultMax", 300);
+
+            ConfigSection spawnerSection = new ConfigSection();
+            spawnerSection.set("1.minDelay", 100);
+            spawnerSection.set("1.maxDelay", 250);
+            spawnerSection.set("1.price", 250000);
+
+            spawnerSection.set("2.minDelay", 50);
+            spawnerSection.set("2.maxDelay", 125);
+            spawnerSection.set("2.price", 500000);
+
+            spawnerSection.set("3.minDelay", 30);
+            spawnerSection.set("3.maxDelay", 75);
+            spawnerSection.set("3.price", 1500000);
+            configFile.set("spawners", spawnerSection);
             configFile.save();
         }
     }
@@ -98,6 +129,18 @@ public class BetterEconomy extends Addon {
     public void registerCommands() {
         registerCommand("bank", new BankCommand("bank", this));
         registerCommand("trade", new TradeCommand("trade", this));
+
+        if (configFile.getBoolean("economySpawners")){
+            registerCommand("spawnerup", new SpawnerCommand("spawnerup", this));
+            registerCommand("spawnerinfo", new SpawnerInfoCommand("spawnerinfo", this));
+        }
+    }
+
+    @Override
+    public void loadListeners() {
+        if (configFile.getBoolean("economySpawners")){
+            this.plugin.getServer().getPluginManager().registerEvents(this.economySpawners, this.plugin);
+        }
     }
 
     @EventHandler
