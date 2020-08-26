@@ -62,9 +62,9 @@ public abstract class Addon implements Listener{
             this.plugin.getLogger().info("§eLoading BetterSurvival addon: §3"+name);
             Server.getInstance().getPluginManager().registerEvents(this, this.plugin);
 
+            this.postLoad();
             this.loadListeners();
             this.registerCommands();
-            this.postLoad();
         }else {
             this.plugin.getLogger().info("§eUnloading BetterSurvival addon: §3"+name);
             this.onUnload();
