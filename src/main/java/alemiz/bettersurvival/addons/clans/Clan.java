@@ -295,7 +295,8 @@ public class Clan {
             player.sendMessage("§c»§r§7You must hold Bank Note item!");
             return;
         }
-        economy.applyNote(player, item, true);
+        Item result = economy.applyNote(player, item, true);
+        if (result != null) player.getInventory().setItemInHand(result);
     }
 
     public void createLand(Player player){
