@@ -2,7 +2,7 @@ package alemiz.bettersurvival.addons.cubemc;
 
 import alemiz.bettersurvival.BetterSurvival;
 import cn.nukkit.Player;
-import cubemc.nukkit.connector.modules.ranks.Rank;
+import cubemc.commons.ranks.Rank;
 
 import java.util.ArrayList;
 import java.util.List;
