@@ -105,6 +105,10 @@ public class BetterEconomy extends Addon {
             configFile.set("spawnerUpgradeBuyMessage", "§a»§7You have successfully bought spawner upgrade level §6{level}§7!");
             configFile.set("spawnerInfoMessage", "§a»§7Spawner level: §e§l{level} §r§7Average delay: §l§a{delay}§r§7!");
 
+            configFile.set("spawnerBreaks", true);
+            configFile.set("spawnerBreakPrice", 250000);
+            configFile.set("spawnerBreakBypass", "bettersurvival.economy.spawnerbypass");
+
             configFile.set("spawnerDefaultMin", 125);
             configFile.set("spawnerDefaultMax", 300);
 

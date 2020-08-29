@@ -6,6 +6,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
+import cn.nukkit.event.block.BlockBreakEvent;
 import cn.nukkit.event.block.BlockPlaceEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerQuitEvent;
@@ -35,6 +36,10 @@ public class EconomySpawners implements Listener {
     private final Map<Integer, SpawnerLevel> spawnerLevels = new HashMap<>();
     private final List<String> spawnerInfo = new ArrayList<>();
 
+
+    private boolean canBreakSpawner;
+    private int spawnerPrice;
+
     public EconomySpawners(BetterEconomy loader){
         this.loader = loader;
 
@@ -53,7 +58,8 @@ public class EconomySpawners implements Listener {
                     section.getInt(levelString+".price")));
         }
 
-
+        this.canBreakSpawner = loader.configFile.getBoolean("spawnerBreaks");
+        this.spawnerPrice = loader.configFile.getInt("spawnerBreakPrice");
         DEFAULT_LEVEL = new SpawnerLevel(
                 0,
                 loader.configFile.getInt("spawnerDefaultMin"),
@@ -123,6 +129,21 @@ public class EconomySpawners implements Listener {
         event.setCancelled(true);
     }
 
+    @EventHandler
+    public void onSpawnerBreak(BlockBreakEvent event){
+        if (!this.canBreakSpawner || event.isCancelled() || event.getBlock().getId() != Block.MONSTER_SPAWNER) return;
+        Player player = event.getPlayer();
+        Block block = event.getBlock();
+
+        if (player.hasPermission(this.loader.configFile.getString("spawnerBreakBypass")) || player.isOp()){
+            event.setDrops(new Item[]{Item.get(Item.MONSTER_SPAWNER, 0, 1)});
+            return;
+        }
+
+        new SpawnerBreakForm(player, block, this).buildForm().sendForm();
+        event.setCancelled(true);
+    }
+
     public Item buildSpawnerUpgrade(String owner, int level){
         Item item = getSpawnerTool();
         item.setCustomName(item.getCustomName()+" §eLevel §l"+level);
@@ -173,6 +194,10 @@ public class EconomySpawners implements Listener {
 
     public SpawnerLevel getHighestLevel(){
         return this.spawnerLevels.get(this.spawnerLevels.size()-1);
+    }
+
+    public int getSpawnerPrice() {
+        return this.spawnerPrice;
     }
 
     public static Item getSpawnerTool() {

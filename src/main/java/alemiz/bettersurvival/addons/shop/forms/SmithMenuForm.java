@@ -24,7 +24,7 @@ public class SmithMenuForm extends SimpleForm {
         this.addButton(new ElementButton("§eBuy Enchants\n§7»Click to open!"));
         this.addButton(new ElementButton("§6Repair Item\n§7»Click to open!"));
 
-        Addon addon = Addon.getAddon("bettereconomy");
+        Addon addon = Addon.getAddon(BetterEconomy.class);
         if ((addon instanceof BetterEconomy) && addon.configFile.getBoolean("economySpawners")){
             this.addButton(new ElementButton("§3Spawner Upgrades\n§7»Click to open!"));
         }
@@ -48,7 +48,7 @@ public class SmithMenuForm extends SimpleForm {
                 this.loader.sendRepairForm(player);
                 break;
             case 3:
-                Addon addon = Addon.getAddon("bettereconomy");
+                Addon addon = Addon.getAddon(BetterEconomy.class);
                 if ((addon instanceof BetterEconomy) && addon.configFile.getBoolean("economySpawners")){
                     BetterEconomy betterEconomy = (BetterEconomy) addon;
                     betterEconomy.economySpawners.sendSpawnerShopForm(player);
