@@ -30,6 +30,18 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>cubemc.commons</groupId>
+            <artifactId>cubecommons-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>cubemc.commons</groupId>
+            <artifactId>cubecommons-nukkit</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>alemiz.sgu</groupId>
             <artifactId>StarGate-Universe</artifactId>
             <version>1.0-SNAPSHOT</version>
