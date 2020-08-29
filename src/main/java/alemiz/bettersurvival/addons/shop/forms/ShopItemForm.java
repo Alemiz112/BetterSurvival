@@ -25,7 +25,7 @@ public class ShopItemForm extends CustomForm {
     @Override
     public Form buildForm() {
         this.addElement(new ElementLabel("§7One package contains §8"+this.item.getCount()+"x "+this.item.getFormattedName()+"§r§7!"));
-        this.addElement(new ElementStepSlider("§7Select package count", Arrays.asList("1", "2", "3","4", "6", "8", "10", "12", "16"), 0));
+        this.addElement(new ElementStepSlider("§7Select package count", Arrays.asList("1", "2", "3","4", "6", "8", "10", "12", "16", "32"), 0));
         return this;
     }
 
