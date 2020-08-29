@@ -48,7 +48,7 @@ public class RandomTpTask extends Task {
 
         if (!found){
             this.getRandomPos();
-            BetterSurvival.getInstance().getServer().getScheduler().scheduleDelayedTask(this, 40, true);
+            BetterSurvival.getInstance().getServer().getScheduler().scheduleDelayedTask(this, 40);
             return;
         }
 
