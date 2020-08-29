@@ -35,7 +35,13 @@ public class ShopItem {
     public boolean buyItem(Player player, int stackCount){
         if (player == null || EconomyAPI.getInstance().reduceMoney(player, this.getStackPrice(stackCount)) < 1) return false;
 
-        player.getInventory().addItem(this.buildItem(stackCount));
+        Item item = this.buildItem(stackCount);
+        if (!player.getInventory().canAddItem(item)){
+            player.sendMessage("§6»§7You do not have space in your inventory! Item was dropped!");
+            player.getLevel().dropItem(player.add(0.5), item);
+        }else {
+            player.getInventory().canAddItem(item);
+        }
         return true;
     }
 
