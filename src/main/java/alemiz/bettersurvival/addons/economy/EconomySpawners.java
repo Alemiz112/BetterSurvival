@@ -201,6 +201,6 @@ public class EconomySpawners implements Listener {
     }
 
     public static Item getSpawnerTool() {
-        return spawnerTool;
+        return Items.deepCopy(spawnerTool);
     }
 }
