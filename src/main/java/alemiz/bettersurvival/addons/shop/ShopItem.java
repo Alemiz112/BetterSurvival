@@ -40,7 +40,7 @@ public class ShopItem {
             player.sendMessage("§6»§7You do not have space in your inventory! Item was dropped!");
             player.getLevel().dropItem(player.add(0.5), item);
         }else {
-            player.getInventory().canAddItem(item);
+            player.getInventory().addItem(item);
         }
         return true;
     }
