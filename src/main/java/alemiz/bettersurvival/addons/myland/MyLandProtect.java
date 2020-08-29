@@ -402,8 +402,8 @@ public class MyLandProtect extends Addon {
 
         if (region != null && !region.canManage(player.getName()) && !player.hasPermission(PERM_ACCESS)){
             boolean cancel = true;
-            if (Addon.getAddon("playerclans") != null && (region instanceof ClanLand)){
-                PlayerClans playerClans = (PlayerClans) Addon.getAddon("playerclans");
+            if (Addon.getAddon(PlayerClans.class) != null && (region instanceof ClanLand)){
+                PlayerClans playerClans = (PlayerClans) Addon.getAddon(PlayerClans.class);
                 Clan clan = playerClans.getClan(player);
                 if (clan != null && clan.getName().equals(((ClanLand) region).getClan().getName())){
                     cancel = false;
@@ -510,7 +510,7 @@ public class MyLandProtect extends Addon {
             int freeLands = 0;
 
             if (clanMode){
-                clan = ((PlayerClans) Addon.getAddon("playerclans")).getClan(player);
+                clan = ((PlayerClans) Addon.getAddon(PlayerClans.class)).getClan(player);
                 if (clan == null) {
                     player.sendMessage("§c»§7You are not in any clan!");
                     return;
@@ -615,7 +615,7 @@ public class MyLandProtect extends Addon {
     public void removeClanLand(Player player){
         if (player == null) return;
 
-        Clan clan = ((PlayerClans) Addon.getAddon("playerclans")).getClan(player);
+        Clan clan = ((PlayerClans) Addon.getAddon(PlayerClans.class)).getClan(player);
         if (clan == null) {
             player.sendMessage("§c»§7You are not in any clan!");
             return;

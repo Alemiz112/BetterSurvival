@@ -70,8 +70,8 @@ public class LevelVote extends Addon {
         Player player = event.getPlayer();
 
         if (configFile.getBoolean("defaultPermission")){
-            if (Addon.getAddon("playerpermissions") != null && (Addon.getAddon("playerpermissions") instanceof PlayerPermissions)){
-                ((PlayerPermissions) Addon.getAddon("playerpermissions")).addPermission(player, configFile.getString("permission-vote"));
+            if (Addon.getAddon(PlayerPermissions.class) != null && (Addon.getAddon(PlayerPermissions.class) instanceof PlayerPermissions)){
+                ((PlayerPermissions) Addon.getAddon(PlayerPermissions.class)).addPermission(player, configFile.getString("permission-vote"));
             }else {
                 player.addAttachment(plugin, configFile.getString("permission-vote"), true);
             }

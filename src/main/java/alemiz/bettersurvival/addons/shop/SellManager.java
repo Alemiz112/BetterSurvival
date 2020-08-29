@@ -1,7 +1,9 @@
 package alemiz.bettersurvival.addons.shop;
 
+import alemiz.bettersurvival.addons.economy.BetterEconomy;
 import alemiz.bettersurvival.addons.shop.forms.ItemSellForm;
 import alemiz.bettersurvival.addons.shop.forms.SellCategoryForm;
+import alemiz.bettersurvival.utils.Addon;
 import cn.nukkit.Player;
 import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.item.Item;
@@ -25,6 +27,11 @@ public class SellManager {
 
     private Integer sellItem(Player player, Item item){
         if (player == null || item == null) return null;
+
+        if ((Addon.getAddon(BetterEconomy.class) instanceof BetterEconomy) && BetterEconomy.isBankNote(item)){
+            return null;
+        }
+
         ShopItem shopItem = null;
 
         for (ShopCategory category : this.loader.getCategories().values()){

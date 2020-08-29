@@ -81,8 +81,8 @@ public class PlayerClans extends Addon {
         Clan clan = new Clan(rawName, config.getString("formattedName"), config, this);
         this.clans.put(rawName, clan);
 
-        if (config.exists("land") && Addon.getAddon("mylandprotect") != null){
-            ((MyLandProtect) Addon.getAddon("mylandprotect")).loadClanLand(clan);
+        if (config.exists("land") && Addon.getAddon(MyLandProtect.class) != null){
+            ((MyLandProtect) Addon.getAddon(MyLandProtect.class)).loadClanLand(clan);
         }
     }
 

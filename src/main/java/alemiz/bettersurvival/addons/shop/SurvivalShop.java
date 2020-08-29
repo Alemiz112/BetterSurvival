@@ -134,8 +134,8 @@ public class SurvivalShop extends Addon {
     public void onJoin(PlayerJoinEvent event){
         Player player = event.getPlayer();
 
-        if (Addon.getAddon("playerpermissions") != null && (Addon.getAddon("playerpermissions") instanceof PlayerPermissions)){
-            ((PlayerPermissions) Addon.getAddon("playerpermissions")).addPermission(player, configFile.getString("enchantPermission"));
+        if (Addon.getAddon(PlayerPermissions.class) != null && (Addon.getAddon(PlayerPermissions.class) instanceof PlayerPermissions)){
+            ((PlayerPermissions) Addon.getAddon(PlayerPermissions.class)).addPermission(player, configFile.getString("enchantPermission"));
         }else {
             player.addAttachment(plugin, configFile.getString("enchantPermission"), true);
         }

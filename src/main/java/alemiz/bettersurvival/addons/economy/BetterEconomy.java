@@ -247,8 +247,8 @@ public class BetterEconomy extends Addon {
 
         boolean success;
         String owner;
-        if (clanMode && Addon.getAddon("playerclans") != null){
-            Clan clan = ((PlayerClans) Addon.getAddon("playerclans")).getClan(player);
+        if (clanMode && Addon.getAddon(PlayerClans.class) != null){
+            Clan clan = ((PlayerClans) Addon.getAddon(PlayerClans.class)).getClan(player);
             if (clan == null) {
                 player.sendMessage("§c»§7You are not in any clan!");
                 return;
@@ -301,8 +301,8 @@ public class BetterEconomy extends Addon {
         }
 
         Clan clan = null;
-        if (clanMode && Addon.getAddon("playerclans") != null){
-            clan = ((PlayerClans) Addon.getAddon("playerclans")).getClan(player);
+        if (clanMode && Addon.getAddon(PlayerClans.class) != null){
+            clan = ((PlayerClans) Addon.getAddon(PlayerClans.class)).getClan(player);
             if (clan == null) {
                 player.sendMessage("§c»§7You are not in any clan!");
                 return null;
@@ -411,6 +411,10 @@ public class BetterEconomy extends Addon {
     public void removeTrader(Player player){
         if (player == null) return;
         this.traders.remove(player.getName());
+    }
+
+    public static boolean isBankNote(Item item){
+        return item.hasCompoundTag() && (item.getNamedTag().contains("economy_note") || item.getNamedTag().contains("note_invalid"));
     }
 
     public static Item getBankNote(){
