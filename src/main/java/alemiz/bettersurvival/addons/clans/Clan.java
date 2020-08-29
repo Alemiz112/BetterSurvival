@@ -273,22 +273,22 @@ public class Clan {
             return;
         }
 
-        if (Addon.getAddon("bettereconomy") == null){
+        if (Addon.getAddon(BetterEconomy.class) == null){
             player.sendMessage("§c»§7Economy addon is not enabled!");
             return;
         }
 
-        BetterEconomy economy = (BetterEconomy) Addon.getAddon("bettereconomy");
+        BetterEconomy economy = (BetterEconomy) Addon.getAddon(BetterEconomy.class);
         economy.createNote(player, value, true);
     }
 
     public void applyBankNote(Player player){
-        if (Addon.getAddon("bettereconomy") == null){
+        if (Addon.getAddon(BetterEconomy.class) == null){
             player.sendMessage("§c»§7Economy addon is not enabled!");
             return;
         }
 
-        BetterEconomy economy = (BetterEconomy) Addon.getAddon("bettereconomy");
+        BetterEconomy economy = (BetterEconomy) Addon.getAddon(BetterEconomy.class);
         Item item = player.getInventory().getItemInHand();
 
         if (item.getId() == Item.AIR){
@@ -307,11 +307,11 @@ public class Clan {
             return;
         }
 
-        if (Addon.getAddon("mylandprotect") == null){
+        if (Addon.getAddon(MyLandProtect.class) == null){
             player.sendMessage("§c»§7MyLandProtect addon is not enabled!");
         }
 
-        MyLandProtect landProtect = (MyLandProtect) Addon.getAddon("mylandprotect");
+        MyLandProtect landProtect = (MyLandProtect) Addon.getAddon(MyLandProtect.class);
         landProtect.createLand(player, "", true);
     }
 
@@ -323,11 +323,11 @@ public class Clan {
             return;
         }
 
-        if (Addon.getAddon("mylandprotect") == null){
+        if (Addon.getAddon(MyLandProtect.class) == null){
             player.sendMessage("§c»§7MyLandProtect addon is not enabled!");
         }
 
-        MyLandProtect landProtect = (MyLandProtect) Addon.getAddon("mylandprotect");
+        MyLandProtect landProtect = (MyLandProtect) Addon.getAddon(MyLandProtect.class);
         landProtect.removeClanLand(player);
     }
 
@@ -343,11 +343,11 @@ public class Clan {
             return;
         }
 
-        if (Addon.getAddon("mylandprotect") == null){
+        if (Addon.getAddon(MyLandProtect.class) == null){
             player.sendMessage("§c»§7MyLandProtect addon is not enabled!");
         }
 
-        MyLandProtect landProtect = (MyLandProtect) Addon.getAddon("mylandprotect");
+        MyLandProtect landProtect = (MyLandProtect) Addon.getAddon(MyLandProtect.class);
 
         if (!action.equals("on") && !action.equals("off")){
             if (args.length < 1 && !action.equals(LandRegion.WHITELIST_LIST)){
@@ -366,11 +366,11 @@ public class Clan {
     }
 
     public ClanLand getLand(){
-        if (Addon.getAddon("mylandprotect") == null){
+        if (Addon.getAddon(MyLandProtect.class) == null){
             return null;
         }
 
-        MyLandProtect landProtect = (MyLandProtect) Addon.getAddon("mylandprotect");
+        MyLandProtect landProtect = (MyLandProtect) Addon.getAddon(MyLandProtect.class);
         LandRegion land = landProtect.getLands().get(this.rawName);
         return (land instanceof ClanLand)? (ClanLand) land : null;
     }

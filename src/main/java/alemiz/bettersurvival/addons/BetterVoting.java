@@ -232,7 +232,7 @@ public class BetterVoting extends Addon {
                 player.getInventory().addItem(item);
             }
 
-            if (Addon.getAddon("playerpermissions") != null && (Addon.getAddon("playerpermissions") instanceof PlayerPermissions)){
+            if (Addon.getAddon(PlayerPermissions.class) != null && (Addon.getAddon(PlayerPermissions.class) instanceof PlayerPermissions)){
                 List<String> permissions = this.configFile.getStringList("rewardPermissions");
                 int expiry = this.configFile.getInt("permissionsExpiry");
 
@@ -240,7 +240,7 @@ public class BetterVoting extends Addon {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
                 for (String permission : permissions){
-                    ((PlayerPermissions) Addon.getAddon("playerpermissions")).addPermission(player, permission, date.format(formatter));
+                    ((PlayerPermissions) Addon.getAddon(PlayerPermissions.class)).addPermission(player, permission, date.format(formatter));
                 }
             }
 

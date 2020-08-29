@@ -16,9 +16,9 @@ public abstract class Addon implements Listener{
     protected boolean enabled = false;
     protected Map<String, Command> commands = new HashMap<>();
 
-    protected static Map<String, Addon> addons = new HashMap<>();
+    protected static Map<Class<?>, Addon> addons = new HashMap<>();
 
-    public static Map<String, Addon> getAddons() {
+    public static Map<Class<?>, Addon> getAddons() {
         return addons;
     }
 
@@ -27,14 +27,14 @@ public abstract class Addon implements Listener{
             Constructor<?> constructor = clazz.getConstructor(String.class);
             Addon addon = (Addon) constructor.newInstance(configName);
             addon.setEnabled(addon.configFile.getBoolean("enable", false));
-            Addon.addons.put(addon.name, addon);
+            Addon.addons.put(clazz, addon);
         }catch (Exception e){
             BetterSurvival.getInstance().getLogger().error("Unable to enable addon: §3"+clazz.getSimpleName(), e);
         }
     }
 
-    public static Addon getAddon(String name){
-        return Addon.addons.get(name);
+    public static Addon getAddon(Class<?> clazz){
+        return Addon.addons.get(clazz);
     }
 
     public static void disableAddons(){
