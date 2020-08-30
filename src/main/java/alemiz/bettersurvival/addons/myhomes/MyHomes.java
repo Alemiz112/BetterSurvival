@@ -133,7 +133,7 @@ public class MyHomes extends Addon {
             return;
         }
 
-        ((Map) config.get("home")).remove(home.toLowerCase());
+        ((Map<?, ?>) config.get("home")).remove(home.toLowerCase());
         config.save();
 
         String message = configFile.getString("homeDel");

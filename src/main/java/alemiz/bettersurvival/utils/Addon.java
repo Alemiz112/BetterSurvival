@@ -26,8 +26,11 @@ public abstract class Addon implements Listener{
         try {
             Constructor<?> constructor = clazz.getConstructor(String.class);
             Addon addon = (Addon) constructor.newInstance(configName);
-            addon.setEnabled(addon.configFile.getBoolean("enable", false));
-            Addon.addons.put(clazz, addon);
+            boolean enable = addon.configFile.getBoolean("enable", false);
+            addon.setEnabled(enable);
+            if (enable){
+                Addon.addons.put(clazz, addon);
+            }
         }catch (Exception e){
             BetterSurvival.getInstance().getLogger().error("Unable to enable addon: §3"+clazz.getSimpleName(), e);
         }
@@ -56,9 +59,7 @@ public abstract class Addon implements Listener{
     }
 
     public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-
-        if (this.enabled && this.preLoad()){
+        if (enabled && this.preLoad()){
             this.plugin.getLogger().info("§eLoading BetterSurvival addon: §3"+name);
             Server.getInstance().getPluginManager().registerEvents(this, this.plugin);
 
@@ -66,9 +67,10 @@ public abstract class Addon implements Listener{
             this.loadListeners();
             this.registerCommands();
         }else {
-            this.plugin.getLogger().info("§eUnloading BetterSurvival addon: §3"+name);
+            if (this.enabled) this.plugin.getLogger().info("§eUnloading BetterSurvival addon: §3"+name);
             this.onUnload();
         }
+        this.enabled = enabled;
     }
 
     public abstract void loadConfig();
