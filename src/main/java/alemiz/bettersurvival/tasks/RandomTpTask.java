@@ -3,9 +3,11 @@ package alemiz.bettersurvival.tasks;
 import alemiz.bettersurvival.BetterSurvival;
 import alemiz.bettersurvival.addons.MoreVanilla;
 import cn.nukkit.Player;
+import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Location;
+import cn.nukkit.level.Position;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.scheduler.Task;
 
@@ -37,8 +39,15 @@ public class RandomTpTask extends Task {
 
         Level level = player.getLevel();
         BaseFullChunk chunk = level.getChunk(x >> 4, z >> 4);
+        boolean nether = level.getDimension() == Level.DIMENSION_NETHER;
 
-        for (y = 0; y <= 250; y++){
+        for (y = 0; y <= (nether? 128 : 256); y++){
+            if (nether && y >= 128){
+                this.clearSpawn(new Position(this.x, y, this.z, player.getLevel()));
+                found = true;
+                break;
+            }
+
             if (MoreVanilla.UNSAFE_BLOCKS.get(chunk.getBlockId(x & 0xF, y, z & 0xF)) ||
                     chunk.getBlockId(x & 0xF, y+1, z & 0xF) != BlockID.AIR ||
                     chunk.getBlockId(x & 0xF, y+2, z & 0xF) != BlockID.AIR) continue;
@@ -69,8 +78,33 @@ public class RandomTpTask extends Task {
         Level level = player.getLevel();
         ThreadLocalRandom rand = ThreadLocalRandom.current();
 
-        this.x = rand.nextInt(-50000, 50000);
-        this.z = rand.nextInt(-50000,50000);
+        boolean invertX = rand.nextBoolean();
+        boolean invertZ = rand.nextBoolean();
+
+        this.x = rand.nextInt(invertX? -50000 : +20000, invertX? -20000 : +50000);
+        this.z = rand.nextInt(invertZ? -50000 : +20000, invertZ? -20000 : +50000);
         level.generateChunk(x >> 4, z >> 4, true);
+    }
+
+    private void clearSpawn(Position pos){
+        Level level = pos.getLevel();
+        int x = (int) pos.getX();
+        int y = (int) pos.getY();
+        int z = (int) pos.getZ();
+
+        for (int i = 0; i < 2; i++){
+            level.setBlockIdAt(x, y+i, z, Block.AIR);
+
+            level.setBlockIdAt(x+1, y+i, z, Block.AIR);
+            level.setBlockIdAt(x-1, y+i, z, Block.AIR);
+
+            level.setBlockIdAt(x, y+i, z+1, Block.AIR);
+            level.setBlockIdAt(x, y+i, z-1, Block.AIR);
+
+            level.setBlockIdAt(x+1, y+i, z+1, Block.AIR);
+            level.setBlockIdAt(x+1, y+i, z-1, Block.AIR);
+            level.setBlockIdAt(x-1, y, z+1, Block.AIR);
+            level.setBlockIdAt(x-1, y+i, z-1, Block.AIR);
+        }
     }
 }
