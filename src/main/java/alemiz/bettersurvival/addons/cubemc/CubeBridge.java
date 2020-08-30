@@ -109,6 +109,7 @@ public class CubeBridge extends Addon {
             staffRank.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-mute"));
             staffRank.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-manage"));
             staffRank.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-keepInvAll"));
+            staffRank.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-mute"));
 
             staffRank.addPermission(Addon.getAddon(MyLandProtect.class).configFile.getString("chestsAccessPermission"));
         }
