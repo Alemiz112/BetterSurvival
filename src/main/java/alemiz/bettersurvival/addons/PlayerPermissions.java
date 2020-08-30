@@ -4,6 +4,7 @@ import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.ConfigManager;
 import cn.nukkit.Player;
 import cn.nukkit.event.EventHandler;
+import cn.nukkit.event.EventPriority;
 import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.ConfigSection;
@@ -12,9 +13,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class PlayerPermissions extends Addon {
 
+    private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private List<String> defaultPermissions;
 
     /*
@@ -39,12 +42,12 @@ public class PlayerPermissions extends Addon {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onJoin(PlayerJoinEvent event){
         Player player = event.getPlayer();
 
-        checkExpiredPermissions(player);
-        loadDefaultPermissions(player);
+        this.checkExpiredPermissions(player);
+        this.loadDefaultPermissions(player);
     }
 
     public void checkExpiredPermissions(Player player){
@@ -53,21 +56,24 @@ public class PlayerPermissions extends Addon {
         Config config = ConfigManager.getInstance().loadPlayer(player);
         if (config == null || (config.get("expired-permissions") instanceof ArrayList)) return;
 
+        Date now = new Date();
         ConfigSection permissions = config.getSection("expired-permissions");
-        permissions.getAllMap().forEach((String permission, Object expiry)->{
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
+        for (Map.Entry<String, Object> entry : permissions.getAllMap().entrySet()){
+            Date expiry;
             try {
-                if (!sdf.parse((String) expiry).before(new Date())) return;
+                expiry = FORMAT.parse((String) entry.getValue());
             }catch (Exception e){
-                plugin.getLogger().alert("Error while parsing date in permissions module! Date: "+expiry+" Right format: yyyy-MM-dd");
-                return;
+                this.plugin.getLogger().alert("Error while parsing date in permissions module! Date: "+entry.getValue()+" Right format: yyyy-MM-dd");
+                continue;
             }
 
-            permission = permission.replace("-", ".");
-            removePermission(player, permission);
-            removeFromExpiryList(player, permission);
-        });
+            if (expiry.before(now)){
+                String permission = entry.getKey().replace("-", ".");
+                this.removePermission(player, permission);
+                this.removeFromExpiryList(player, permission);
+            }
+        }
     }
 
     public void loadDefaultPermissions(Player player){
@@ -131,7 +137,9 @@ public class PlayerPermissions extends Addon {
         config.set("permissions", permissions);
         config.save();
 
-        player.addAttachment(plugin, permission, false);
+        if (player.hasPermission(permission)){
+            player.addAttachment(this.plugin, permission, false);
+        }
     }
 
     /**
@@ -153,7 +161,7 @@ public class PlayerPermissions extends Addon {
         Config config = ConfigManager.getInstance().loadPlayer(player);
         if (config == null) return;
 
-        config.remove("expired-permissions."+permission.replace(".", "-"));
+        ((Map<?, ?>) config.get("expired-permissions")).remove(permission.replace(".", "-"));
         config.save();
     }
 
