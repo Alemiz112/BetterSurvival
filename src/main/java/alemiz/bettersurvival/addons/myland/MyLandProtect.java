@@ -15,10 +15,13 @@ import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityChest;
 import cn.nukkit.blockentity.BlockEntityHopper;
 import cn.nukkit.blockentity.BlockEntitySign;
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.item.EntityPainting;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.block.BlockBreakEvent;
 import cn.nukkit.event.block.BlockPlaceEvent;
 import cn.nukkit.event.block.ItemFrameDropItemEvent;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityExplodeEvent;
 import cn.nukkit.event.inventory.InventoryMoveItemEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
@@ -267,6 +270,22 @@ public class MyLandProtect extends Addon {
         Player player = event.getPlayer();
 
         LandRegion region = this.getLandByPos(pos);
+        if (!this.interact(player, region)){
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onDamage(EntityDamageByEntityEvent event){
+        if (!(event.getDamager() instanceof Player)) return;
+        Player player = (Player) event.getDamager();
+        Entity entity = event.getEntity();
+
+        if (!(entity instanceof EntityPainting)){
+            return;
+        }
+
+        LandRegion region = this.getLandByPos(entity);
         if (!this.interact(player, region)){
             event.setCancelled(true);
         }
