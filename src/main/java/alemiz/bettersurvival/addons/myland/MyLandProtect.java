@@ -16,6 +16,7 @@ import cn.nukkit.blockentity.BlockEntityChest;
 import cn.nukkit.blockentity.BlockEntityHopper;
 import cn.nukkit.blockentity.BlockEntitySign;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.item.EntityArmorStand;
 import cn.nukkit.entity.item.EntityPainting;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.block.BlockBreakEvent;
@@ -281,7 +282,7 @@ public class MyLandProtect extends Addon {
         Player player = (Player) event.getDamager();
         Entity entity = event.getEntity();
 
-        if (!(entity instanceof EntityPainting)){
+        if (!(entity instanceof EntityPainting) && !(entity instanceof EntityArmorStand)){
             return;
         }
 
