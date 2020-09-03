@@ -6,6 +6,7 @@ import alemiz.bettersurvival.utils.form.ModalForm;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
 import cubemc.nukkit.connector.modules.Money;
 
@@ -45,8 +46,13 @@ public class SpawnerBreakForm extends ModalForm {
         }
 
         Level level = this.block.getLevel();
-        level.useBreakOn(this.block, player.getInventory().getItemInHand(), null, true);
-        level.dropItem(this.block.add(0.5, 0.5, 0.5), Item.get(Item.MONSTER_SPAWNER, 0, 1));
+        Item item = player.getInventory().getItemInHand();
+        level.useBreakOn(this.block, item, null, true);
+
+        boolean silkTouch = item.getEnchantment(Enchantment.ID_SILK_TOUCH) != null;
+        if (!silkTouch){
+            level.dropItem(this.block.add(0.5, 0.5, 0.5), Item.get(Item.MONSTER_SPAWNER, 0, 1));
+        }
         player.sendMessage("§a»§7You have successfully bought spawner!");
     }
 }
