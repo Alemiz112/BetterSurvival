@@ -92,7 +92,7 @@ public class SellManager {
         }
 
         int basePrice = shopItem.getSellPrice();
-        int count =0;
+        int count = 0;
 
         for (Item item : inv.getContents().values()){
             if (item.equals(handItem, true, false)){

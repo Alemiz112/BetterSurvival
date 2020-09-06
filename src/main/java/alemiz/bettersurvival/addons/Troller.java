@@ -77,23 +77,13 @@ public class Troller extends Addon {
     @EventHandler
     public void onJoin(PlayerJoinEvent event){
         Player player = event.getPlayer();
-
-        for (String name : this.vanishPlayers){
-            Player pplayer = plugin.getServer().getPlayer(name);
-            if (player == null || !player.isConnected()) continue;
-
-            player.hidePlayer(pplayer);
-        }
+        this.hideVanishPlayers(player);
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event){
         Player player = event.getPlayer();
-
         this.vanishPlayers.remove(player.getName());
-        for (Player pplayer : plugin.getServer().getOnlinePlayers().values()){
-            pplayer.showPlayer(player);
-        }
     }
 
     /*@EventHandler //TODO: allow transferring items of invsee
@@ -103,30 +93,36 @@ public class Troller extends Addon {
 
     }*/
 
-    public void showVanishPlayers(Player player){
-        for (String pname : this.vanishPlayers){
-            Player pplayer = plugin.getServer().getPlayer(pname);
-
-            if (pplayer == null || !pplayer.isConnected()){
-                this.vanishPlayers.remove(pname);
+    public void showVanishPlayers(Player spectator){
+        for (String playerName : new ArrayList<>(this.vanishPlayers)){
+            Player player = this.plugin.getServer().getPlayer(playerName);
+            if (player == null || !player.isConnected()){
+                this.vanishPlayers.remove(playerName);
                 continue;
             }
-
-            player.showPlayer(pplayer);
+            this.showPlayer(spectator, player);
         }
     }
 
-    public void hideVanishPlayers(Player player){
-        for (String pname : this.vanishPlayers){
-            Player pplayer = plugin.getServer().getPlayer(pname);
-
-            if (pplayer == null || !pplayer.isConnected()){
-                this.vanishPlayers.remove(pname);
+    public void hideVanishPlayers(Player spectator){
+        for (String playerName : new ArrayList<>(this.vanishPlayers)){
+            Player player = this.plugin.getServer().getPlayer(playerName);
+            if (player == null || !player.isConnected()){
+                this.vanishPlayers.remove(playerName);
                 continue;
             }
-
-            player.hidePlayer(pplayer);
+            this.hidePlayer(spectator, player);
         }
+    }
+
+    private void showPlayer(Player spectator, Player player){
+        this.plugin.getServer().updatePlayerListData(player.getUniqueId(), player.getId(), player.getDisplayName(), player.getSkin(), player.getLoginChainData().getXUID(), new Player[]{spectator});
+        spectator.showPlayer(player);
+    }
+
+    private void hidePlayer(Player spectator, Player player){
+        spectator.hidePlayer(player);
+        this.plugin.getServer().removePlayerListData(player.getUniqueId(), new Player[]{spectator});
     }
 
     public void vanish(Player player){
@@ -145,26 +141,19 @@ public class Troller extends Addon {
         boolean hidden = this.vanishPlayers.contains(player.getName());
         if (hidden){
             this.vanishPlayers.remove(player.getName());
-            hideVanishPlayers(player);
+            this.hideVanishPlayers(player);
         }else {
             this.vanishPlayers.add(player.getName());
-            showVanishPlayers(player);
+            this.showVanishPlayers(player);
             if (bossBar != null) bossBar.setText(bossBar.getText()+" §7- §3Vanished");
         }
 
-        for (Player pplayer : plugin.getServer().getOnlinePlayers().values()){
+        List<Player> onlinePlayers = new ArrayList<>(this.plugin.getServer().getOnlinePlayers().values());
+        for (Player spectator : onlinePlayers){
             if (hidden){
-                if (this.vanishPlayers.contains(pplayer.getName())){
-                    player.hidePlayer(pplayer);
-                    continue;
-                }
-                pplayer.showPlayer(player);
+                this.showPlayer(spectator, player);
             }else{
-                if (this.vanishPlayers.contains(pplayer.getName())){
-                    player.showPlayer(pplayer);
-                    continue;
-                }
-                pplayer.hidePlayer(player);
+                this.hidePlayer(spectator, player);
             }
         }
 
