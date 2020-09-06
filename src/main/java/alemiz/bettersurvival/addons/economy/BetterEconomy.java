@@ -263,7 +263,7 @@ public class BetterEconomy extends Addon {
 
         if (success){
             Item item = this.buildNote(owner, price);
-            if (!player.getInventory().isFull()){
+            if (player.getInventory().canAddItem(item)){
                 player.getInventory().addItem(item);
             }else {
                 player.getLevel().dropItem(player, item);
