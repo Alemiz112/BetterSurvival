@@ -37,6 +37,7 @@ public class CubeBridge extends Addon {
             configFile.set("rank.cube+", new ArrayList<>(Collections.emptyList()));
             configFile.set("rank.vip", new ArrayList<>(Collections.emptyList()));
             configFile.set("rank.staff", new ArrayList<>(Collections.emptyList()));
+            configFile.set("rank.helper", new ArrayList<>(Collections.emptyList()));
             configFile.save();
         }
     }
@@ -109,9 +110,15 @@ public class CubeBridge extends Addon {
             staffRank.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-mute"));
             staffRank.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-manage"));
             staffRank.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-keepInvAll"));
-            staffRank.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-mute"));
 
             staffRank.addPermission(Addon.getAddon(MyLandProtect.class).configFile.getString("chestsAccessPermission"));
+            staffRank.addPermission(Addon.getAddon(MyLandProtect.class).configFile.getString("landsAccessPermission"));
+        }
+
+        RankData helperRank = this.getRankData("helper");
+        if (helperRank != null){
+            helperRank.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-near"));
+            helperRank.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-mute"));
         }
     }
 
