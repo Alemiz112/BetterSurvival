@@ -96,22 +96,22 @@ public class Troller extends Addon {
     public void showVanishPlayers(Player spectator){
         for (String playerName : new ArrayList<>(this.vanishPlayers)){
             Player player = this.plugin.getServer().getPlayer(playerName);
-            if (player == null || !player.isConnected()){
-                this.vanishPlayers.remove(playerName);
-                continue;
-            }
             this.showPlayer(spectator, player);
+
+            if (!player.canSee(spectator)){
+                this.showPlayer(player, spectator);
+            }
         }
     }
 
     public void hideVanishPlayers(Player spectator){
         for (String playerName : new ArrayList<>(this.vanishPlayers)){
             Player player = this.plugin.getServer().getPlayer(playerName);
-            if (player == null || !player.isConnected()){
-                this.vanishPlayers.remove(playerName);
-                continue;
-            }
             this.hidePlayer(spectator, player);
+
+            if (player.canSee(spectator)){
+                this.hidePlayer(player, spectator);
+            }
         }
     }
 
@@ -150,6 +150,10 @@ public class Troller extends Addon {
 
         List<Player> onlinePlayers = new ArrayList<>(this.plugin.getServer().getOnlinePlayers().values());
         for (Player spectator : onlinePlayers){
+            if (this.vanishPlayers.contains(spectator.getName())){
+                continue;
+            }
+
             if (hidden){
                 this.showPlayer(spectator, player);
             }else{
