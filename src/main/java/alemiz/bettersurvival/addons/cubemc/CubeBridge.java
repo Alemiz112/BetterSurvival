@@ -119,6 +119,8 @@ public class CubeBridge extends Addon {
         if (helperRank != null){
             helperRank.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-near"));
             helperRank.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-mute"));
+            helperRank.addPermission(Addon.getAddon(Troller.class).configFile.getString("permission-invsee"));
+            helperRank.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-fly"));
         }
     }
 
