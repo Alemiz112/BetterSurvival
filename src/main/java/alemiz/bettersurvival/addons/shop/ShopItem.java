@@ -18,6 +18,7 @@ public class ShopItem {
     public final int count;
     public final int price;
     public int sellPrice = 0;
+    public boolean canBeSold = true;
     public int meta = 0;
 
     public ShopItem(String name, int itemId, int count, int price){
@@ -129,5 +130,9 @@ public class ShopItem {
 
     public int getSellPrice() {
         return this.sellPrice == 0? this.price : this.sellPrice;
+    }
+
+    public boolean canBeSold() {
+        return this.canBeSold;
     }
 }

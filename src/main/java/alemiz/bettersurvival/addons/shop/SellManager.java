@@ -21,7 +21,7 @@ public class SellManager {
         new SellCategoryForm(player, this).buildForm().sendForm();
     }
 
-    public void sendSellForm(ShopCategory category, Player player){
+    public void sendSellForm(ShopCategoryElement category, Player player){
         new ItemSellForm(player, category).buildForm().sendForm();
     }
 
@@ -35,14 +35,14 @@ public class SellManager {
         ShopItem shopItem = null;
 
         for (ShopCategory category : this.loader.getCategories().values()){
-            for (ShopItem sshopItem : category.getItems()){
+            for (ShopItem sshopItem : category.getAllItems()){
                 if (!item.equals(sshopItem.getItemSample(), true, false)) continue;
                 shopItem = sshopItem;
                 break;
             }
         }
 
-        if (shopItem == null) return null;
+        if (shopItem == null || !shopItem.canBeSold()) return null;
         int price = item.getCount() * shopItem.getSellPrice();
 
         player.getInventory().removeItem(item);
@@ -88,6 +88,11 @@ public class SellManager {
 
         if (shopItem == null){
             player.sendMessage("§c»§7Unknown item! Can not sold item in your hand.");
+            return;
+        }
+
+        if (!shopItem.canBeSold()){
+            player.sendMessage("§c»§7This item can not be sold!");
             return;
         }
 

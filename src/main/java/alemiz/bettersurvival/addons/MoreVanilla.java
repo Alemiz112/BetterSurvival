@@ -224,8 +224,9 @@ public class MoreVanilla extends Addon{
         Player player = (Player) event.getDamager();
 
         boolean canFly = player.getAdventureSettings().get(AdventureSettings.Type.ALLOW_FLIGHT);
-        if (!player.isCreative() && canFly){
+        if (!player.isCreative() && !player.isOp() && canFly){
             player.getAdventureSettings().set(AdventureSettings.Type.FLYING, false);
+            player.getAdventureSettings().set(AdventureSettings.Type.ALLOW_FLIGHT, false);
             player.getAdventureSettings().update();
             player.sendMessage("§c»§7You can not attack player while flying!");
         }

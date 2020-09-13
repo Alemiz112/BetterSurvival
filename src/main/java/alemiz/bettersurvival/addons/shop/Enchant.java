@@ -2,7 +2,7 @@ package alemiz.bettersurvival.addons.shop;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.item.enchantment.Enchantment;
-import net.minidev.json.JSONObject;
+import com.google.gson.JsonObject;
 
 public class Enchant {
 
@@ -12,7 +12,7 @@ public class Enchant {
     public final int enchantId;
     public final int[] prices;
 
-    public Enchant(String name, int enchantId, int price, JSONObject json){
+    public Enchant(String name, int enchantId, int price, JsonObject json){
         this.name = name;
         this.enchantId = enchantId;
         this.formattedName = this.buildFormattedName();
@@ -22,9 +22,9 @@ public class Enchant {
 
         for (int i = 0; i < enchantment.getMaxLevel(); i++){
             int index = i+1;
-            if (!json.containsKey("price"+index)) continue;
+            if (!json.has("price"+index)) continue;
 
-            levels[i] = json.getAsNumber("price"+index).intValue();
+            levels[i] = json.get("price"+index).getAsInt();
         }
         this.prices = levels;
     }
