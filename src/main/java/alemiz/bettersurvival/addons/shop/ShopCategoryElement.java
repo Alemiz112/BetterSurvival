@@ -5,6 +5,7 @@ import alemiz.bettersurvival.utils.TextUtils;
 import cn.nukkit.Player;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,14 @@ public abstract class ShopCategoryElement {
 
             if (itemJson.has("meta")) item.meta = itemJson.get("meta").getAsInt();
             if (itemJson.has("image")) item.setCustomImage(itemJson.get("image").getAsString());
-            if (itemJson.has("sell")) item.sellPrice = itemJson.get("sell").getAsInt();
+            if (itemJson.has("sell")){
+                JsonPrimitive sell = itemJson.get("sell").getAsJsonPrimitive();
+                if (sell.isBoolean()){
+                    item.canBeSold = sell.getAsBoolean();
+                }else {
+                    item.sellPrice = sell.getAsInt();
+                }
+            }
             this.items.add(item);
         }
     }

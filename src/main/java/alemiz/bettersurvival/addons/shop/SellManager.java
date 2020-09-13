@@ -42,7 +42,7 @@ public class SellManager {
             }
         }
 
-        if (shopItem == null) return null;
+        if (shopItem == null || !shopItem.canBeSold()) return null;
         int price = item.getCount() * shopItem.getSellPrice();
 
         player.getInventory().removeItem(item);
@@ -88,6 +88,11 @@ public class SellManager {
 
         if (shopItem == null){
             player.sendMessage("§c»§7Unknown item! Can not sold item in your hand.");
+            return;
+        }
+
+        if (!shopItem.canBeSold()){
+            player.sendMessage("§c»§7This item can not be sold!");
             return;
         }
 
