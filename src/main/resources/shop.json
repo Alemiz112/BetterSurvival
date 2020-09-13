@@ -1,23 +1,50 @@
 {
-  "food": {
-    "carrot": {
-      "id": 391,
-      "count": 10,
-      "price": 50,
-      "sell": 40
+  "categories": {
+    "food": {
+      "items": {
+        "carrot": {
+          "id": 391,
+          "count": 10,
+          "price": 50,
+          "sell": 40
+        },
+        "apple": {
+          "id": 260,
+          "count": 10,
+          "price": 100,
+          "sell": 80
+        }
+      }
     },
-    "apple": {
-      "id": 260,
-      "count": 10,
-      "price": 100,
-      "sell": 80
+    "resources": {
+      "subcategories": ["wood"],
+      "items": {
+        "iron": {
+          "id": 265,
+          "count": 5,
+          "price": 375
+        }
+      }
     }
   },
-  "resources": {
-    "iron": {
-      "id": 265,
-      "count": 5,
-      "price": 375
+  "subcategories": {
+    "wood": {
+      "items": {
+        "Oak Log": {
+          "image": false,
+          "id": 17,
+          "meta": 0,
+          "count": 1,
+          "price": 20
+        },
+        "Spruce Log": {
+          "image": false,
+          "id": 17,
+          "meta": 1,
+          "count": 1,
+          "price": 20
+        }
+      }
     }
   }
 }

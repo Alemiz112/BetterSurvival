@@ -1,57 +1,67 @@
 package alemiz.bettersurvival.addons.shop;
 
-import alemiz.bettersurvival.addons.shop.forms.ShopItemListForm;
-import cn.nukkit.Player;
-import net.minidev.json.JSONObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+public class ShopCategory extends ShopCategoryElement{
 
-public class ShopCategory {
+    public Map<String, ShopSubCategory> subCategories = new HashMap<>();
+    private List<ShopItem> allItems = null;
 
-    private SurvivalShop loader;
+    public ShopCategory(String categoryName, JsonObject data, SurvivalShop loader) {
+        super(categoryName, data, loader);
 
-    private String category;
-    private List<ShopItem> items = new ArrayList<>();
-
-    public ShopCategory(String categoryName, JSONObject data, SurvivalShop loader){
-        this.loader = loader;
-        this.category = categoryName;
-
-        for (String itemKey : data.keySet()){
-            if (!(data.get(itemKey) instanceof JSONObject)) continue;
-            JSONObject itemJson = (JSONObject) data.get(itemKey);
-
-            ShopItem item = new ShopItem(itemKey,
-                    itemJson.getAsNumber("id").intValue(),
-                    itemJson.getAsNumber("count").intValue(),
-                    itemJson.getAsNumber("price").intValue());
-
-            if (itemJson.containsKey("meta")) item.meta = itemJson.getAsNumber("meta").intValue();
-            if (itemJson.containsKey("image")) item.setCustomImage(itemJson.getAsString("image"));
-            if (itemJson.containsKey("sell")) item.sellPrice = itemJson.getAsNumber("sell").intValue();
-            this.items.add(item);
+        try {
+            this.loadCategories(data);
+        }catch (Exception e){
+            loader.plugin.getLogger().error("§cCan not load subcategories for shop category '"+categoryName+"'!");
         }
     }
 
-    public void sendForm(Player player){
-        new ShopItemListForm(player, this).buildForm().sendForm();
+    private void loadCategories(JsonObject jsonObject) throws Exception{
+        if (!jsonObject.has("subcategories") || !jsonObject.get("subcategories").isJsonArray()){
+            return;
+        }
+
+        JsonArray categories = jsonObject.getAsJsonArray("subcategories");
+        for (JsonElement jsonElement : categories){
+            String subName = jsonElement.getAsString();
+            JsonObject json = this.loader.getSubCategoryJson(subName);
+
+            if (json == null) continue;
+            ShopSubCategory subCategory = new ShopSubCategory(subName, json, this.loader);
+            this.subCategories.put(subName.toLowerCase(), subCategory);
+        }
     }
 
-    public String getCategoryName() {
-        return this.category;
+    public boolean hasSubCategories(){
+        return !this.subCategories.isEmpty();
     }
 
-    public List<ShopItem> getItems() {
-        return this.items;
+    public Map<String, ShopSubCategory> getSubCategories() {
+        return this.subCategories;
     }
 
-    public ShopItem getItem(int index){
-        return this.items.get(index);
+    public void resetAllItems(){
+        this.allItems = null;
     }
 
-    public SurvivalShop getLoader() {
-        return this.loader;
+    public List<ShopItem> getAllItems(){
+        if (this.allItems == null){
+            List<ShopItem> items = new ArrayList<>(this.items);
+            if (this.hasSubCategories()){
+                for (ShopSubCategory subCategory : this.subCategories.values()){
+                    items.addAll(subCategory.getItems());
+                }
+            }
+            this.allItems = items;
+        }
+        return this.allItems;
     }
 }

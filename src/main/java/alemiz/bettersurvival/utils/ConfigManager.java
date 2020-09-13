@@ -3,6 +3,8 @@ package alemiz.bettersurvival.utils;
 import alemiz.bettersurvival.BetterSurvival;
 import cn.nukkit.Player;
 import cn.nukkit.utils.Config;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 
@@ -71,14 +73,11 @@ public class ConfigManager {
         return configs;
     }
 
-    public JSONObject loadJson(String path){
-        Object json;
+    public JsonElement loadJson(String path){
         try {
-            json = new JSONParser(JSONParser.DEFAULT_PERMISSIVE_MODE).parse(new FileReader(path));
+            return new JsonParser().parse(new FileReader(path));
         }catch (Exception e){
-            return null;
         }
-
-        return (JSONObject) json;
+        return null;
     }
 }

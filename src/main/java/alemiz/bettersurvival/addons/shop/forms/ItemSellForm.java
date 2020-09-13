@@ -1,6 +1,6 @@
 package alemiz.bettersurvival.addons.shop.forms;
 
-import alemiz.bettersurvival.addons.shop.ShopCategory;
+import alemiz.bettersurvival.addons.shop.ShopCategoryElement;
 import alemiz.bettersurvival.addons.shop.ShopItem;
 import alemiz.bettersurvival.utils.form.CustomForm;
 import alemiz.bettersurvival.utils.form.Form;
@@ -15,9 +15,9 @@ import java.util.Arrays;
 
 public class ItemSellForm extends CustomForm {
 
-    private final transient ShopCategory category;
+    private final transient ShopCategoryElement category;
 
-    public ItemSellForm(Player player, ShopCategory category){
+    public ItemSellForm(Player player, ShopCategoryElement category){
         super();
         this.player = player;
         this.category = category;

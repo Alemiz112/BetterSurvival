@@ -21,7 +21,7 @@ public class SellManager {
         new SellCategoryForm(player, this).buildForm().sendForm();
     }
 
-    public void sendSellForm(ShopCategory category, Player player){
+    public void sendSellForm(ShopCategoryElement category, Player player){
         new ItemSellForm(player, category).buildForm().sendForm();
     }
 
@@ -35,7 +35,7 @@ public class SellManager {
         ShopItem shopItem = null;
 
         for (ShopCategory category : this.loader.getCategories().values()){
-            for (ShopItem sshopItem : category.getItems()){
+            for (ShopItem sshopItem : category.getAllItems()){
                 if (!item.equals(sshopItem.getItemSample(), true, false)) continue;
                 shopItem = sshopItem;
                 break;

@@ -5,19 +5,17 @@ import alemiz.bettersurvival.commands.EnchCommand;
 import alemiz.bettersurvival.utils.ConfigManager;
 import alemiz.bettersurvival.utils.Items;
 import alemiz.bettersurvival.utils.enitity.FakeHuman;
-import alemiz.bettersurvival.utils.form.CustomForm;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.form.element.ElementButton;
-import cn.nukkit.form.element.ElementInput;
-import cn.nukkit.form.element.ElementLabel;
 import cn.nukkit.form.window.FormWindowSimple;
 import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
-import net.minidev.json.JSONObject;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import java.util.*;
 
@@ -40,14 +38,18 @@ public class SmithShop {
         loader.saveFromResources("enchants.json");
         loader.registerCommand("ench", new EnchCommand("ench", this));
 
-        JSONObject enchantsData = ConfigManager.getInstance().loadJson(ConfigManager.getInstance().ADDONS_PATH+"/enchants.json");
-        Set<String> enchants = enchantsData.keySet();
+        JsonElement json = ConfigManager.getInstance().loadJson(ConfigManager.getInstance().ADDONS_PATH+"/enchants.json");
+        if (!json.isJsonObject()){
+            return;
+        }
+        JsonObject enchantsData = json.getAsJsonObject();
 
-        for (String enchantName : enchants){
-            if (!(enchantsData.get(enchantName) instanceof JSONObject)) continue;
+        for (Map.Entry<String, JsonElement> entry: enchantsData.entrySet()){
+            if (!entry.getValue().isJsonObject()) continue;
+            JsonObject enchantJson = entry.getValue().getAsJsonObject();
+            String enchantName = entry.getKey();
 
-            JSONObject enchantJson = (JSONObject) enchantsData.get(enchantName);
-            Enchant enchant = new Enchant(enchantName, enchantJson.getAsNumber("id").intValue(), enchantJson.getAsNumber("price1").intValue(), enchantJson);
+            Enchant enchant = new Enchant(enchantName, enchantJson.get("id").getAsInt(), enchantJson.get("price1").getAsInt(), enchantJson);
             this.enchants.add(enchant);
         }
     }

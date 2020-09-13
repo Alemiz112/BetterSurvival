@@ -22,8 +22,9 @@ import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.nbt.tag.CompoundTag;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import me.onebone.economyapi.EconomyAPI;
-import net.minidev.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -36,6 +37,7 @@ import java.util.*;
 public class SurvivalShop extends Addon {
 
     public Map<String, ShopCategory> categories = new HashMap<>();
+    private Map<String, JsonObject> subCategories = new HashMap<>();
 
     private Position shopSpawn;
     private SellManager sellManager;
@@ -50,14 +52,30 @@ public class SurvivalShop extends Addon {
 
     @Override
     public void postLoad() {
-        JSONObject shopData = ConfigManager.getInstance().loadJson(ConfigManager.getInstance().ADDONS_PATH+"/shop.json");
-        Set<String> categories = shopData.keySet();
+        JsonElement json = ConfigManager.getInstance().loadJson(ConfigManager.getInstance().ADDONS_PATH+"/shop.json");
+        if (!json.isJsonObject()){
+            this.setEnabled(false);
+            return;
+        }
+        JsonObject shopData = json.getAsJsonObject();
 
-        for (String category : categories){
-            if (!(shopData.get(category) instanceof JSONObject)) continue;
+        if (shopData.has("subcategories") && shopData.get("subcategories").isJsonObject()){
+            JsonObject subCategories = shopData.getAsJsonObject("subcategories");
+            for (Map.Entry<String, JsonElement> entry : subCategories.entrySet()){
+                if (!entry.getValue().isJsonObject()) continue;
+                this.subCategories.put(entry.getKey().toLowerCase(), (JsonObject) entry.getValue());
+            }
+        }
 
-            ShopCategory shopCategory = new ShopCategory(category, (JSONObject) shopData.get(category), this);
-            this.categories.put(category.toLowerCase(), shopCategory);
+        JsonObject categories = shopData.getAsJsonObject("categories");
+        for (Map.Entry<String, JsonElement> entry: categories.entrySet()){
+            String categoryName = entry.getKey();
+            JsonElement category = entry.getValue();
+
+            if (category.isJsonObject()){
+                ShopCategory shopCategory = new ShopCategory(categoryName, (JsonObject) category, this);
+                this.categories.put(categoryName.toLowerCase(), shopCategory);
+            }
         }
 
         this.sellManager = new SellManager(this);
@@ -285,6 +303,10 @@ public class SurvivalShop extends Addon {
 
     public ShopCategory getCategory(String category){
         return this.categories.getOrDefault(category.toLowerCase(), null);
+    }
+
+    public JsonObject getSubCategoryJson(String subName){
+        return this.subCategories.get(subName.toLowerCase());
     }
 
     public Map<String, ShopCategory> getCategories() {
