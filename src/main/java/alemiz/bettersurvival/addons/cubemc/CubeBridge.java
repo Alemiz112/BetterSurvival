@@ -8,10 +8,10 @@ import alemiz.bettersurvival.addons.shop.SurvivalShop;
 import alemiz.bettersurvival.utils.Addon;
 import cn.nukkit.Player;
 import cn.nukkit.event.EventHandler;
+import cubemc.commons.nukkit.events.CubePlayerJoinEvent;
+import cubemc.commons.nukkit.events.RanksLoadEvent;
 import cubemc.commons.ranks.Rank;
 import cubemc.nukkit.connector.CubeConnector;
-import cubemc.nukkit.connector.events.CubePlayerJoinEvent;
-import cubemc.nukkit.connector.events.RanksLoadEvent;
 
 import java.util.*;
 
