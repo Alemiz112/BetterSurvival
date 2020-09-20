@@ -7,7 +7,6 @@ import alemiz.bettersurvival.utils.LevelDecoration;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
-import cn.nukkit.entity.Entity;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.block.ItemFrameDropItemEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
@@ -18,10 +17,8 @@ import cn.nukkit.event.server.DataPacketReceiveEvent;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.particle.FloatingTextParticle;
 import cn.nukkit.math.Vector3;
-import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.LevelEventPacket;
 import cn.nukkit.network.protocol.SetLocalPlayerAsInitializedPacket;
-import cn.nukkit.scheduler.Task;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.DummyBossBar;
 
@@ -125,20 +122,6 @@ public class BetterLobby extends Addon {
     @EventHandler
     public void onJoin(PlayerJoinEvent event){
         Player player = event.getPlayer();
-
-        AddEntityPacket packet = new AddEntityPacket();
-        packet.type = 93;
-        packet.entityRuntimeId = Entity.entityCount++;
-        packet.yaw = (float) player.getYaw();
-        packet.pitch = (float) player.getPitch();
-        packet.x = (float) player.getX();
-        packet.y = (float) player.getY();
-        packet.z = (float) player.getZ();
-
-        for (Player pplayer : player.getLevel().getPlayers().values()){
-            pplayer.dataPacket(packet);
-        }
-
         String message = joinMessage.replace("{player}", player.getName());
         event.setJoinMessage(message);
     }

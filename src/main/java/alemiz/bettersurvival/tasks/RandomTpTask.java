@@ -19,9 +19,11 @@ public class RandomTpTask extends Task {
     private final String message;
 
     private int x;
+    private int y;
     private int z;
 
     private int countdown = 5;
+    private boolean found = false;
 
     public RandomTpTask(Player player, String message){
         this.player = player;
@@ -34,28 +36,31 @@ public class RandomTpTask extends Task {
     public void onRun(int i) {
         if (player == null) return;
 
-        int y;
-        boolean found = false;
+        if (!this.found){
+            Level level = player.getLevel();
+            BaseFullChunk chunk = level.getChunk(this.x >> 4, this.z >> 4);
+            boolean nether = level.getDimension() == Level.DIMENSION_NETHER;
 
-        Level level = player.getLevel();
-        BaseFullChunk chunk = level.getChunk(x >> 4, z >> 4);
-        boolean nether = level.getDimension() == Level.DIMENSION_NETHER;
+            for (this.y = 0; this.y <= (nether? 124 : 250); this.y++){
+                if (nether && this.y > 122){
+                    this.clearSpawn(new Position(this.x, this.y, this.z, player.getLevel()));
+                    this.found = true;
+                    break;
+                }
 
-        for (y = 0; y <= (nether? 128 : 256); y++){
-            if (nether && y >= 128){
-                this.clearSpawn(new Position(this.x, y, this.z, player.getLevel()));
-                found = true;
+                int xx = this.x & 15;
+                int zz = this.z & 15;
+
+                if (MoreVanilla.UNSAFE_BLOCKS.get(chunk.getBlockId(xx, this.y & 255, zz)) ||
+                        chunk.getBlockId(xx, (this.y & 255)+1, zz) != BlockID.AIR ||
+                        chunk.getBlockId(xx, (this.y & 255)+2, zz) != BlockID.AIR) continue;
+
+                this.found = true;
                 break;
             }
-
-            if (MoreVanilla.UNSAFE_BLOCKS.get(chunk.getBlockId(x & 0xF, y, z & 0xF)) ||
-                    chunk.getBlockId(x & 0xF, y+1, z & 0xF) != BlockID.AIR ||
-                    chunk.getBlockId(x & 0xF, y+2, z & 0xF) != BlockID.AIR) continue;
-            found = true;
-            break;
         }
 
-        if (!found){
+        if (!this.found){
             this.getRandomPos();
             BetterSurvival.getInstance().getServer().getScheduler().scheduleDelayedTask(this, 40);
             return;
