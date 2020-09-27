@@ -29,18 +29,20 @@ import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.inventory.ChestInventory;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.math.Vector3f;
 import cn.nukkit.utils.Config;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class MyLandProtect extends Addon {
 
     public static final BitSet INTERACT_BLOCKS = new BitSet();
 
-    private Map<String, List<Block>> selectors = new HashMap<>();
-    private Map<String, LandRegion> lands = new HashMap<>();
+    private final Map<String, LinkedList<Block>> selectors = new HashMap<>();
+    private final Map<String, LandRegion> lands = new ConcurrentHashMap<>();
 
     public static String WAND = "§6LandWand";
     public static String PERM_VIP = "bettersurvival.land.vip";
@@ -144,16 +146,16 @@ public class MyLandProtect extends Addon {
         String item = player.getInventory().getItemInHand().getName();
 
         if (event.getAction() == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK && item.equals(WAND)){
-            List<Block> blocks = new ArrayList<>();
+            LinkedList<Block> blocks = new LinkedList<>();
 
-            if (selectors.containsKey(player.getName().toLowerCase())){
-                blocks = selectors.get(player.getName().toLowerCase());
+            if (this.selectors.containsKey(player.getName().toLowerCase())){
+                blocks = this.selectors.get(player.getName().toLowerCase());
             }
 
             if (blocks.size() >= 2) blocks.clear();
 
             blocks.add(event.getBlock());
-            selectors.put(player.getName().toLowerCase(), blocks);
+            this.selectors.put(player.getName().toLowerCase(), blocks);
 
             String message = configFile.getString("landPosSelected");
             message = message.replace("{pos}", event.getBlock().x +", "+ event.getBlock().y +", "+ event.getBlock().z);
@@ -186,7 +188,7 @@ public class MyLandProtect extends Addon {
         Block block = event.getBlock();
         Player player = event.getPlayer();
 
-        LandRegion region = this.getLandByPos(block);
+        LandRegion region = this.getLandByPos(block, true);
         if (!this.interact(player, region)){
             event.setCancelled(true);
             return;
@@ -239,8 +241,8 @@ public class MyLandProtect extends Addon {
         Block block = event.getBlock();
         Player player = event.getPlayer();
 
-        LandRegion region = getLandByPos(block);
-        if (!interact(player, region)){
+        LandRegion region = this.getLandByPos(block, true);
+        if (!this.interact(player, region)){
             event.setCancelled();
         }
     }
@@ -270,7 +272,7 @@ public class MyLandProtect extends Addon {
         Position pos = event.getItemFrame();
         Player player = event.getPlayer();
 
-        LandRegion region = this.getLandByPos(pos);
+        LandRegion region = this.getLandByPos(pos, true);
         if (!this.interact(player, region)){
             event.setCancelled(true);
         }
@@ -334,15 +336,15 @@ public class MyLandProtect extends Addon {
         LandRegion foundregion = null;
 
         for (LandRegion region : this.lands.values()){
-            if (position.getLevel() != null && !region.level.getFolderName().equals(position.getLevel().getFolderName())) continue;
-
-            if (position.x < Math.min(region.pos1.x, region.pos2.x) || position.x > Math.max(region.pos1.x, region.pos2.x)
-                    || position.y < Math.min(region.pos1.y, region.pos2.y) || position.y > Math.max(region.pos1.y, region.pos2.y)
-                    || position.z < Math.min(region.pos1.z, region.pos2.z) || position.z > Math.max(region.pos1.z, region.pos2.z)){
+            if (position.getLevel() != null && !region.level.getFolderName().equals(position.getLevel().getFolderName())){
                 continue;
             }
 
-            if (!prioritize || !(region instanceof ClanLand)){
+            if (!this.isInside(position.asVector3f(), region.pos1, region.pos2)){
+                continue;
+            }
+
+            if (prioritize && !(region instanceof ClanLand)){
                 return region;
             }
 
@@ -350,6 +352,16 @@ public class MyLandProtect extends Addon {
         }
 
         return foundregion;
+    }
+
+    public boolean isInside(Vector3 position, Vector3 in1, Vector3 in2){
+        return this.isInside(position.asVector3f(), in1.asVector3f(), in2.asVector3f());
+    }
+
+    public boolean isInside(Vector3f position, Vector3f in1, Vector3f in2){
+        return position.x >= Math.min(in1.x, in2.x) && position.x <= Math.max(in1.x, in2.x) &&
+                position.y >= Math.min(in1.y, in2.y) && position.y <= Math.max(in1.y, in2.y) &&
+                position.z >= Math.min(in1.z, in2.z) && position.z <= Math.max(in1.z, in2.z);
     }
 
     public boolean interactChest(Player player, BlockEntityChest chest){
@@ -391,11 +403,7 @@ public class MyLandProtect extends Addon {
         return config.getSection("land").getKeys(false);
     }
 
-    public boolean validateLand(List<Block> blocks){
-        return validateLand(blocks, null, false);
-    }
-
-    public boolean validateLand(List<Block> blocks, Player player, boolean clanMode){
+    public boolean validateLand(List<Block> blocks, Player player, boolean clanMode, Vector3f pos1, Vector3f pos2){
         if (blocks == null || blocks.isEmpty()) return false;
 
         if (blocks.size() < 2){
@@ -412,11 +420,20 @@ public class MyLandProtect extends Addon {
             return false;
         }
 
-        //2. Check if land is in other land
+        //2. Check if land is in other land or over other land
         LandRegion region = null;
         for (Block block : blocks){
             if ((region = this.getLandByPos(block)) != null){
                 break;
+            }
+        }
+
+        if (region == null){
+            for (LandRegion landRegion : this.lands.values()){
+                if (this.isInside(landRegion.pos1, pos1, pos2) || this.isInside(landRegion.pos2, pos1, pos2)){
+                    region = landRegion;
+                    break;
+                }
             }
         }
 
@@ -574,19 +591,19 @@ public class MyLandProtect extends Addon {
 
             player.sendMessage("§6»§r§7Validating land. Please wait...");
 
-            List<Block> blocks = this.selectors.get(player.getName().toLowerCase());
-            if (!validateLand(blocks, player, clanMode)){
-                selectors.remove(player.getName().toLowerCase());
+            LinkedList<Block> blocks = this.selectors.get(player.getName().toLowerCase());
+            Block block1 = blocks.poll();
+            Block block2 = blocks.poll();
+
+            if (block1 == null || block2 == null || !this.validateLand(blocks, player, clanMode, block1.asVector3f(), block1.asVector3f())){
+                this.selectors.remove(player.getName().toLowerCase());
                 return;
             }
 
-            for (int i = 0; i < blocks.size(); i++){
-                Block block = blocks.get(i);
-                Double[] pos = {block.getX(), block.getY(), block.getZ()};
-
-                String index = clanMode? "land.pos"+i : "land."+land.toLowerCase()+".pos"+i;
-                config.set(index, pos);
-            }
+            String index = clanMode? "land.pos0" : "land."+land.toLowerCase()+".pos0";
+            config.set(index, new double[]{block1.getX(), block1.getY(), block1.getZ()});
+            String index2 = clanMode? "land.pos1" : "land."+land.toLowerCase()+".pos1";
+            config.set(index2, new double[]{block2.getX(), block2.getY(), block2.getZ()});
 
             if (!clanMode) config.set("land."+land.toLowerCase()+".whitelist", new String[0]);
 
@@ -600,8 +617,8 @@ public class MyLandProtect extends Addon {
             config.save();
 
             LandRegion region = clanMode? new ClanLand(clan, player.getLevel()) : new LandRegion(player.getName().toLowerCase(), land.toLowerCase(), player.getLevel());
-            region.pos1 = blocks.get(0).asVector3f();
-            region.pos2 = blocks.get(1).asVector3f();
+            region.pos1 = block1.asVector3f();
+            region.pos2 = block2.asVector3f();
             this.lands.put(clanMode? clan.getRawName() : player.getName().toLowerCase()+"-"+land.toLowerCase(), region);
         };
         this.plugin.getServer().getScheduler().scheduleTask(this.plugin, task, true);
