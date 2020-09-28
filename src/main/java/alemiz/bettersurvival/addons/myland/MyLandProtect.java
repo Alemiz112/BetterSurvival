@@ -402,10 +402,8 @@ public class MyLandProtect extends Addon {
         return config.getSection("land").getKeys(false);
     }
 
-    public boolean validateLand(List<Block> blocks, Player player, boolean clanMode, Vector3f pos1, Vector3f pos2){
-        if (blocks == null || blocks.isEmpty()) return false;
-
-        if (blocks.size() < 2){
+    public boolean validateLand(Player player, boolean clanMode, Block block1, Block block2, Level level){
+        if (block1 == null || block2 == null){
             if (player != null){
                 player.sendMessage(configFile.getString("landSetPos"));
             }
@@ -413,26 +411,23 @@ public class MyLandProtect extends Addon {
         }
 
         //1. Check if land is in spawn
-        for (Block block : blocks){
-            if (!block.getLevel().isInSpawnRadius(block)) continue;
+        if (level.isInSpawnRadius(block1) || level.isInSpawnRadius(block2)){
             player.sendMessage("§c»§7You can not create land inside spawn area!");
             return false;
         }
 
         //2. Check if land is in other land or over other land
         LandRegion region = null;
-        for (Block block : blocks){
-            if ((region = this.getLandByPos(block)) != null){
-                break;
-            }
-        }
+        Vector3f pos1 = block1.asVector3f();
+        Vector3f pos2 = block2.asVector3f();
 
-        if (region == null){
-            for (LandRegion landRegion : this.lands.values()){
-                if (this.isInside(landRegion.pos1, pos1, pos2) || this.isInside(landRegion.pos2, pos1, pos2)){
-                    region = landRegion;
-                    break;
-                }
+        for (LandRegion landRegion : this.lands.values()){
+            if (this.isInside(pos1, landRegion.pos1, landRegion.pos2) ||
+                    this.isInside(pos2, landRegion.pos1, landRegion.pos2) ||
+                    this.isInside(landRegion.pos1, pos1, pos2) ||
+                    this.isInside(landRegion.pos2, pos1, pos2)){
+                region = landRegion;
+                break;
             }
         }
 
@@ -469,9 +464,9 @@ public class MyLandProtect extends Addon {
 
         if (player != null && player.isOp()) return true;
 
-        if ((Math.max(blocks.get(0).x, blocks.get(1).x) - Math.min(blocks.get(0).x, blocks.get(1).x)) > landSize ||
-                (Math.max(blocks.get(0).y, blocks.get(1).y) - Math.min(blocks.get(0).y, blocks.get(1).y)) > landSize ||
-                (Math.max(blocks.get(0).z, blocks.get(1).z) - Math.min(blocks.get(0).z, blocks.get(1).z)) > landSize){
+        if ((Math.max(pos1.x, pos2.x) - Math.min(pos1.x, pos2.x)) > landSize ||
+                (Math.max(pos1.y, pos2.y) - Math.min(pos1.y, pos2.y)) > landSize ||
+                (Math.max(pos1.z, pos2.z) - Math.min(pos1.z, pos2.z)) > landSize){
 
             if (player != null){
                 String message = configFile.getString("landTooBig");
@@ -594,7 +589,7 @@ public class MyLandProtect extends Addon {
             Block block1 = blocks.poll();
             Block block2 = blocks.poll();
 
-            if (block1 == null || block2 == null || !this.validateLand(blocks, player, clanMode, block1.asVector3f(), block1.asVector3f())){
+            if (block1 == null || block2 == null || !this.validateLand(player, clanMode, block1, block2, player.getLevel())){
                 this.selectors.remove(player.getName().toLowerCase());
                 return;
             }
