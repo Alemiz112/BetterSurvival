@@ -42,6 +42,7 @@
           "sell": 122
         },
         "golden carrot": {
+          "image": "carrot_golden",
           "id": 396,
           "count": 4,
           "price": 350,
@@ -141,6 +142,7 @@
           "sell": 4
         },
         "pumpkin": {
+          "image": false,
           "id": 86,
           "count": 8,
           "price": 450,
@@ -579,7 +581,7 @@
           "count": 2,
           "meta": 10,
           "price": 4500,
-          "image": "items/egg chicken",
+          "image": "items/egg_chicken",
           "sell": 437
         },
         "cow spawn egg": {
@@ -1474,41 +1476,39 @@
     },
     "weekly offers": {
       "items": {
-        "dark oak log": {
-          "id": 162,
-          "count": 8,
-          "meta": 1,
-          "price": 500,
-          "image": false,
-          "sell": 11
-        },
-        "bread": {
-          "id": 297,
-          "count": 8,
-          "price": 650,
-          "sell": 15
-        },
-        "purpur blocks": {
-          "id": 201,
-          "count": 16,
-          "price": 550,
-          "image": false,
-          "sell": 5
-        },
-        "trident": {
-          "id": 455,
-          "count": 1,
-          "price": 4500,
-          "image": false,
-          "sell": 737
-        },
-        "regeneration": {
+        "water breathing": {
           "id": 373,
           "count": 1,
-          "meta": 28,
-          "price": 3000,
-          "image": "items/potion_bottle_regeneration",
-          "sell": 550
+          "meta": 19,
+          "price": 2500,
+          "image": "items/potion_bottle_waterBreathing",
+          "sell": 270
+        },
+        "camp fire": {
+          "id": -209,
+          "count": 2,
+          "price": 210,
+          "image": "items/campfire",
+          "sell": 10
+        },
+        "egg": {
+          "id": 344,
+          "count": 16,
+          "price": 600,
+          "sell": 4
+        },
+        "cookie": {
+          "id": 357,
+          "count": 16,
+          "price": 470,
+          "sell": 5
+        },
+        "golden sword": {
+          "image": "items/gold_sword",
+          "id": 283,
+          "count": 1,
+          "price": 400,
+          "sell": 20
         }
       }
     }
@@ -1755,7 +1755,7 @@
     "concrete": {
       "items": {
         "white concrete": {
-          "image": "blocks",
+          "image": false,
           "id": 270,
           "count": 1,
           "price": 100,

@@ -102,7 +102,6 @@ public class CubeBridge extends Addon {
         RankData staffRank = this.getRankData("staff");
         if (staffRank != null){
             staffRank.addPermission(Addon.getAddon(Troller.class).configFile.getString("permission-vanish"));
-            staffRank.addPermission(Addon.getAddon(Troller.class).configFile.getString("permission-block"));
             staffRank.addPermission(Addon.getAddon(Troller.class).configFile.getString("permission-troll"));
             staffRank.addPermission(Addon.getAddon(Troller.class).configFile.getString("permission-troll-advanced"));
             staffRank.addPermission(Addon.getAddon(Troller.class).configFile.getString("permission-invsee"));
