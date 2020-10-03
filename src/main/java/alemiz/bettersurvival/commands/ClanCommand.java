@@ -129,16 +129,17 @@ public class ClanCommand extends Command {
                     break;
                 }
 
-                clan = this.loader.getClans().get(args[1]);
-                if (clan == null){
+                if ((clan = this.loader.getClans().get(args[1])) == null){
                     player.sendMessage("§c»§7This clan does no longer exists!");
+                }
+
+                if (clan == null || !clan.addPlayer(player)){
                     config.set("clanInvites", pendingInvites);
                     config.save();
                     break;
                 }
 
                 this.loader.clearInvitations(player);
-                clan.addPlayer(player);
                 break;
             case "deny":
                 if (args.length < 2){
