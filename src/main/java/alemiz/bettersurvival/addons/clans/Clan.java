@@ -361,7 +361,6 @@ public class Clan {
 
         boolean state = action.equalsIgnoreCase("on");
         land.setWhitelistEnabled(state);
-        land.save();
         player.sendMessage("§a»§7Land whitelist has been turned §6"+(state? "on" : "off")+"§7!");
     }
 

@@ -8,6 +8,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.Vector3f;
 import cn.nukkit.utils.Config;
+import cn.nukkit.utils.ConfigSection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,27 +20,20 @@ public class LandRegion {
     public static final String WHITELIST_LIST = "list";
 
 
-    public String owner = "";
-    public String land = "";
+    public final String owner;
+    public final String land;
 
-    public List<String> whitelist = new ArrayList<>();
+    protected Level level;
+    protected Vector3f pos1;
+    protected Vector3f pos2;
 
-    public Level level = null;
-    public Vector3f pos1;
-    public Vector3f pos2;
+    protected List<String> whitelist = new ArrayList<>();;
+
+    protected boolean liquidFlow = true;
 
     public LandRegion(String owner, String name){
-        this(owner, name, null);
-    }
-
-    public LandRegion(String owner, String name, Level level){
         this.owner = owner;
         this.land = name;
-
-        if (level == null){
-            level = Server.getInstance().getDefaultLevel();
-        }
-        this.level = level;
     }
 
     public boolean onInteract(Player player, Block block) throws CancelException {
@@ -60,6 +54,21 @@ public class LandRegion {
         this.save();
     }
 
+    public void load(ConfigSection config){
+        this.level = Server.getInstance().getLevelByName(config.getString("level"));
+        if (this.level == null){
+            this.level = Server.getInstance().getDefaultLevel();
+        }
+
+        List<Integer> data = config.getIntegerList("pos0");
+        this.pos1 = new Vector3f(data.get(0), data.get(1), data.get(2));
+        data = config.getIntegerList("pos1");
+        this.pos2 = new Vector3f(data.get(0), data.get(1), data.get(2));
+
+        this.whitelist = config.getStringList("whitelist");
+        this.liquidFlow = config.getBoolean("liquidFlow", true);
+    }
+
     public void save(){
         Config config = ConfigManager.getInstance().loadPlayer(owner);
         if (config == null) return;
@@ -68,7 +77,46 @@ public class LandRegion {
         config.set("land."+land.toLowerCase()+".pos0", new float[]{pos1.getX(), pos1.getY(), pos1.getZ()});
         config.set("land."+land.toLowerCase()+".pos1", new float[]{pos2.getX(), pos2.getY(), pos2.getZ()});
 
-        config.set("land."+land.toLowerCase()+".whitelist",this. whitelist);
+        config.set("land."+land.toLowerCase()+".whitelist", this.whitelist);
+        config.set("land."+land.toLowerCase()+".liquidFlow", this.liquidFlow);
         config.save();
+    }
+
+    public boolean validate(){
+        return this.level != null && this.pos1 != null && this.pos2 != null;
+    }
+
+    public String getName(){
+        return this.land;
+    }
+
+    public Level getLevel() {
+        return this.level;
+    }
+
+    public List<String> getWhitelist() {
+        return this.whitelist;
+    }
+
+    public void setWhitelist(List<String> whitelist) {
+        this.whitelist = whitelist;
+        this.save();
+    }
+
+    public Vector3f getPos1() {
+        return this.pos1;
+    }
+
+    public Vector3f getPos2() {
+        return this.pos2;
+    }
+
+    public void setLiquidFlow(boolean liquidFlow) {
+        this.liquidFlow = liquidFlow;
+        this.save();
+    }
+
+    public boolean canLiquidFlow() {
+        return this.liquidFlow;
     }
 }

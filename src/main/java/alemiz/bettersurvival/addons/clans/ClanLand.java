@@ -5,8 +5,8 @@ import alemiz.bettersurvival.addons.myland.MyLandProtect;
 import alemiz.bettersurvival.utils.exception.CancelException;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
-import cn.nukkit.level.Level;
 import cn.nukkit.utils.Config;
+import cn.nukkit.utils.ConfigSection;
 
 public class ClanLand extends LandRegion {
 
@@ -15,8 +15,8 @@ public class ClanLand extends LandRegion {
     private boolean restriction = false;
     private boolean whitelistEnabled = false;
 
-    public ClanLand(Clan clan, Level level) {
-        super(clan.getName(), clan.getName()+" land", level);
+    public ClanLand(Clan clan) {
+        super(clan.getName(), clan.getName()+" land");
         this.clan = clan;
     }
 
@@ -46,6 +46,14 @@ public class ClanLand extends LandRegion {
     }
 
     @Override
+    public void load(ConfigSection config) {
+       super.load(config);
+
+       this.restriction = config.getBoolean("playerRestriction", false);
+       this.whitelistEnabled = config.getBoolean("whitelistEnabled", false);
+    }
+
+    @Override
     public void save() {
         Config config = this.clan.getConfig();
         if (config == null) return;
@@ -56,11 +64,18 @@ public class ClanLand extends LandRegion {
         config.set("land.restriction", this.restriction);
         config.set("land.whitelistEnabled", this.whitelistEnabled);
         config.set("land.whitelist", this.whitelist);
+        config.set("land.liquidFlow", this.liquidFlow);
         config.save();
+    }
+
+    @Override
+    public boolean validate() {
+        return super.validate() && this.clan != null;
     }
 
     public void setRestriction(boolean restriction) {
         this.restriction = restriction;
+        this.save();
     }
 
     public boolean isRestrictionEnabled() {
@@ -73,6 +88,7 @@ public class ClanLand extends LandRegion {
 
     public void setWhitelistEnabled(boolean whitelistEnabled) {
         this.whitelistEnabled = whitelistEnabled;
+        this.save();
     }
 
     public Clan getClan() {

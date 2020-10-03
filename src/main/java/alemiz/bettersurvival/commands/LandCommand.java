@@ -18,7 +18,8 @@ public class LandCommand extends Command {
         this.usage = "§7/land <wand> : Get wand to select positions\n" +
                 "§7/land <create|add> <land>: Create land after selected positions\n" +
                 "§7/land <remove|del> <land>: Deny players request\n"+
-                "§7/land <whitelist> <add|remove|list> <land> <player> : Manage lands whitelist\n"+
+                "§7/land <whitelist> <add|remove|list> <land> <player> : Manage lands whitelist\n" +
+                "§7/land <flow> <land> <on|off> : Allow water and lava flow in land\n"+
                 "§7/land <here> : Shows area where you are\n" +
                 "§7/land <list> : Shows your lands";
         this.setUsage(getUsageMessage());
@@ -44,6 +45,8 @@ public class LandCommand extends Command {
             player.sendMessage(getUsageMessage());
             return true;
         }
+
+        LandRegion region;
 
         switch (args[0]){
             case "wand":
@@ -72,11 +75,26 @@ public class LandCommand extends Command {
 
                 this.loader.removeLand(player, args[1]);
                 break;
+            case "flow":
+                if (args.length < 3){
+                    player.sendMessage(getUsageMessage());
+                    break;
+                }
+
+                region = this.loader.getLands().get(player.getName().toLowerCase()+"-"+args[1]);
+                if (region == null){
+                    this.loader.regionNotFound(player);
+                    break;
+                }
+
+                boolean state = args[2].equalsIgnoreCase("on");
+                region.setLiquidFlow(state);
+                this.loader.waterFlowMessage(player, region.getName(), state);
+                break;
             case "here":
                 this.loader.findLand(player);
                 break;
             case "whitelist":
-                LandRegion region;
                 if (args.length < 4){
                     if (args.length == 3 && args[1].equals(LandRegion.WHITELIST_LIST)){
                         region = this.loader.getLands().get(player.getName().toLowerCase()+"-"+args[2]);
