@@ -203,14 +203,21 @@ public class Clan {
         if (executor != null) executor.sendMessage("§6»§7You have invited §6@"+player.getName()+"§7 to your clan!");
     }
 
-    public void addPlayer(Player player){
-        if (player == null) return;
+    public boolean addPlayer(Player player){
+        if (player == null) return false;
+
+        int limit = this.config.getInt("playerLimit");
+        if (this.players.size() >= limit){
+            player.sendMessage("§c»§7Clan §6@"+this.name+"§7 is full at the moment! You can not join!");
+            return false;
+        }
 
         this.sendMessage("Player §6@"+player.getName()+" joined your Clan!");
         this.players.add(player.getName());
         this.savePlayerList();
 
         player.sendMessage("§6»§7You joined §6@"+this.name+"§7 Clan! Welcome to your new Home!");
+        return true;
     }
 
     public void kickPlayer(String playerName, Player executor){
@@ -361,7 +368,6 @@ public class Clan {
 
         boolean state = action.equalsIgnoreCase("on");
         land.setWhitelistEnabled(state);
-        land.save();
         player.sendMessage("§a»§7Land whitelist has been turned §6"+(state? "on" : "off")+"§7!");
     }
 

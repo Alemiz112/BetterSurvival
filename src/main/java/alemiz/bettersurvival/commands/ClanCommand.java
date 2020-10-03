@@ -3,8 +3,6 @@ package alemiz.bettersurvival.commands;
 import alemiz.bettersurvival.addons.clans.Clan;
 import alemiz.bettersurvival.addons.clans.ClanLand;
 import alemiz.bettersurvival.addons.clans.PlayerClans;
-import alemiz.bettersurvival.addons.myland.MyLandProtect;
-import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.Command;
 import alemiz.bettersurvival.utils.ConfigManager;
 import cn.nukkit.Player;
@@ -43,6 +41,7 @@ public class ClanCommand extends Command {
                 "§7/clan land remove: Removes clan land\n" +
                 "§7/clan land access <on|off>: Allow clan members open chests\n" +
                 "§7/clan land whitelist <add|remove|list|on|off> <value - optional>: Allow clan members open chests\n" +
+                "§7/clan land <flow> <on|off> : Allow water and lava flow in land\n" +
                 "§7/clan home <create|remove|home>: Classic clan homes\n" +
                 "§7/clan listhome : Lists all homes\n" +
                 "§aYou can use clan chat by starting message with §6%§a!";
@@ -130,16 +129,17 @@ public class ClanCommand extends Command {
                     break;
                 }
 
-                clan = this.loader.getClans().get(args[1]);
-                if (clan == null){
+                if ((clan = this.loader.getClans().get(args[1])) == null){
                     player.sendMessage("§c»§7This clan does no longer exists!");
+                }
+
+                if (clan == null || !clan.addPlayer(player)){
                     config.set("clanInvites", pendingInvites);
                     config.save();
                     break;
                 }
 
                 this.loader.clearInvitations(player);
-                clan.addPlayer(player);
                 break;
             case "deny":
                 if (args.length < 2){
@@ -256,6 +256,8 @@ public class ClanCommand extends Command {
 
                 clan = this.checkForClan(player);
                 if (clan == null) break;
+                ClanLand land = clan.getLand();
+                boolean state;
 
                 switch (args[1]){
                     case "create":
@@ -270,7 +272,6 @@ public class ClanCommand extends Command {
                             break;
                         }
 
-                        ClanLand land = clan.getLand();
                         if (land == null){
                             player.sendMessage("§c»§7Your clan has not land!");
                             break;
@@ -280,10 +281,9 @@ public class ClanCommand extends Command {
                             break;
                         }
 
-                        boolean state = args[2].equalsIgnoreCase("on");
+                        state = args[2].equalsIgnoreCase("on");
                         land.setRestriction(state);
-                        land.save();
-                        player.sendMessage("§a»§7Land restrictions has been turned §6"+(state? "on" : "off")+"§7!");
+                        player.sendMessage("§a»§7Land restrictions was turned §6"+(state? "on" : "off")+"§7!");
                         break;
                     case "whitelist":
                         if (args.length < 3){
@@ -291,6 +291,21 @@ public class ClanCommand extends Command {
                             break;
                         }
                         clan.landWhitelist(player, args[2], Arrays.copyOfRange(args, 3, args.length));
+                        break;
+                    case "flow":
+                        if (args.length < 3){
+                            player.sendMessage(this.getUsageMessage());
+                            break;
+                        }
+
+                        if (land == null){
+                            player.sendMessage("§c»§7Your clan has not land!");
+                            break;
+                        }
+
+                        state = args[2].equalsIgnoreCase("on");
+                        land.setLiquidFlow(state);
+                        player.sendMessage("§a»§7Water and lava flow was §6"+(state? "enabled" : "disabled")+"§7!");
                         break;
                     default:
                         player.sendMessage(this.getUsageMessage());

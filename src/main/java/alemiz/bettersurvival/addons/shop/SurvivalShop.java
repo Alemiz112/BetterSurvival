@@ -17,6 +17,7 @@ import cn.nukkit.event.block.BlockBreakEvent;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntitySpawnEvent;
+import cn.nukkit.event.inventory.StartBrewEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.level.Level;
@@ -115,6 +116,8 @@ public class SurvivalShop extends Addon {
 
             configFile.set("sellAllMessage", "§6»§7All your inventory was sold. Total income: §e{money}§7!");
             configFile.set("sellHandMessage", "§6»§7All items same as item in your hand were sold. Total income: §e{money}§7!");
+
+            configFile.set("allowBrewing", false);
             configFile.save();
         }
 
@@ -247,6 +250,10 @@ public class SurvivalShop extends Addon {
     public void onInteract(PlayerInteractEvent event){
         Player player = event.getPlayer();
 
+        if (!this.configFile.getBoolean("allowBrewing") && event.getBlock().getId() == Block.BREWING_STAND_BLOCK){
+            event.setCancelled(true);
+        }
+
         if (this.smithShop != null){
             if (event.getBlock().getId() == Block.ANVIL){
                 event.setCancelled(true);
@@ -287,6 +294,13 @@ public class SurvivalShop extends Addon {
         if (category == null) return;
 
         category.sendForm(player);
+    }
+
+    @EventHandler
+    public void onBrew(StartBrewEvent event){
+        if (!this.configFile.getBoolean("allowBrewing")){
+            event.setCancelled(true);
+        }
     }
 
     public void setShopSpawn(Position pos){
