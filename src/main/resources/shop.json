@@ -422,7 +422,7 @@
           "sell": 12
         },
         "hopper": {
-          "id": 410,
+          "id": 154,
           "count": 4,
           "price": 1200,
           "image": "items/hopper",
@@ -1476,39 +1476,43 @@
     },
     "weekly offers": {
       "items": {
-        "water breathing": {
-          "id": 373,
+        "skeleton horse spawn egg": {
+          "id": 383,
           "count": 1,
-          "meta": 19,
-          "price": 2500,
-          "image": "items/potion_bottle_waterBreathing",
-          "sell": 270
+          "meta": 26,
+          "price": 12000,
+          "image": "items/egg_skeletonhorse",
+          "sell": 1750
         },
-        "camp fire": {
-          "id": -209,
-          "count": 2,
-          "price": 210,
-          "image": "items/campfire",
+        "bone": {
+          "id": 352,
+          "count": 8,
+          "price": 500,
+          "image": "items/bone",
+          "sell": 7
+        },
+        "cocoa beans": {
+          "id": 351,
+          "meta": 3,
+          "count": 16,
+          "price": 425,
+          "sell": 5,
+          "image": false
+        },
+        "brown dye": {
+          "id": 351,
+          "count": 8,
+          "meta": 17,
+          "price": 1000,
+          "image": "items/dye_powder_brown",
           "sell": 10
         },
-        "egg": {
-          "id": 344,
-          "count": 16,
-          "price": 600,
-          "sell": 4
-        },
-        "cookie": {
-          "id": 357,
-          "count": 16,
-          "price": 470,
-          "sell": 5
-        },
-        "golden sword": {
-          "image": "items/gold_sword",
-          "id": 283,
+        "netherite shovel": {
+          "image": false,
+          "id": 744,
           "count": 1,
-          "price": 400,
-          "sell": 20
+          "price": 10000,
+          "sell": 4500
         }
       }
     }
