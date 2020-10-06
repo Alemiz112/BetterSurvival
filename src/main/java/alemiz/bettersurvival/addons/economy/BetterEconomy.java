@@ -13,9 +13,11 @@ import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.block.BlockItemFrame;
+import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityItemFrame;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.EventPriority;
+import cn.nukkit.event.block.BlockPistonEvent;
 import cn.nukkit.event.block.ItemFrameDropItemEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerQuitEvent;
@@ -251,6 +253,21 @@ public class BetterEconomy extends Addon {
         message = message.replace("{player}", player.getName());
         message = message.replace("{item}", item.getName());
         player.sendMessage(message);
+    }
+
+    @EventHandler
+    public void onPistonDrop(BlockPistonEvent event){
+        List<Block> blocks = event.getDestroyedBlocks();
+        for (Block block : blocks){
+            BlockEntity blockEntity;
+            if (!(block instanceof BlockItemFrame) || !((blockEntity = block.getLevel().getBlockEntity(block)) instanceof BlockEntityItemFrame)){
+                continue;
+            }
+            if (this.isTradeFrame((BlockEntityItemFrame) blockEntity)){
+                event.setCancelled(true);
+                return;
+            }
+        }
     }
 
     private void dropItem(BlockEntityItemFrame itemFrame, Vector3 source, Item item, boolean clearAll){
