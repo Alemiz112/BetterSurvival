@@ -157,7 +157,7 @@ public class BetterEconomy extends Addon {
         String owner = tag.getString("trade_owner");
 
         //In this case bank note is in item frame
-        if (!itemFrame.namedTag.contains("trade_price")){
+        if (!tag.contains("trade_price")){
             if (!player.getName().equals(owner)){
                 player.sendMessage("§c»§7Bank note can pickup only trade owner!");
                 event.setCancelled(true);
@@ -342,6 +342,22 @@ public class BetterEconomy extends Addon {
         return item;
     }
 
+    public boolean isTradeFrame(BlockEntityItemFrame itemFrame){
+        if (itemFrame == null){
+            return false;
+        }
+        CompoundTag tag = itemFrame.namedTag;
+        return tag.contains("trade_owner") && tag.contains("trade_count") && tag.contains("trade_price");
+    }
+
+    public boolean isTradeFramePayed(BlockEntityItemFrame itemFrame){
+        if (itemFrame == null){
+            return false;
+        }
+        CompoundTag tag = itemFrame.namedTag;
+        return tag.contains("trade_owner") && tag.contains("trade_count") && !tag.contains("trade_price");
+    }
+
     public void showItemInfo(Player player){
         if (player == null || !player.isConnected()) return;
         BlockFace direction = player.getDirection();
@@ -367,7 +383,7 @@ public class BetterEconomy extends Addon {
         BlockEntityItemFrame itemFrame = (BlockEntityItemFrame) player.getLevel().getBlockEntity(itemFrameBlock);
 
         Item item = itemFrame.getItem();
-        if (item == null || item.getId() == Item.AIR || !itemFrame.namedTag.contains("trade_price")) return;
+        if (item == null || item.getId() == Item.AIR || this.isTradeFramePayed(itemFrame)) return;
 
         CompoundTag tag = itemFrame.namedTag;
         String owner = tag.getString("trade_owner");
