@@ -173,15 +173,22 @@ public class MoreVanilla extends Addon{
         this.keepInvCache.remove(player.getName());
     }
 
+    @EventHandler
+    public void onTell(PlayerCommandPreprocessEvent event){
+        if (!event.getMessage().startsWith("/tell")){
+            return;
+        }
+
+        Player player = event.getPlayer();
+        if (this.onMuteChat(player)){
+            event.setCancelled(true);
+        }
+    }
+
     @EventHandler(priority = EventPriority.LOWEST)
     public void onChat(PlayerChatEvent event){
         Player player = event.getPlayer();
-
-        if (this.mutedPlayers.containsKey(player.getName().toLowerCase())){
-            String message = configFile.getString("muteChatMessage");
-            message = message.replace("{player}", player.getName());
-
-            player.sendMessage(message);
+        if (this.onMuteChat(player)){
             event.setCancelled(true);
             return;
         }
@@ -333,6 +340,17 @@ public class MoreVanilla extends Addon{
         if (changed != null && changed.getId() != Item.AIR){
             inv.addItem(changed);
         }
+        return true;
+    }
+
+    private boolean onMuteChat(Player player){
+        if (!this.mutedPlayers.containsKey(player.getName().toLowerCase())){
+            return false;
+        }
+
+        String message = configFile.getString("muteChatMessage");
+        message = message.replace("{player}", player.getName());
+        player.sendMessage(message);
         return true;
     }
 
