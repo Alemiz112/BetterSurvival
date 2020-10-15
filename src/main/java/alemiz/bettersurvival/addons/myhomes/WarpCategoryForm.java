@@ -55,7 +55,7 @@ public class WarpCategoryForm extends SimpleForm {
             warp.teleport(player);
 
             String message = this.loader.configFile.getString("warpTeleport");
-            message = message.replace("{player}", player.getName());
+            message = message.replace("{player}", player.getDisplayName());
             message = message.replace("{warp}", warp.getName());
             player.sendMessage(message);
         }, 20*3);

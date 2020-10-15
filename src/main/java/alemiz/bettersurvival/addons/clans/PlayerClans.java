@@ -122,7 +122,7 @@ public class PlayerClans extends Addon {
         this.clans.put(rawName, clan);
 
         String message = configFile.getString("clanCreateMessage");
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{player}", player.getDisplayName());
         message = message.replace("{clan}", name);
         player.sendMessage(message);
         return clan;

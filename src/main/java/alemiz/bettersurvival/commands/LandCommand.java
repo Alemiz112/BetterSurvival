@@ -81,7 +81,7 @@ public class LandCommand extends Command {
                     break;
                 }
 
-                region = this.loader.getLands().get(player.getName().toLowerCase()+"-"+args[1]);
+                region = this.loader.getLand(player, args[1]);
                 if (region == null){
                     this.loader.regionNotFound(player);
                     break;
@@ -95,17 +95,17 @@ public class LandCommand extends Command {
                 this.loader.findLand(player);
                 break;
             case "whitelist":
-                if (args.length < 4){
-                    if (args.length == 3 && args[1].equals(LandRegion.WHITELIST_LIST)){
-                        region = this.loader.getLands().get(player.getName().toLowerCase()+"-"+args[2]);
-                        this.loader.whitelist(player, "", region, args[1]);
-                    }else {
-                        player.sendMessage(getUsageMessage());
-                    }
+                if (args.length >= 4){
+                    region = this.loader.getLand(player, args[2]);
+                    this.loader.whitelist(player, args[3], region, args[1]);
                     break;
                 }
-                region = this.loader.getLands().get(player.getName().toLowerCase()+"-"+args[2]);
-                this.loader.whitelist(player, args[3], region, args[1]);
+                if (args.length == 3 && args[1].equals(LandRegion.WHITELIST_LIST)){
+                    region = this.loader.getLand(player, args[2]);
+                    this.loader.whitelist(player, "", region, args[1]);
+                }else {
+                    player.sendMessage(getUsageMessage());
+                }
                 break;
             case "list":
                 this.loader.listLands(player);

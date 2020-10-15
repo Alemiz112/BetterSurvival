@@ -116,7 +116,7 @@ public class MyHomes extends Addon {
         config.save();
 
         String message = configFile.getString("homeSet");
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{player}", player.getDisplayName());
         message = message.replace("{home}", home);
         message = message.replace("{limit}", player.isOp()? "unlimited" : String.valueOf(limit - homes.size()));
         player.sendMessage(message);
@@ -137,7 +137,7 @@ public class MyHomes extends Addon {
         config.save();
 
         String message = configFile.getString("homeDel");
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{player}", player.getDisplayName());
         message = message.replace("{home}", home);
         player.sendMessage(message);
     }
@@ -164,7 +164,7 @@ public class MyHomes extends Addon {
         player.teleport(new Position(data.get(0), data.get(1), data.get(2), level));
 
         String message = configFile.getString("homeTeleport");
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{player}", player.getDisplayName());
         message = message.replace("{home}", home);
         player.sendMessage(message);
     }
@@ -200,7 +200,7 @@ public class MyHomes extends Addon {
         category.addWarp(playerWarp);
 
         String message = configFile.getString("warpCreate");
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{player}", player.getDisplayName());
         message = message.replace("{warp}", name);
         message = message.replace("{limit}", player.isOp()? "unlimited" : String.valueOf(limit - warps.size()));
         player.sendMessage(message);
@@ -231,7 +231,7 @@ public class MyHomes extends Addon {
         config.save();
 
         String message = configFile.getString("warpDelete");
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{player}", player.getDisplayName());
         message = message.replace("{warp}", name);
         player.sendMessage(message);
     }

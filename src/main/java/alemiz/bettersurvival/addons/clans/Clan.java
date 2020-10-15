@@ -200,7 +200,7 @@ public class Clan {
         config.save();
 
         player.sendMessage("§6»§7You was invited to join §6@"+this.name+" Clan! Use §6/clan accept <name> §7or§6 /clan deny <name> §7to manage your invite!");
-        if (executor != null) executor.sendMessage("§6»§7You have invited §6@"+player.getName()+"§7 to your clan!");
+        if (executor != null) executor.sendMessage("§6»§7You have invited §6@"+player.getDisplayName()+"§7 to your clan!");
     }
 
     public boolean addPlayer(Player player){
@@ -212,7 +212,7 @@ public class Clan {
             return false;
         }
 
-        this.sendMessage("Player §6@"+player.getName()+" joined your Clan!");
+        this.sendMessage("Player §6@"+player.getDisplayName()+" joined your Clan!");
         this.players.add(player.getName());
         this.savePlayerList();
 
@@ -266,7 +266,7 @@ public class Clan {
         }
 
         this.players.remove(player.getName());
-        this.sendMessage("Player @6"+player.getName()+" left your Clan!");
+        this.sendMessage("Player @6"+player.getDisplayName()+" left your Clan!");
         this.savePlayerList();
 
         player.sendMessage("§6»§7You left §6@"+this.name+"§7 Clan!");
@@ -432,7 +432,7 @@ public class Clan {
         }
 
         player.teleport(this.homes.get(home.toLowerCase()));
-        player.sendMessage("§6»§7Woosh! Welcome at clan home §6"+home+" @"+player.getName()+"§7!");
+        player.sendMessage("§6»§7Woosh! Welcome at clan home §6"+home+" @"+player.getDisplayName()+"§7!");
     }
 
     //May be useful in feature
@@ -441,7 +441,7 @@ public class Clan {
     }
 
     public void onDonate(Player player, int value){
-        this.sendMessage("Player §6@"+player.getName()+"§f donated to clan bank value of §e"+TextUtils.formatBigNumber(value)+"$§f!");
+        this.sendMessage("Player §6@"+player.getDisplayName()+"§f donated to clan bank value of §e"+TextUtils.formatBigNumber(value)+"$§f!");
     }
 
     public void chat(String message, Player player){

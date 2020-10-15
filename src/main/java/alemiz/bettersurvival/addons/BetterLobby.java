@@ -108,7 +108,7 @@ public class BetterLobby extends Addon {
         Runnable task = () -> {
             String message = this.broadcastMessages.get(this.nextMessage);
             for (Player player : Server.getInstance().getOnlinePlayers().values()){
-                String msg = message.replace("{player}", player.getName());
+                String msg = message.replace("{player}", player.getDisplayName());
                 player.sendMessage(this.broadcastPrefix+" "+msg);
             }
 
@@ -122,7 +122,7 @@ public class BetterLobby extends Addon {
     @EventHandler
     public void onJoin(PlayerJoinEvent event){
         Player player = event.getPlayer();
-        String message = joinMessage.replace("{player}", player.getName());
+        String message = joinMessage.replace("{player}", player.getDisplayName());
         event.setJoinMessage(message);
     }
 
@@ -141,7 +141,7 @@ public class BetterLobby extends Addon {
             this.bossBars.remove(player.getName());
         }
 
-        String message = quitMessage.replace("{player}", player.getName());
+        String message = quitMessage.replace("{player}", player.getDisplayName());
         event.setQuitMessage(message);
     }
 

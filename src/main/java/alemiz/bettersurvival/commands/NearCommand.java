@@ -50,7 +50,7 @@ public class NearCommand extends Command {
         String pplayers = "";
         for (Player pplayer : players){
             if (pplayer.getName().equals(player.getName())) continue;
-            pplayers += pplayer.getName() + ", ";
+            pplayers += pplayer.getDisplayName() + ", ";
         }
 
         String message = this.loader.configFile.getString("nearMessage");

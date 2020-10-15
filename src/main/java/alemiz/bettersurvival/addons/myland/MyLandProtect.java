@@ -162,7 +162,7 @@ public class MyLandProtect extends Addon {
 
             String message = configFile.getString("landPosSelected");
             message = message.replace("{pos}", event.getBlock().x +", "+ event.getBlock().y +", "+ event.getBlock().z);
-            message = message.replace("{player}", player.getName());
+            message = message.replace("{player}", player.getDisplayName());
             message = message.replace("{select}", (blocks.size() == 1)? "first" : "second");
             player.sendMessage(message);
             event.setCancelled();
@@ -329,7 +329,7 @@ public class MyLandProtect extends Addon {
         if (!canInteract){
             String message = configFile.getString("landWarn");
             message = message.replace("{land}", clanLand? "" : region.land);
-            message = message.replace("{player}", player.getName());
+            message = message.replace("{player}", player.getDisplayName());
             message = message.replace("{owner}", region.owner + (clanLand? " Clan" : ""));
             player.sendMessage(message);
         }
@@ -402,7 +402,7 @@ public class MyLandProtect extends Addon {
         if (owner == null || owner.equalsIgnoreCase(player.getName())) return true;
 
         String message = configFile.getString("privateChestAccessDenied");
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{player}", player.getDisplayName());
         message = message.replace("{owner}", owner);
         player.sendMessage(message);
 
@@ -423,7 +423,7 @@ public class MyLandProtect extends Addon {
     }
 
     public Set<String> getLands(Player player){
-        return getLands(player.getName());
+        return this.getLands(player.getName());
     }
 
     public Set<String> getLands(String player){
@@ -475,7 +475,7 @@ public class MyLandProtect extends Addon {
             if (cancel){
                 String message = configFile.getString("landWarn");
                 message = message.replace("{land}", (region instanceof ClanLand)? "" : region.land);
-                message = message.replace("{player}", player.getName());
+                message = message.replace("{player}", player.getDisplayName());
                 message = message.replace("{owner}", region.owner + ((region instanceof ClanLand)? " Clan" : ""));
                 player.sendMessage(message);
                 return false;
@@ -501,7 +501,7 @@ public class MyLandProtect extends Addon {
 
             if (player != null){
                 String message = configFile.getString("landTooBig");
-                message = message.replace("{player}", player.getName());
+                message = message.replace("{player}", player.getDisplayName());
                 message = message.replace("{limit}", String.valueOf(landSize));
                 player.sendMessage(message);
             }
@@ -587,15 +587,15 @@ public class MyLandProtect extends Addon {
                 if (freeLands < 1 && !player.isOp()){
                     String message = configFile.getString("landLimitWarn");
                     message = message.replace("{land}", land);
-                    message = message.replace("{player}", player.getName());
+                    message = message.replace("{player}", player.getDisplayName());
                     player.sendMessage(message);
                     return;
                 }
 
-                if (lands != null && lands.contains(land.toLowerCase())){
+                if (lands.contains(land)){
                     String message = configFile.getString("landWithNameExists");
                     message = message.replace("{land}", land);
-                    message = message.replace("{player}", player.getName());
+                    message = message.replace("{player}", player.getDisplayName());
                     player.sendMessage(message);
                     return;
                 }
@@ -617,12 +617,24 @@ public class MyLandProtect extends Addon {
                 return;
             }
 
-            String index = clanMode? "land.pos0" : "land."+land.toLowerCase()+".pos0";
-            config.set(index, new double[]{block1.getX(), block1.getY(), block1.getZ()});
-            String index2 = clanMode? "land.pos1" : "land."+land.toLowerCase()+".pos1";
-            config.set(index2, new double[]{block2.getX(), block2.getY(), block2.getZ()});
+            this.selectors.remove(player.getName().toLowerCase());
 
-            if (!clanMode) config.set("land."+land.toLowerCase()+".whitelist", new String[0]);
+            LandRegion region = clanMode? new ClanLand(clan) : new LandRegion(player.getName().toLowerCase(), land);
+            region.level = player.getLevel();
+            region.pos1 = block1.asVector3f();
+            region.pos2 = block2.asVector3f();
+
+            if (!region.validate()){
+                player.sendMessage("§c»§7Land is invalid! Please try again!");
+                return;
+            }
+
+            String index = clanMode? "land.pos0" : "land."+land+".pos0";
+            config.set(index, new double[]{block1.getX(), block1.getY(), block1.getZ()});
+            String index2 = clanMode? "land.pos1" : "land."+land+".pos1";
+            config.set(index2, new double[]{block2.getX(), block2.getY(), block2.getZ()});
+            if (!clanMode)  config.set("land."+land+".whitelist", new String[0]);
+            config.save();
 
             String message = configFile.getString("landCreate");
             message = message.replace("{land}", (clanMode? clan.getName()+" land" : land));
@@ -630,17 +642,7 @@ public class MyLandProtect extends Addon {
             message = message.replace("{limit}", player.isOp()? "unlimited" : String.valueOf(freeLands));
             player.sendMessage(message);
 
-            this.selectors.remove(player.getName().toLowerCase());
-            config.save();
-
-            LandRegion region = clanMode? new ClanLand(clan) : new LandRegion(player.getName().toLowerCase(), land.toLowerCase());
-            region.level = player.getLevel();
-            region.pos1 = block1.asVector3f();
-            region.pos2 = block2.asVector3f();
-
-            //TODO: validate
-
-            this.lands.put(clanMode? clan.getRawName() : player.getName().toLowerCase()+"-"+land.toLowerCase(), region);
+            this.lands.put(clanMode? clan.getRawName() : player.getName().toLowerCase()+"-"+land, region);
         };
         this.plugin.getServer().getScheduler().scheduleTask(this.plugin, task, true);
     }
@@ -651,15 +653,15 @@ public class MyLandProtect extends Addon {
         Config config = ConfigManager.getInstance().loadPlayer(player);
         if (config == null) return;
 
-        if (!config.exists("land."+land.toLowerCase())){
+        if (!config.exists("land."+land)){
             this.regionNotFound(player);
             return;
         }
 
-        ((Map) config.get("land")).remove(land.toLowerCase());
+        ((Map) config.get("land")).remove(land);
         config.save();
 
-        this.lands.remove(player.getName().toLowerCase()+"-"+land.toLowerCase());
+        this.lands.remove(player.getName().toLowerCase()+"-"+land);
 
         String message = configFile.getString("landRemove");
         message = message.replace("{player}", player.getName());
@@ -690,7 +692,7 @@ public class MyLandProtect extends Addon {
 
     public void findLand(Player player){
         Block block = player.getLevel().getBlock(player.clone());
-        LandRegion land = null;
+        LandRegion land;
 
         if (block == null || (land = getLandByPos(block)) == null){
             String message = configFile.getString("landHereNotFound");
@@ -708,7 +710,6 @@ public class MyLandProtect extends Addon {
         message = message.replace("{owner}", land.owner);
         message = message.replace("{land}", land.land);
         player.sendMessage(message);
-
     }
 
     public void whitelist(Player owner, String player, LandRegion region, String action){
@@ -861,5 +862,9 @@ public class MyLandProtect extends Addon {
 
     public Map<String, LandRegion> getLands() {
         return this.lands;
+    }
+
+    public LandRegion getLand(Player player, String land){
+        return this.lands.get(player.getName().toLowerCase()+"-"+land);
     }
 }
