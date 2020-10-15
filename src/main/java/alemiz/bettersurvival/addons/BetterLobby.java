@@ -122,8 +122,7 @@ public class BetterLobby extends Addon {
     @EventHandler
     public void onJoin(PlayerJoinEvent event){
         Player player = event.getPlayer();
-        String message = joinMessage.replace("{player}", player.getDisplayName());
-        event.setJoinMessage(message);
+        event.setJoinMessage(this.joinMessage);
     }
 
     @EventHandler
