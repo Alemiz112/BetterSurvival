@@ -195,13 +195,13 @@ public class LevelVote extends Addon {
 
             String message = configFile.getString("newVote");
             message = message.replace("{vote}", key);
-            message = message.replace("{player}", player.getName());
+            message = message.replace("{player}", player.getDisplayName());
             this.plugin.getServer().broadcastMessage(message, players);
         }else {
             String message = configFile.getString("vote");
             message = message.replace("{vote}", key);
             message = message.replace("{state}", value);
-            message = message.replace("{player}", player.getName());
+            message = message.replace("{player}", player.getDisplayName());
             this.plugin.getServer().broadcastMessage(message, players);
         }
 

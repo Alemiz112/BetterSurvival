@@ -139,7 +139,7 @@ public class BetterEconomy extends Addon {
         player.getInventory().setItemInHand(item);
 
         String message = configFile.getString("tradeShopCreate");
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{player}", player.getDisplayName());
         message = message.replace("{price}", price.toString());
         player.sendMessage(message);
         event.setCancelled(true);
@@ -179,7 +179,7 @@ public class BetterEconomy extends Addon {
 
         if (!this.isTrader(player)){
             String message = configFile.getString("requireTraderMode");
-            message = message.replace("{player}", player.getName());
+            message = message.replace("{player}", player.getDisplayName());
             player.sendMessage(message);
             return;
         }
@@ -187,7 +187,7 @@ public class BetterEconomy extends Addon {
         boolean success = EconomyAPI.getInstance().reduceMoney(player, price) >= 1;
         if (!success){
             String message = configFile.getString("tradeFailMessage");
-            message = message.replace("{player}", player.getName());
+            message = message.replace("{player}", player.getDisplayName());
             message = message.replace("{item}", item.getName());
             player.sendMessage(message);
             return;
@@ -201,7 +201,7 @@ public class BetterEconomy extends Addon {
         itemFrame.setItemRotation(0);
 
         String message = configFile.getString("tradeBuyMessage");
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{player}", player.getDisplayName());
         message = message.replace("{item}", item.getName());
         player.sendMessage(message);
     }
@@ -239,7 +239,7 @@ public class BetterEconomy extends Addon {
 
         if (price > limit){
             String message = configFile.getString("failMessageLimit");
-            message = message.replace("{player}", player.getName());
+            message = message.replace("{player}", player.getDisplayName());
             message = message.replace("{limit}", TextUtils.formatBigNumber(limit));
             player.sendMessage(message);
             return;
@@ -271,7 +271,7 @@ public class BetterEconomy extends Addon {
         }
 
         String message = configFile.getString(success? "noteCreateMessage" : "failMessage");
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{player}", player.getDisplayName());
         message = message.replace("{money}", TextUtils.formatBigNumber(price));
         player.sendMessage(message);
     }
@@ -315,7 +315,7 @@ public class BetterEconomy extends Addon {
         }
 
         String message = configFile.getString(clanMode? "noteApplyMessageClan" : "noteApplyMessage");
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{player}", player.getDisplayName());
         message = message.replace("{money}", TextUtils.formatBigNumber((clanMode && clan != null)? clan.getMoney() : EconomyAPI.getInstance().myMoney(player)));
         player.sendMessage(message);
         return Item.get(Item.AIR);
@@ -403,7 +403,7 @@ public class BetterEconomy extends Addon {
         this.tradeCreators.put(player.getName(), value);
 
         String message = configFile.getString("tradeCreatorAdd");
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{player}", player.getDisplayName());
         player.sendMessage(message);
     }
 

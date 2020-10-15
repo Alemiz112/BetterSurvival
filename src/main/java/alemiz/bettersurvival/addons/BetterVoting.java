@@ -283,11 +283,11 @@ public class BetterVoting extends Addon {
             }
 
             String message = this.configFile.getString("playerVoteMessage");
-            message = message.replace("{player}", player.getName());
+            message = message.replace("{player}", player.getDisplayName());
             player.sendMessage(message);
 
             message = this.configFile.getString("voteMessage");
-            message = message.replace("{player}", player.getName());
+            message = message.replace("{player}", player.getDisplayName());
             plugin.getServer().broadcastMessage(message);
         }catch (Exception e){
             return false;
@@ -310,12 +310,12 @@ public class BetterVoting extends Addon {
         target.getInventory().addItem(item);
 
         String message = configFile.getString("crateKeyGiveMessage");
-        message = message.replace("{player}", executor.getName());
+        message = message.replace("{player}", executor.getDisplayName());
         target.sendMessage(message);
 
         message = configFile.getString("crateKeyGiveMessageAuthor");
-        message = message.replace("{player}", executor.getName());
-        message = message.replace("{target}", target.getName());
+        message = message.replace("{player}", executor.getDisplayName());
+        message = message.replace("{target}", target.getDisplayName());
         executor.sendMessage(message);
     }
 
@@ -325,7 +325,7 @@ public class BetterVoting extends Addon {
         }
 
         String message = configFile.getString("crateSetMessage");
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{player}", player.getDisplayName());
         player.sendMessage(message);
     }
 

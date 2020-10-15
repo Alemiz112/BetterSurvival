@@ -161,7 +161,7 @@ public class MyLandProtect extends Addon {
 
             String message = configFile.getString("landPosSelected");
             message = message.replace("{pos}", event.getBlock().x +", "+ event.getBlock().y +", "+ event.getBlock().z);
-            message = message.replace("{player}", player.getName());
+            message = message.replace("{player}", player.getDisplayName());
             message = message.replace("{select}", (blocks.size() == 1)? "first" : "second");
             player.sendMessage(message);
             event.setCancelled();
@@ -328,7 +328,7 @@ public class MyLandProtect extends Addon {
         if (!canInteract){
             String message = configFile.getString("landWarn");
             message = message.replace("{land}", clanLand? "" : region.land);
-            message = message.replace("{player}", player.getName());
+            message = message.replace("{player}", player.getDisplayName());
             message = message.replace("{owner}", region.owner + (clanLand? " Clan" : ""));
             player.sendMessage(message);
         }
@@ -401,7 +401,7 @@ public class MyLandProtect extends Addon {
         if (owner == null || owner.equalsIgnoreCase(player.getName())) return true;
 
         String message = configFile.getString("privateChestAccessDenied");
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{player}", player.getDisplayName());
         message = message.replace("{owner}", owner);
         player.sendMessage(message);
 
@@ -474,7 +474,7 @@ public class MyLandProtect extends Addon {
             if (cancel){
                 String message = configFile.getString("landWarn");
                 message = message.replace("{land}", (region instanceof ClanLand)? "" : region.land);
-                message = message.replace("{player}", player.getName());
+                message = message.replace("{player}", player.getDisplayName());
                 message = message.replace("{owner}", region.owner + ((region instanceof ClanLand)? " Clan" : ""));
                 player.sendMessage(message);
                 return false;
@@ -500,7 +500,7 @@ public class MyLandProtect extends Addon {
 
             if (player != null){
                 String message = configFile.getString("landTooBig");
-                message = message.replace("{player}", player.getName());
+                message = message.replace("{player}", player.getDisplayName());
                 message = message.replace("{limit}", String.valueOf(landSize));
                 player.sendMessage(message);
             }
@@ -586,7 +586,7 @@ public class MyLandProtect extends Addon {
                 if (freeLands < 1 && !player.isOp()){
                     String message = configFile.getString("landLimitWarn");
                     message = message.replace("{land}", land);
-                    message = message.replace("{player}", player.getName());
+                    message = message.replace("{player}", player.getDisplayName());
                     player.sendMessage(message);
                     return;
                 }
@@ -594,7 +594,7 @@ public class MyLandProtect extends Addon {
                 if (lands.contains(land)){
                     String message = configFile.getString("landWithNameExists");
                     message = message.replace("{land}", land);
-                    message = message.replace("{player}", player.getName());
+                    message = message.replace("{player}", player.getDisplayName());
                     player.sendMessage(message);
                     return;
                 }

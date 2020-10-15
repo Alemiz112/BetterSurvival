@@ -194,12 +194,12 @@ public class MoreVanilla extends Addon{
         }
 
         String format = configFile.getString("chatFormat");
-        format = format.replace("{player}", player.getName());
+        format = format.replace("{player}", player.getDisplayName());
         format = format.replace("{message}", event.getMessage());
         event.setFormat(format);
 
         for (Player pplayer : this.plugin.getServer().getOnlinePlayers().values()){
-            if (!event.getMessage().contains("@"+pplayer.getName())) continue;
+            if (!event.getMessage().contains("@"+pplayer.getDisplayName())) continue;
 
             PlaySoundPacket packet = new PlaySoundPacket();
             packet.name = "note.hat"; //cubemc use as info sound
@@ -349,7 +349,7 @@ public class MoreVanilla extends Addon{
         }
 
         String message = configFile.getString("muteChatMessage");
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{player}", player.getDisplayName());
         player.sendMessage(message);
         return true;
     }
@@ -385,17 +385,17 @@ public class MoreVanilla extends Addon{
         this.tpa.put(pplayer.getName(), executor.getName());
 
         String message = configFile.getString("tpaMessage");
-        message = message.replace("{player}", pplayer.getName());
+        message = message.replace("{player}", pplayer.getDisplayName());
         executor.sendMessage(message);
 
         String rmessage = configFile.getString("tpaRequestMessage");
-        rmessage = rmessage.replace("{player}", executor.getName());
+        rmessage = rmessage.replace("{player}", executor.getDisplayName());
         pplayer.sendMessage(rmessage);
     }
 
     public void tpaAccept(Player player){
         if (!tpa.containsKey(player.getName()) || tpa.get(player.getName()) == null){
-            String message = configFile.getString("tpaNoRequests").replace("{player}", player.getName());
+            String message = configFile.getString("tpaNoRequests").replace("{player}", player.getDisplayName());
             player.sendMessage(message);
             return;
         }
@@ -406,7 +406,7 @@ public class MoreVanilla extends Addon{
         }else {
             requester.teleport(player);
 
-            String message = configFile.getString("tpaAcceptMessage").replace("{player}", player.getName());
+            String message = configFile.getString("tpaAcceptMessage").replace("{player}", player.getDisplayName());
             requester.sendMessage(message);
         }
 
@@ -421,14 +421,14 @@ public class MoreVanilla extends Addon{
         if (tpa.get(player.getName()) != null){
             Player requester = Server.getInstance().getPlayer(tpa.get(player.getName()));
             if (requester != null && requester.isConnected()){
-                String message = configFile.getString("tpaDennyMessage").replace("{player}", player.getName());
+                String message = configFile.getString("tpaDennyMessage").replace("{player}", player.getDisplayName());
                 requester.sendMessage(message);
             }
         }
 
         tpa.remove(player.getName());
 
-        String message = configFile.getString("tpaDennyConfirmMessage").replace("{player}", player.getName());
+        String message = configFile.getString("tpaDennyConfirmMessage").replace("{player}", player.getDisplayName());
         player.sendMessage(message);
     }
 
@@ -447,7 +447,7 @@ public class MoreVanilla extends Addon{
         }
 
         if (pexecutor != null && !executor.equals(player.getName())){
-            pexecutor.sendMessage("§6»§7You changed flying mode of §6@"+player.getName()+"§7!");
+            pexecutor.sendMessage("§6»§7You changed flying mode of §6@"+player.getDisplayName()+"§7!");
         }
 
         boolean canFly = player.getAdventureSettings().get(AdventureSettings.Type.ALLOW_FLIGHT);
@@ -455,7 +455,7 @@ public class MoreVanilla extends Addon{
         player.getAdventureSettings().update();
 
         String message = configFile.getString("flyMessage");
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{player}", player.getDisplayName());
         message = message.replace("{state}", (!canFly ? "on" : "off"));
         player.sendMessage(message);
     }
@@ -476,13 +476,13 @@ public class MoreVanilla extends Addon{
         }
 
         if (pexecutor != null && !executor.equals(player.getName())){
-            pexecutor.sendMessage("§6»§7You feeded §6@"+player.getName()+"§7!");
+            pexecutor.sendMessage("§6»§7You feeded §6@"+player.getDisplayName()+"§7!");
         }
 
         player.getFoodData().reset();
 
         String message = configFile.getString("feedMessage");
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{player}", player.getDisplayName());
         message = message.replace("{state}", (String.valueOf(player.getFoodData().getLevel())));
         player.sendMessage(message);
     }
@@ -502,13 +502,13 @@ public class MoreVanilla extends Addon{
         }
 
         if (pexecutor != null && !executor.equals(player.getName())){
-            pexecutor.sendMessage("§6»§7You healed §6@"+player.getName()+"§7!");
+            pexecutor.sendMessage("§6»§7You healed §6@"+player.getDisplayName()+"§7!");
         }
 
         player.addEffect(Effect.getEffect(Effect.REGENERATION).setAmplifier(1).setDuration(5 * 20));
 
         String message = configFile.getString("healMessage");
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{player}", player.getDisplayName());
         message = message.replace("{state}", (String.valueOf(player.getHealth())));
         player.sendMessage(message);
     }
@@ -517,7 +517,7 @@ public class MoreVanilla extends Addon{
         Location location = this.back.get(player.getName());
         if (location == null){
             String message = configFile.getString("backPosNotFound");
-            message = message.replace("{player}", player.getName());
+            message = message.replace("{player}", player.getDisplayName());
             player.sendMessage(message);
             return;
         }
@@ -526,7 +526,7 @@ public class MoreVanilla extends Addon{
         player.teleport(location);
 
         String message = configFile.getString("backMessage");
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{player}", player.getDisplayName());
         player.sendMessage(message);
     }
 
@@ -581,7 +581,7 @@ public class MoreVanilla extends Addon{
         player.setMotion(motion);
 
         String message = configFile.getString("jumpMessage");
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{player}", player.getDisplayName());
         player.sendMessage(message);
     }
 
@@ -603,7 +603,7 @@ public class MoreVanilla extends Addon{
         player.sendMessage("§6»§7Finding nice location... This usually takes some time!");
 
         String message = configFile.getString("randtpMessage");
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{player}", player.getDisplayName());
         this.plugin.getServer().getScheduler().scheduleDelayedTask(new RandomTpTask(player, message), 30);
     }
 
@@ -638,7 +638,7 @@ public class MoreVanilla extends Addon{
         }
 
         if (pexecutor != null && !executor.equals(player.getName())){
-            pexecutor.sendMessage("§6»§7You muted §6@"+player.getName()+"§7 for §8"+time+"§7!");
+            pexecutor.sendMessage("§6»§7You muted §6@"+player.getDisplayName()+"§7 for §8"+time+"§7!");
         }
 
         Calendar calendar = Calendar.getInstance();
@@ -648,7 +648,7 @@ public class MoreVanilla extends Addon{
         this.mutedPlayers.put(player.getName().toLowerCase(), calendar.getTime());
 
         String message = configFile.getString("muteMessage");
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{player}", player.getDisplayName());
         message = message.replace("{time}", time);
         player.sendMessage(message);
     }
@@ -664,14 +664,14 @@ public class MoreVanilla extends Addon{
         }
 
         if (pexecutor != null && !executor.equals(player.getName())){
-            pexecutor.sendMessage("§6»§7You unmuted §6@"+player.getName()+"§7!");
+            pexecutor.sendMessage("§6»§7You unmuted §6@"+player.getDisplayName()+"§7!");
         }
 
         this.mutedPlayers.remove(playerName.toLowerCase());
         if (player == null) return;
 
         String message = configFile.getString("unmuteMessage");
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{player}", player.getDisplayName());
         player.sendMessage(message);
     }
 
@@ -685,7 +685,7 @@ public class MoreVanilla extends Addon{
         this.keepInvCache.put(player.getName(), enable);
 
         String message = configFile.getString("keepInventoryMessage");
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{player}", player.getDisplayName());
         message = message.replace("{state}", enable? "on" : "off");
         player.sendMessage(message);
     }

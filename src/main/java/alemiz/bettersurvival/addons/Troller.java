@@ -167,7 +167,7 @@ public class Troller extends Addon {
         }
 
         String message = configFile.getString("vanishMessage");
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{player}", player.getDisplayName());
         message = message.replace("{state}", ((hidden)? "off" : "on"));
         player.sendMessage(message);
     }
@@ -305,7 +305,7 @@ public class Troller extends Addon {
         if (block == null){
             String message = configFile.getString("blockNotFound");
             message = message.replace("{id}", blockString);
-            message = message.replace("{player}", player.getName());
+            message = message.replace("{player}", player.getDisplayName());
             player.sendMessage(message);
             return;
         }
@@ -313,8 +313,8 @@ public class Troller extends Addon {
         this.blocksBefore.put(pvictim.getName(), setBlocksArround(pvictim, block));
 
         String message = configFile.getString("blockMessage");
-        message = message.replace("{victim}", pvictim.getName());
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{victim}", pvictim.getDisplayName());
+        message = message.replace("{player}", player.getDisplayName());
         player.sendMessage(message);
     }
 
@@ -332,8 +332,8 @@ public class Troller extends Addon {
         }
 
         String message = configFile.getString("unblockMessage");
-        message = message.replace("{victim}", pvictim.getName());
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{victim}", pvictim.getDisplayName());
+        message = message.replace("{player}", player.getDisplayName());
         player.sendMessage(message);
     }
 
@@ -345,8 +345,8 @@ public class Troller extends Addon {
         pvictim.getLevel().setBlock(pvictim.add(0, 4), Block.get(Block.ANVIL), true, true);
 
         String message = configFile.getString("anvilMessage");
-        message = message.replace("{victim}", pvictim.getName());
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{victim}", pvictim.getDisplayName());
+        message = message.replace("{player}", player.getDisplayName());
         player.sendMessage(message);
     }
 
@@ -361,8 +361,8 @@ public class Troller extends Addon {
             pvictim.chat(message);
         }
         String pmessage = configFile.getString("chatMessage");
-        pmessage = pmessage.replace("{victim}", pvictim.getName());
-        pmessage = pmessage.replace("{player}", player.getName());
+        pmessage = pmessage.replace("{victim}", pvictim.getDisplayName());
+        pmessage = pmessage.replace("{player}", player.getDisplayName());
         player.sendMessage(pmessage);
     }
 
@@ -381,8 +381,8 @@ public class Troller extends Addon {
         sendRealChunks(pvictim, 20*60, 1, new Player[]{pvictim, player});
 
         String message = configFile.getString("rainbowFloorMessage");
-        message = message.replace("{victim}", pvictim.getName());
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{victim}", pvictim.getDisplayName());
+        message = message.replace("{player}", player.getDisplayName());
         player.sendMessage(message);
     }
 
@@ -402,8 +402,8 @@ public class Troller extends Addon {
         sendRealChunks(pvictim, 20*45, 1, new Player[]{pvictim, player});
 
         String message = configFile.getString("fakeLavaMessage");
-        message = message.replace("{victim}", pvictim.getName());
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{victim}", pvictim.getDisplayName());
+        message = message.replace("{player}", player.getDisplayName());
         player.sendMessage(message);
     }
 
@@ -412,7 +412,7 @@ public class Troller extends Addon {
         if (!checkForPlayer(pvictim, player, configFile.getString("permission-invsee"),
                 "§cYou dont have inv-see permission!")) return;
 
-        FakeInventory inv = FakeInventoryManager.createInventory(player, pvictim.getName()+"'s Inventory", pvictim.getInventory().getContents(), FakeInventoryManager.INV_DOUBLE);
+        FakeInventory inv = FakeInventoryManager.createInventory(player, pvictim.getDisplayName()+"'s Inventory", pvictim.getInventory().getContents(), FakeInventoryManager.INV_DOUBLE);
         inv.setInventoryFlag(FakeInventory.Flags.IS_LOCKED, true);
         inv.setInventoryFlag(FakeInventory.Flags.IS_INV_SEE, true);
         inv.showInventory(player);

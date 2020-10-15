@@ -359,7 +359,7 @@ public class SurvivalShop extends Addon {
         if (player == null || messageKey == null || configFile.getString(messageKey).equals("")) return "";
 
         String message = configFile.getString(messageKey);
-        message = message.replace("{player}", player.getName());
+        message = message.replace("{player}", player.getDisplayName());
         message = message.replace("{money}", TextUtils.formatBigNumber(money));
         return message;
     }
