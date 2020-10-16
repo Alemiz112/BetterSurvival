@@ -178,7 +178,7 @@ public class MyHomes extends Addon {
             return;
         }
 
-        if (category.getWarp(name) != null){
+        if (this.getWarp(name) != null){
             player.sendMessage("§c»§7Warp with this name has been already registered!");
             return;
         }
