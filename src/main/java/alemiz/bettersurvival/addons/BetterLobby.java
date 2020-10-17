@@ -7,6 +7,7 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.event.EventHandler;
+import cn.nukkit.event.block.BlockGrowEvent;
 import cn.nukkit.event.block.ItemFrameDropItemEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityExplodeEvent;
@@ -37,6 +38,7 @@ public class BetterLobby extends Addon {
     private List<FloatingTextParticle> particles = new ArrayList<>();
 
     private boolean protectSpawn = true;
+    private boolean growOnSpawn = true;
 
     private FloatingTextParticle rulesParticle = null;
 
@@ -53,6 +55,7 @@ public class BetterLobby extends Addon {
         this.quitMessage = configFile.getString("quitMessage");
 
         this.protectSpawn = configFile.getBoolean("safeSpawn", true);
+        this.growOnSpawn = configFile.getBoolean("noGrowOnSpawn", true);
 
         this.particles = createHelpParticles();
         this.loadBroadcaster();
@@ -94,6 +97,7 @@ public class BetterLobby extends Addon {
             configFile.set("rulesText", new ArrayList<>());
 
             configFile.set("safeSpawn", true);
+            configFile.set("growOnSpawn", false);
             configFile.save();
         }
     }
@@ -176,6 +180,14 @@ public class BetterLobby extends Addon {
     public void onItemFrame(ItemFrameDropItemEvent event){
         if (!this.protectSpawn || event.getPlayer().isOp() || !isSafeSpawn(event.getItemFrame())) return;
         event.setCancelled();
+    }
+
+    @EventHandler
+    public void onBlockGrow(BlockGrowEvent event){
+        Block block = event.getBlock();
+        if (!this.growOnSpawn && this.isSafeSpawn(block)){
+            event.setCancelled(true);
+        }
     }
 
     public boolean isSafeSpawn(Position position){
