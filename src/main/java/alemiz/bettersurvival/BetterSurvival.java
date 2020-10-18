@@ -5,6 +5,7 @@ import alemiz.bettersurvival.addons.clans.PlayerClans;
 import alemiz.bettersurvival.addons.economy.BetterEconomy;
 import alemiz.bettersurvival.addons.myhomes.MyHomes;
 import alemiz.bettersurvival.addons.myland.MyLandProtect;
+import alemiz.bettersurvival.addons.quests.SurvivalQuests;
 import alemiz.bettersurvival.addons.shop.SurvivalShop;
 import alemiz.bettersurvival.tasks.ServerRestartTask;
 import alemiz.bettersurvival.utils.Addon;
@@ -122,6 +123,7 @@ public class BetterSurvival extends PluginBase implements Listener {
         Addon.loadAddon(SurvivalShop.class, "survival_shop.yml");
         Addon.loadAddon(BetterEconomy.class, "better_economy.yml");
         Addon.loadAddon(PlayerClans.class, "player_clans.yml");
+        Addon.loadAddon(SurvivalQuests.class, "survival_quests.yml");
 
         //This must be last addon loaded
         Addon.loadAddon(BetterLobby.class, "better_lobby.yml");

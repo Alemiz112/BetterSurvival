@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.entity.data.Skin;
+import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
@@ -98,5 +99,12 @@ public class FakeHuman extends EntityHuman {
         this.server.removePlayerListData(this.getUniqueId(), new Player[]{player});
 
         super.spawnTo(player);
+    }
+
+    @Override
+    public boolean attack(EntityDamageEvent source) {
+        source.setCancelled(true);
+        super.attack(source);
+        return false;
     }
 }

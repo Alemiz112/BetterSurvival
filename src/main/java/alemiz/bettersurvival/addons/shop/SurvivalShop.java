@@ -27,10 +27,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import me.onebone.economyapi.EconomyAPI;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -53,7 +49,7 @@ public class SurvivalShop extends Addon {
 
     @Override
     public void postLoad() {
-        JsonElement json = ConfigManager.getInstance().loadJson(ConfigManager.getInstance().ADDONS_PATH+"/shop.json");
+        JsonElement json = this.getJsonResource("shop.json");
         if (!json.isJsonObject()){
             this.setEnabled(false);
             return;
@@ -122,25 +118,6 @@ public class SurvivalShop extends Addon {
         }
 
         this.saveFromResources("shop.json");
-    }
-
-    protected void saveFromResources(String fileName){
-        try {
-            File shopFile = new File(ConfigManager.getInstance().ADDONS_PATH+"/"+fileName);
-            if (!shopFile.exists()){
-                shopFile.createNewFile();
-
-                InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(fileName);
-                byte[] buffer = new byte[inputStream.available()];
-                inputStream.read(buffer);
-
-                OutputStream outputStream = new FileOutputStream(shopFile);
-                outputStream.write(buffer);
-                inputStream.close();
-            }
-        }catch (Exception e){
-            this.plugin.getLogger().info("§eUnable to save "+fileName+" from resources!");
-        }
     }
 
     @Override

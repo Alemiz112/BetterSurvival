@@ -38,7 +38,7 @@ public class ShopCommand extends Command {
             return true;
         }
 
-        if (!player.hasPermission(this.loader.configFile.getString("bettersurvival.shop.manage"))){
+        if (!player.hasPermission(this.loader.configFile.getString("shopManagePermission"))){
             player.sendMessage("§c»§7You dont have permission to create shop!");
             return true;
         }

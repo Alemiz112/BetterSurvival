@@ -1,6 +1,5 @@
 package alemiz.bettersurvival.addons.myhomes;
 
-import alemiz.bettersurvival.BetterSurvival;
 import alemiz.bettersurvival.utils.form.Form;
 import alemiz.bettersurvival.utils.form.SimpleForm;
 import cn.nukkit.Player;
