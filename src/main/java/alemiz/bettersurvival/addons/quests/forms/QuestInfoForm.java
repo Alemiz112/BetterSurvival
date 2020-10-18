@@ -19,9 +19,9 @@ package alemiz.bettersurvival.addons.quests.forms;
 import alemiz.bettersurvival.addons.quests.Quest;
 import alemiz.bettersurvival.addons.quests.QuestIngredient;
 import alemiz.bettersurvival.addons.quests.SurvivalQuests;
-import alemiz.bettersurvival.utils.form.Form;
 import alemiz.bettersurvival.utils.form.ModalForm;
 import cn.nukkit.Player;
+import cubemc.commons.nukkit.utils.forms.Form;
 
 public class QuestInfoForm extends ModalForm {
 

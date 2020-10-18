@@ -18,10 +18,11 @@ package alemiz.bettersurvival.addons.quests.forms;
 
 import alemiz.bettersurvival.addons.quests.Quest;
 import alemiz.bettersurvival.addons.quests.SurvivalQuests;
-import alemiz.bettersurvival.utils.form.Form;
 import alemiz.bettersurvival.utils.form.SimpleForm;
 import cn.nukkit.Player;
 import cn.nukkit.form.element.ElementButton;
+import cubemc.commons.nukkit.utils.forms.Form;
+import cubemc.commons.nukkit.utils.forms.FormImage;
 
 public class QuestMenuForm extends SimpleForm {
 
@@ -39,9 +40,9 @@ public class QuestMenuForm extends SimpleForm {
         message = message.replace("{player}", player.getDisplayName());
         this.setContent(message);
 
-        this.addButton(new ElementButton("§aDaily Quest\n§7»Click to open"));
-        this.addButton(new ElementButton("§eQuest Profile\n§7»Click to open"));
-        this.addButton(new ElementButton("§fClose"));
+        this.addButton(new ElementButton("§aDaily Quest\n§7»Click to open", FormImage.IMAGE_SECRET.getImage()));
+        this.addButton(new ElementButton("§eQuest Profile\n§7»Click to open", FormImage.IMAGE_PARROT.getImage()));
+        this.addButton(new ElementButton("§fClose", FormImage.IMAGE_EXIT.getImage()));
         return this;
     }
 

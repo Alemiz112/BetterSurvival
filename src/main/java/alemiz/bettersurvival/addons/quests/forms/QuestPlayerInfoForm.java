@@ -19,11 +19,11 @@ package alemiz.bettersurvival.addons.quests.forms;
 import alemiz.bettersurvival.addons.quests.PlayerQuestData;
 import alemiz.bettersurvival.addons.quests.SurvivalQuests;
 import alemiz.bettersurvival.utils.TextUtils;
-import alemiz.bettersurvival.utils.form.Form;
 import alemiz.bettersurvival.utils.form.SimpleForm;
 import cn.nukkit.Player;
 import cn.nukkit.form.element.ElementButton;
 import cn.nukkit.item.Item;
+import cubemc.commons.nukkit.utils.forms.Form;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 
 import java.util.Map;
