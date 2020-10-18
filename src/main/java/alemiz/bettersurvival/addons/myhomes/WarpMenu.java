@@ -1,6 +1,6 @@
 package alemiz.bettersurvival.addons.myhomes;
 
-import alemiz.bettersurvival.utils.form.Form;
+import cubemc.commons.nukkit.utils.forms.Form;
 import alemiz.bettersurvival.utils.form.SimpleForm;
 import cn.nukkit.Player;
 import cn.nukkit.form.element.ElementButton;

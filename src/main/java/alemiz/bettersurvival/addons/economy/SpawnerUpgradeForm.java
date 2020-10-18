@@ -1,11 +1,11 @@
 package alemiz.bettersurvival.addons.economy;
 
 import alemiz.bettersurvival.utils.form.CustomForm;
-import alemiz.bettersurvival.utils.form.Form;
 import cn.nukkit.Player;
 import cn.nukkit.form.element.ElementDropdown;
 import cn.nukkit.form.element.ElementLabel;
 import cn.nukkit.item.Item;
+import cubemc.commons.nukkit.utils.forms.Form;
 import cubemc.nukkit.connector.modules.Money;
 
 import java.util.ArrayList;

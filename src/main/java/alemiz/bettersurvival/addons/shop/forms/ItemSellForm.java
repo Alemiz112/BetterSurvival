@@ -3,7 +3,7 @@ package alemiz.bettersurvival.addons.shop.forms;
 import alemiz.bettersurvival.addons.shop.ShopCategoryElement;
 import alemiz.bettersurvival.addons.shop.ShopItem;
 import alemiz.bettersurvival.utils.form.CustomForm;
-import alemiz.bettersurvival.utils.form.Form;
+import cubemc.commons.nukkit.utils.forms.Form;
 import cn.nukkit.Player;
 import cn.nukkit.form.element.ElementDropdown;
 import cn.nukkit.form.element.ElementLabel;

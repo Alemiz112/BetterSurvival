@@ -1,7 +1,7 @@
 package alemiz.bettersurvival.addons.shop.forms;
 
 import alemiz.bettersurvival.utils.form.CustomForm;
-import alemiz.bettersurvival.utils.form.Form;
+import cubemc.commons.nukkit.utils.forms.Form;
 import cn.nukkit.Player;
 import cn.nukkit.form.element.ElementInput;
 import cn.nukkit.form.element.ElementLabel;

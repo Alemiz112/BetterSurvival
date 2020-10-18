@@ -13,7 +13,6 @@ import alemiz.bettersurvival.utils.ConfigManager;
 import alemiz.bettersurvival.utils.enitity.FakeHuman;
 import alemiz.bettersurvival.utils.fakeChest.FakeInventory;
 import alemiz.bettersurvival.utils.fakeChest.FakeInventoryManager;
-import alemiz.bettersurvival.utils.form.Form;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.EventHandler;
@@ -101,13 +100,6 @@ public class BetterSurvival extends PluginBase implements Listener {
         });
 
         if (cancel.get()) event.setCancelled(true);
-    }
-
-    @EventHandler
-    public void onForm(PlayerFormRespondedEvent event){
-        if (!(event.getWindow() instanceof Form)) return;
-        Form form = (Form) event.getWindow();
-        form.handle(event.getPlayer());
     }
 
     public void loadAddons(){

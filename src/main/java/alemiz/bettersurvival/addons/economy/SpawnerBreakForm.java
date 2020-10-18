@@ -1,13 +1,13 @@
 package alemiz.bettersurvival.addons.economy;
 
 import alemiz.bettersurvival.utils.TextUtils;
-import alemiz.bettersurvival.utils.form.Form;
 import alemiz.bettersurvival.utils.form.ModalForm;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
+import cubemc.commons.nukkit.utils.forms.Form;
 import cubemc.nukkit.connector.modules.Money;
 
 public class SpawnerBreakForm extends ModalForm {
@@ -16,7 +16,7 @@ public class SpawnerBreakForm extends ModalForm {
     private final transient Block block;
 
     public SpawnerBreakForm(Player player, Block block, EconomySpawners loader) {
-        super("", "", "", "");
+        super("", "");
         this.player = player;
         this.block = block;
         this.loader = loader;
