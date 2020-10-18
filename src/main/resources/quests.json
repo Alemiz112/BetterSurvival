@@ -3,18 +3,51 @@
     "diamond_bag" : {
       "type": "ITEM",
       "count": 18,
-      "item_id": "264",
-      "item_meta": "0"
+      "item_id": 264,
+      "item_meta": 0
     },
     "brick_roof": {
       "type": "CRAFT",
-      "count" : 10,
+      "count" : 64,
       "item_id": 108
     },
     "some_pigs": {
       "type": "KILL",
       "entityName": "Pig",
-      "count": 15
+      "count": 50
+    },
+    "iron_axe": {
+      "type": "CRAFT",
+      "count" : 2,
+      "item_id": 258
+    },
+    "vine": {
+      "type": "ITEM",
+      "count": 88,
+      "item_id": 106,
+      "item_meta": 0
+    },
+    "pumpkins": {
+      "type": "ITEM",
+      "count": 48,
+      "item_id": 86,
+      "item_meta": 0
+    },
+    "red_mushrooms": {
+      "type": "ITEM",
+      "count": 32,
+      "item_id": 40,
+      "item_meta": 0
+    },
+    "witches": {
+      "type": "KILL",
+      "entityName": "Witch",
+      "count": 18
+    },
+    "withers": {
+      "type": "KILL",
+      "entityName": "Wither",
+      "count": 10
     }
   },
   "quests": {
@@ -22,19 +55,43 @@
       "name": "The Diamond Day",
       "description": "During the diamond day players all over the server are finding diamonds. Bring me some too!",
       "ingredients": ["diamond_bag"],
-      "reward": 1000
+      "reward": 2400
     },
     "broken_roof" : {
       "name": "Broken Roof",
       "description": "Have you seen my house? It's roof is broken, help me fix it!",
       "ingredients": ["brick_roof"],
-      "reward": 1500
+      "reward": 1800
     },
     "food_festival": {
       "name": "CubeFest",
       "description": "This eventing im organizing small festival, CubeFest. If you want to join, hunt some pigs!",
       "ingredients": ["some_pigs"],
-      "reward": 1000
+      "reward": 6000
+    },
+    "clean_wines": {
+      "name": "Clean The Vines",
+      "description": "Have you seen the vines all around? I bet someone forgot to clean it! Clean all the statues and bring me those vines!",
+      "ingredients": ["iron_axe", "vine"],
+      "reward": 5200
+    },
+    "halloween_2020": {
+      "name": "Halloween",
+      "description": "Did you know that Halloween is coming? Come help me gather resources for decorations!",
+      "ingredients": ["pumpkins", "red_mushrooms"],
+      "reward": 6200
+    },
+    "the_witches": {
+      "name": "The Witches",
+      "description": "Hey! Please help me, there are so many witches waiting for Halloween to happen. But they are dangerous, can you help me kill them?",
+      "ingredients": ["witches"],
+      "reward": 5200
+    },
+    "the_beacon": {
+      "name": "Light The Sky",
+      "description": "I have collected some diamonds. To create beacon I need you to visit Mr Wither. Help me light the sky!",
+      "ingredients": ["withers"],
+      "reward": 5200
     }
   }
 }
