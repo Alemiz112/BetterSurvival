@@ -1,0 +1,40 @@
+{
+  "ingredients": {
+    "diamond_bag" : {
+      "type": "ITEM",
+      "count": 18,
+      "item_id": "264",
+      "item_meta": "0"
+    },
+    "brick_roof": {
+      "type": "CRAFT",
+      "count" : 10,
+      "item_id": 108
+    },
+    "some_pigs": {
+      "type": "KILL",
+      "entityName": "Pig",
+      "count": 15
+    }
+  },
+  "quests": {
+    "diamond_day": {
+      "name": "The Diamond Day",
+      "description": "During the diamond day players all over the server are finding diamonds. Bring me some too!",
+      "ingredients": ["diamond_bag"],
+      "reward": 1000
+    },
+    "broken_roof" : {
+      "name": "Broken Roof",
+      "description": "Have you seen my house? It's roof is broken, help me fix it!",
+      "ingredients": ["brick_roof"],
+      "reward": 1500
+    },
+    "food_festival": {
+      "name": "CubeFest",
+      "description": "This eventing im organizing small festival, CubeFest. If you want to join, hunt some pigs!",
+      "ingredients": ["some_pigs"],
+      "reward": 1000
+    }
+  }
+}

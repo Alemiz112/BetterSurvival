@@ -227,7 +227,7 @@ public class MyHomes extends Addon {
         Config config = ConfigManager.getInstance().loadPlayer(isOwner? player.getName() : playerWarp.getOwner());
         if (config == null) return;
 
-        ((Map) config.get("pwarps")).remove(playerWarp.getRawName());
+        ((Map<?, ?>) config.get("pwarps")).remove(playerWarp.getRawName());
         config.save();
 
         String message = configFile.getString("warpDelete");

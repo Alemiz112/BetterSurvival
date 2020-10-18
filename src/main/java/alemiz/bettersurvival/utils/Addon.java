@@ -4,7 +4,12 @@ import alemiz.bettersurvival.BetterSurvival;
 import cn.nukkit.Server;
 import cn.nukkit.event.Listener;
 import cn.nukkit.utils.Config;
+import com.google.gson.JsonElement;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
@@ -88,6 +93,30 @@ public abstract class Addon implements Listener{
 
         if (registered && map) this.commands.put(fallbackPrefix, command);
         return registered;
+    }
+
+    public boolean saveFromResources(String fileName){
+        try {
+            File shopFile = new File(ConfigManager.ADDONS_PATH +"/"+fileName);
+            if (!shopFile.createNewFile()){
+                return false;
+            }
+            InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(fileName);
+            byte[] buffer = new byte[inputStream.available()];
+            inputStream.read(buffer);
+
+            OutputStream outputStream = new FileOutputStream(shopFile);
+            outputStream.write(buffer);
+            inputStream.close();
+            return true;
+        }catch (Exception e){
+            this.plugin.getLogger().info("§eUnable to save "+fileName+" from resources!");
+        }
+        return false;
+    }
+
+    public JsonElement getJsonResource(String fileName){
+        return ConfigManager.getInstance().loadJson(ConfigManager.ADDONS_PATH+"/"+fileName);
     }
 
     public void loadListeners(){
