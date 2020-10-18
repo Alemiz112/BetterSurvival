@@ -22,7 +22,7 @@ import cn.nukkit.Player;
 import cn.nukkit.event.Event;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import me.onebone.economyapi.EconomyAPI;
+import cubemc.nukkit.connector.modules.Money;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -84,7 +84,7 @@ public class Quest {
         Event event = new QuestCompletedEvent(player, this);
         player.getServer().getPluginManager().callEvent(event);
 
-        EconomyAPI.getInstance().addMoney(player, this.rewardValue);
+        Money.getInstance().addMoney(player, this.rewardValue);
 
         String message = loader.configFile.getString("completedQuestMessage");
         message = message.replace("{quest}", this.questName);
