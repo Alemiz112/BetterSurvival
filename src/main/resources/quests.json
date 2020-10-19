@@ -21,7 +21,7 @@
       "count" : 2,
       "item_id": 258
     },
-    "vine": {
+    "vines": {
       "type": "ITEM",
       "count": 88,
       "item_id": 106,
@@ -72,7 +72,7 @@
     "clean_wines": {
       "name": "Clean The Vines",
       "description": "Have you seen the vines all around? I bet someone forgot to clean it! Clean all the statues and bring me those vines!",
-      "ingredients": ["iron_axe", "vine"],
+      "ingredients": ["iron_axe", "vines"],
       "reward": 5200
     },
     "halloween_2020": {
