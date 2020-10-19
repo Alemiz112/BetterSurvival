@@ -99,11 +99,7 @@ public class QuestIngredient {
     }
 
     private boolean checkInventory(Player player){
-        System.out.println("Original:"+this.item);
-
         Item item = this.getSampleItem();
-        System.out.println("Sample:"+item);
-        System.out.println("Count:"+count);
         item.setCount(this.count);
         return player.getInventory().contains(item);
     }
