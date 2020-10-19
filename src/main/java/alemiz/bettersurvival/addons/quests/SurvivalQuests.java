@@ -84,7 +84,11 @@ public class SurvivalQuests extends Addon {
             String ingredientId = entry.getKey();
             try {
                 QuestIngredient ingredient = QuestIngredient.fromJson(ingredientId, entry.getValue().getAsJsonObject());
-                this.registerIngredient(ingredient);
+                if (ingredient == null){
+                 this.plugin.getLogger().warning("§cUnable to load QuestIngredient "+ingredientId+"!");
+                }else {
+                    this.registerIngredient(ingredient);
+                }
             }catch (Exception e){
                 this.plugin.getLogger().warning("§cUnable to load ingredient "+ingredientId+"!");
             }
@@ -196,7 +200,6 @@ public class SurvivalQuests extends Addon {
         }
     }
 
-    //TODO: damage check
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onKill(EntityDamageByEntityEvent event){
         if (event.isCancelled() || !(event.getDamager() instanceof Player)){
@@ -335,11 +338,6 @@ public class SurvivalQuests extends Addon {
             return false;
         }
         ZonedDateTime completedAt = ZonedDateTime.parse(completedTime, TimeUtils.DATE_TIME_FORMATTER);
-
-        //TODO: finish tests, death test
-        System.out.println("Completed before valid:"+completedAt.isBefore(quest.getValidTime()));
-        System.out.println("Completed after start:"+completedAt.isAfter(quest.getValidTime().minusHours(this.questHourInterval)));
-
         return completedAt.isBefore(quest.getValidTime()) && completedAt.isAfter(quest.getValidTime().minusHours(this.questHourInterval));
     }
 
