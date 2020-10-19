@@ -31,6 +31,11 @@ import java.util.List;
 public class Quest {
 
     public static Quest fromJson(String questId, JsonObject jsonObject, SurvivalQuests loader){
+        if (!jsonObject.has("description") || !jsonObject.has("reward") || !jsonObject.has("ingredients")){
+            loader.plugin.getLogger().warning("§cWrong configuration for quest "+jsonObject+"!");
+            return null;
+        }
+
         String questName = jsonObject.has("name")? jsonObject.get("name").getAsString() : TextUtils.headerFormat(questId.replace("_", " "));
         String description = jsonObject.get("description").getAsString();
         int reward = jsonObject.get("reward").getAsInt();

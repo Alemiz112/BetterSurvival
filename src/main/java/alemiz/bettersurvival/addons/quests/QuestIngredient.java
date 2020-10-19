@@ -25,6 +25,10 @@ import com.google.gson.JsonObject;
 public class QuestIngredient {
 
     public static QuestIngredient fromJson(String ingredientId, JsonObject jsonObject){
+        if (!jsonObject.has("type") || !jsonObject.has("count")){
+            return null;
+        }
+
         String stringType = jsonObject.get("type").getAsString();
         TYPE type;
         try {
@@ -38,11 +42,17 @@ public class QuestIngredient {
         switch (type){
             case ITEM:
             case CRAFT:
+                if (!jsonObject.has("item_id")){
+                    return null;
+                }
                 int itemMeta = jsonObject.has("item_meta")? jsonObject.get("item_meta").getAsInt() : 0;
                 Item item = Item.get(jsonObject.get("item_id").getAsInt(), itemMeta);
                 ingredient.setItem(item);
                 break;
             case KILL:
+                if (!jsonObject.has("entityName")){
+                    return null;
+                }
                 ingredient.setEntityName(jsonObject.get("entityName").getAsString());
                 break;
         }
@@ -89,7 +99,11 @@ public class QuestIngredient {
     }
 
     private boolean checkInventory(Player player){
+        System.out.println("Original:"+this.item);
+
         Item item = this.getSampleItem();
+        System.out.println("Sample:"+item);
+        System.out.println("Count:"+count);
         item.setCount(this.count);
         return player.getInventory().contains(item);
     }
