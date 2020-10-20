@@ -55,7 +55,7 @@ public class BetterLobby extends Addon {
         this.quitMessage = configFile.getString("quitMessage");
 
         this.protectSpawn = configFile.getBoolean("safeSpawn", true);
-        this.growOnSpawn = configFile.getBoolean("noGrowOnSpawn", true);
+        this.growOnSpawn = configFile.getBoolean("growOnSpawn", true);
 
         this.particles = createHelpParticles();
         this.loadBroadcaster();
