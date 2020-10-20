@@ -28,9 +28,19 @@ public class PlayerClans extends Addon {
 
     @Override
     public void postLoad() {
+        int failedAttempts = 0;
+
         for (SuperConfig config : ConfigManager.getInstance().loadAllFromFolder(ConfigManager.PATH+"/clans")){
-            this.loadClan(config);
+            String rawName = config.getName().split("\\.")[0];
+            try {
+                this.loadClan(rawName, config);
+            }catch (Exception e){
+                failedAttempts++;
+                this.plugin.getLogger().error("§cFailed to load clan §4"+rawName+"§c!", e);
+            }
         }
+        this.plugin.getLogger().info("§eAll clans loaded! Entries: §3"+this.clans.size());
+        this.plugin.getLogger().info("§eFailed: §c"+failedAttempts);
     }
 
     @Override
@@ -74,10 +84,7 @@ public class PlayerClans extends Addon {
         event.setCancelled(true);
     }
 
-    private void loadClan(SuperConfig config){
-        String rawName = config.getName().split("\\.")[0];
-        this.plugin.getLogger().info("§eLoading clan §3"+rawName+"§e!");
-
+    private void loadClan(String rawName, SuperConfig config){
         Clan clan = new Clan(rawName, config.getString("formattedName"), config, this);
         this.clans.put(rawName, clan);
 
