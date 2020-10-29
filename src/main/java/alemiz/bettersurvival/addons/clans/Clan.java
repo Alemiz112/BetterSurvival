@@ -94,12 +94,13 @@ public class Clan {
     }
 
     private void saveHomes(){
+        Map<String, String> homeMap = new HashMap<>();
         for (String homeName : this.homes.keySet()){
             Position home = this.homes.get(homeName);
             String homeString = home.getX()+","+home.getY()+","+home.getZ()+","+home.getLevel().getFolderName();
-
-            config.set("home."+homeName, homeString);
+            homeMap.put(homeName, homeString);
         }
+        config.set("home", homeMap);
         config.save();
     }
 
