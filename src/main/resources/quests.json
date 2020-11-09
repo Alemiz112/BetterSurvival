@@ -48,6 +48,71 @@
       "type": "KILL",
       "entityName": "Wither",
       "count": 10
+    },
+    "torches" : {
+      "type": "ITEM",
+      "count": 256,
+      "item_id": 50
+    },
+    "craft_torches": {
+      "type": "CRAFT",
+      "count" : 256,
+      "item_id": 50
+    },
+    "bread" : {
+      "type": "ITEM",
+      "count": 5,
+      "item_id": 297
+    },
+    "pork_chops" : {
+      "type": "ITEM",
+      "count": 2,
+      "item_id": 320
+    },
+    "cooked_steaks" : {
+      "type": "ITEM",
+      "count": 2,
+      "item_id": 364
+    },
+    "grilled_chicken" : {
+      "type": "ITEM",
+      "count": 4,
+      "item_id": 366
+    },
+    "craft_cake" : {
+      "type": "CRAFT",
+      "count": 4,
+      "item_id": 354
+    },
+    "bring_cookies" : {
+      "type": "ITEM",
+      "count": 16,
+      "item_id": 357
+    },
+    "spiders": {
+      "type": "KILL",
+      "entityName": "Spider",
+      "count": 7
+    },
+    "skeletons": {
+      "type": "KILL",
+      "entityName": "Skeleton",
+      "count": 12
+    },
+    "zombies": {
+      "type": "KILL",
+      "entityName": "Zombie",
+      "count": 10
+    },
+    "bring_quartz" : {
+      "type": "ITEM",
+      "count": 16,
+      "item_id": 406
+    },
+    "bring_nether_wart" : {
+      "type": "ITEM",
+      "count": 32,
+      "item_id": 372
     }
   },
   "quests": {
@@ -92,6 +157,36 @@
       "description": "I have collected some diamonds. To create beacon I need you to visit Mr Wither. Help me light the sky!",
       "ingredients": ["withers"],
       "reward": 5200
+    },
+    "light_up": {
+      "name": "Light It Up",
+      "description": "Find some coal. Make torches! Use your torches to light your home. Craft and bring me some torches.",
+      "ingredients": ["craft_torches", "torches"],
+      "reward": 4800
+    },
+    "cooking": {
+      "name": "What’s Cooking",
+      "description": "Bake five loaves of bread, two pork chops, two steaks, and two pieces of grilled chicken.",
+      "ingredients": ["bread", "pork_chops", "cooked_steaks", "grilled_chicken"],
+      "reward": 6300
+    },
+    "desert": {
+      "name": "Time for Dessert",
+      "description": "Bake me cake and cookies!",
+      "ingredients": ["craft_cake", "bring_cookies"],
+      "reward": 4100
+    },
+    "monster_hunting": {
+      "name": "Monster Hunting",
+      "description": "Collect me some reward from monster hunting. But be careful some monsters can explode!",
+      "ingredients": ["spiders", "skeletons", "zombies"],
+      "reward": 4500
+    },
+    "the_gateway": {
+      "name": "The Gateway",
+      "description": "Collect obsidian and build a nether portal in or near your home. Travel thought it and bring me some nether souvenirs!",
+      "ingredients": ["bring_quartz", "bring_nether_wart"],
+      "reward": 4500
     }
   }
 }
