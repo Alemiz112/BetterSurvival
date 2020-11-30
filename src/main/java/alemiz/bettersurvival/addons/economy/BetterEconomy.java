@@ -460,18 +460,23 @@ public class BetterEconomy extends Addon {
             //ignore
         }
 
-        if (itemFrameBlock == null) return;
-        BlockEntityItemFrame itemFrame = (BlockEntityItemFrame) player.getLevel().getBlockEntity(itemFrameBlock);
+        BlockEntity blockEntity;
+        if (itemFrameBlock == null || (blockEntity = player.getLevel().getBlockEntity(itemFrameBlock)) == null){
+            return;
+        }
+        BlockEntityItemFrame itemFrame = (BlockEntityItemFrame) blockEntity;
 
         Item item = itemFrame.getItem();
-        if (item == null || item.getId() == Item.AIR || this.isTradeFramePayed(itemFrame)) return;
+        if (item == null || item.getId() == Item.AIR || this.isTradeFramePayed(itemFrame)){
+            return;
+        }
 
         CompoundTag tag = itemFrame.namedTag;
         String owner = tag.getString("trade_owner");
         int price = tag.getInt("trade_price");
         int count = tag.getInt("trade_count");
 
-        player.sendTip("§aOwner: §2"+owner+"\n§bCount: §3"+count+"§b Price: §e"+price+"$");
+        player.sendPopup("§aOwner: §2"+owner+"\n§bCount: §3"+count+"§b Price: §e"+price+"$");
     }
 
     public void addTraderCreator(Player player, int value){
