@@ -455,13 +455,13 @@ public class MyLandProtect extends Addon {
             return false;
         }
 
-        //1. Check if land is in spawn
+        // 1. Check if land is in spawn
         if (level.isInSpawnRadius(block1) || level.isInSpawnRadius(block2)){
             player.sendMessage("§c»§7You can not create land inside spawn area!");
             return false;
         }
 
-        //2. Check if land is in other land or over other land
+        // 2. Check if land is in other land or over other land
         LandRegion region = null;
         Vector3f pos1 = block1.asVector3f();
         Vector3f pos2 = block2.asVector3f();
@@ -469,7 +469,7 @@ public class MyLandProtect extends Addon {
         for (LandRegion landRegion : this.lands.values()){
             if (this.isInside(pos1, landRegion.getPos1(), landRegion.getPos2()) ||
                     this.isInside(pos2, landRegion.getPos1(), landRegion.getPos2()) ||
-                    this.isInside(landRegion.getPos2(), pos1, pos2) ||
+                    this.isInside(landRegion.getPos1(), pos1, pos2) ||
                     this.isInside(landRegion.getPos2(), pos1, pos2)){
                 region = landRegion;
                 break;
@@ -496,7 +496,7 @@ public class MyLandProtect extends Addon {
             }
         }
 
-        //3. Check land sizes
+        // 3. Check land sizes
         int landSize;
         if (clanMode){
             landSize = 5*75; //TODO: calculate by clan player count & allow resizing
