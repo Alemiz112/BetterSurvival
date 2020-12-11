@@ -36,7 +36,7 @@ public class CubeBridge extends Addon {
             configFile.set("rank.subscriber", new ArrayList<>(Collections.emptyList()));
             configFile.set("rank.cube+", new ArrayList<>(Collections.emptyList()));
             configFile.set("rank.vip", new ArrayList<>(Collections.emptyList()));
-            configFile.set("rank.staff", new ArrayList<>(Collections.emptyList()));
+            configFile.set("rank.moderator", new ArrayList<>(Collections.emptyList()));
             configFile.set("rank.helper", new ArrayList<>(Collections.emptyList()));
             configFile.save();
         }
@@ -99,7 +99,7 @@ public class CubeBridge extends Addon {
             vip.addPermission(Addon.getAddon(SurvivalShop.class).configFile.getString("shopVipPermission"));
         }
 
-        RankData staffRank = this.getRankData("staff");
+        RankData staffRank = this.getRankData("moderator");
         if (staffRank != null){
             staffRank.addPermission(Addon.getAddon(Troller.class).configFile.getString("permission-vanish"));
             staffRank.addPermission(Addon.getAddon(Troller.class).configFile.getString("permission-troll"));
