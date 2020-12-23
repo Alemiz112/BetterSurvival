@@ -17,7 +17,7 @@ package alemiz.bettersurvival.tasks;
 
 import alemiz.bettersurvival.BetterSurvival;
 import cn.nukkit.Player;
-import cubemc.nukkit.connector.network.LobbyJoinPacket;
+import cubemc.nukkit.connector.CubeConnector;
 
 public class ServerRestartTask implements Runnable{
 
@@ -38,9 +38,7 @@ public class ServerRestartTask implements Runnable{
         }
 
         for (Player player : this.plugin.getServer().getOnlinePlayers().values()){
-            LobbyJoinPacket packet = new LobbyJoinPacket();
-            packet.player = player.getName();
-            packet.putPacket();
+            CubeConnector.getInstance().getPlayerManager().sendToLobby(player);
         }
         this.plugin.getServer().shutdown();
     }

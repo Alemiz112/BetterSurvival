@@ -2,7 +2,7 @@ package alemiz.bettersurvival.commands;
 
 import alemiz.bettersurvival.addons.BetterLobby;
 import alemiz.bettersurvival.utils.Command;
-import alemiz.sgu.StarGateUniverse;
+import alemiz.sgu.nukkit.StarGateUniverse;
 import cn.nukkit.Player;
 import cn.nukkit.command.CommandSender;
 
@@ -31,7 +31,7 @@ public class EventCommand extends Command {
             return true;
         }
 
-        StarGateUniverse.getInstance().transferPlayer((Player) sender, "event");
+        StarGateUniverse.getInstance().transferPlayer(((Player) sender), "event");
         return true;
     }
 }

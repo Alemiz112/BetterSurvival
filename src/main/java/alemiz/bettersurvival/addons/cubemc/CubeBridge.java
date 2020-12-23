@@ -24,11 +24,6 @@ public class CubeBridge extends Addon {
     }
 
     @Override
-    public void postLoad() {
-        this.loadRanks(new ArrayList<>(CubeConnector.getInstance().rankManager.getRanks().values()));
-    }
-
-    @Override
     public void loadConfig() {
         if (!configFile.exists("enable")){
             configFile.set("enable", true);
