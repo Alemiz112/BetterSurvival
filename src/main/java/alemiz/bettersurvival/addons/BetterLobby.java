@@ -218,7 +218,7 @@ public class BetterLobby extends Addon {
 
     public DummyBossBar buildBossBar(Player player){
         if (!configFile.getBoolean("bossBar")){
-            return new DummyBossBar.Builder(player).build();
+            return null;
         }
 
         DummyBossBar.Builder builder = new DummyBossBar.Builder(player);
