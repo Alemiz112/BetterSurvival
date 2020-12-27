@@ -8,19 +8,37 @@ import alemiz.bettersurvival.addons.shop.SurvivalShop;
 import alemiz.bettersurvival.utils.Addon;
 import cn.nukkit.Player;
 import cn.nukkit.event.EventHandler;
+import cn.nukkit.event.player.PlayerQuitEvent;
 import cubemc.commons.nukkit.events.CubePlayerJoinEvent;
 import cubemc.commons.nukkit.events.RanksLoadEvent;
+import cubemc.commons.nukkit.utils.scoreboard.AdvancedScoreboard;
+import cubemc.commons.nukkit.utils.scoreboard.ScoreLineEntry;
 import cubemc.commons.ranks.Rank;
-import cubemc.nukkit.connector.CubeConnector;
 
 import java.util.*;
 
 public class CubeBridge extends Addon {
 
     private final Map<String, RankData> rankDataMap = new HashMap<>();
+    private AdvancedScoreboard scoreboard = null;
 
     public CubeBridge(String path){
         super("cubebridge", path);
+    }
+
+    @Override
+    public void postLoad() {
+        this.scoreboard = new AdvancedScoreboard("survival", "survival");
+
+        ScoreLineEntry playerCountLine = new ScoreLineEntry("\uE180§e {count}");
+        playerCountLine.addTranslation((text, player) ->
+                text.replace("{count}", String.valueOf(this.plugin.getServer().getOnlinePlayersCount())));
+        this.scoreboard.addLine(playerCountLine, false);
+
+        ScoreLineEntry mainEntry = new ScoreLineEntry("§bCube§6MC §aSurvival{vanish}");
+        mainEntry.addTranslation(this::translateMainScore);
+        this.scoreboard.addLine(mainEntry, false);
+        this.scoreboard.updateBoard();
     }
 
     @Override
@@ -44,8 +62,12 @@ public class CubeBridge extends Addon {
 
     @EventHandler
     public void onNetworkJoin(CubePlayerJoinEvent event){
+        if (event.getPlayer() == null){
+            return;
+        }
         Player player = event.getPlayer();
-        if (player == null) return;
+        this.scoreboard.addPlayer(player);
+        this.scoreboard.updateBoard();
 
         for (Rank rank : event.getRanks()){
             RankData rankData = this.getRankData(rank.getName());
@@ -53,6 +75,13 @@ public class CubeBridge extends Addon {
                 rankData.assignPermissions(player, this.plugin);
             }
         }
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        this.scoreboard.removePlayer(player);
+        this.scoreboard.updateBoard();
     }
 
     public void loadRanks(List<Rank> ranks){
@@ -118,11 +147,25 @@ public class CubeBridge extends Addon {
         }
     }
 
+    private String translateMainScore(String text, Player player) {
+        Addon addon = Addon.getAddon(Troller.class);
+        if (addon == null || !addon.isEnabled()) {
+            return text.replace("{vanish}", "");
+        }
+
+        boolean vanished = ((Troller) addon).getVanishPlayers().contains(player.getName());
+        return text.replace("{vanish}", vanished? "§7 - §cVanished": "");
+    }
+
     public RankData getRankData(String rankName){
         return this.rankDataMap.get(rankName.toLowerCase());
     }
 
     public Map<String, RankData> getRankDataMap() {
         return this.rankDataMap;
+    }
+
+    public AdvancedScoreboard getScoreboard() {
+        return this.scoreboard;
     }
 }

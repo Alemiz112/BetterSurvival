@@ -15,6 +15,7 @@
 
 package alemiz.bettersurvival.addons;
 
+import alemiz.bettersurvival.addons.cubemc.CubeBridge;
 import alemiz.bettersurvival.commands.*;
 import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.fakeChest.FakeInventory;
@@ -36,6 +37,7 @@ import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.UpdateBlockPacket;
 import cn.nukkit.scheduler.Task;
 import cn.nukkit.utils.DummyBossBar;
+import cubemc.commons.nukkit.utils.scoreboard.PlayerEntry;
 
 import java.util.*;
 
@@ -108,6 +110,10 @@ public class Troller extends Addon {
 
     }*/
 
+    public List<String> getVanishPlayers() {
+        return this.vanishPlayers;
+    }
+
     public void showVanishPlayers(Player spectator){
         for (String playerName : new ArrayList<>(this.vanishPlayers)){
             Player player = this.plugin.getServer().getPlayer(playerName);
@@ -162,6 +168,14 @@ public class Troller extends Addon {
             this.vanishPlayers.add(player.getName());
             this.showVanishPlayers(player);
             if (bossBar != null) bossBar.setText(bossBar.getText()+" §7- §3Vanished");
+        }
+
+        if (Addon.getAddon(CubeBridge.class) != null) {
+            CubeBridge cubeBridge = (CubeBridge) Addon.getAddon(CubeBridge.class);
+            PlayerEntry playerScoreEntry = cubeBridge.getScoreboard().getPlayerEntry(player);
+            if (playerScoreEntry != null) {
+                playerScoreEntry.updateBoard();
+            }
         }
 
         List<Player> onlinePlayers = new ArrayList<>(this.plugin.getServer().getOnlinePlayers().values());
