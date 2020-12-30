@@ -313,4 +313,8 @@ public class BetterLobby extends Addon {
     public Map<String, Long> getBossBars() {
         return bossBars;
     }
+
+    public String getJoinMessage() {
+        return this.joinMessage;
+    }
 }

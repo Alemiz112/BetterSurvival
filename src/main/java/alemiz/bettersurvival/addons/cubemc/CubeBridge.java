@@ -1,5 +1,6 @@
 package alemiz.bettersurvival.addons.cubemc;
 
+import alemiz.bettersurvival.addons.BetterLobby;
 import alemiz.bettersurvival.addons.MoreVanilla;
 import alemiz.bettersurvival.addons.Troller;
 import alemiz.bettersurvival.addons.myhomes.MyHomes;
@@ -14,6 +15,7 @@ import cubemc.commons.nukkit.events.RanksLoadEvent;
 import cubemc.commons.nukkit.utils.scoreboard.AdvancedScoreboard;
 import cubemc.commons.nukkit.utils.scoreboard.ScoreLineEntry;
 import cubemc.commons.ranks.Rank;
+import cubemc.nukkit.connector.CubeConnector;
 
 import java.util.*;
 
@@ -39,6 +41,11 @@ public class CubeBridge extends Addon {
         mainEntry.addTranslation(this::translateMainScore);
         this.scoreboard.addLine(mainEntry, false);
         this.scoreboard.updateBoard();
+
+        if (Addon.getAddon(BetterLobby.class) != null && Addon.getAddon(BetterLobby.class).isEnabled()) {
+            BetterLobby betterLobby = (BetterLobby) Addon.getAddon(BetterLobby.class);
+            CubeConnector.getInstance().getPlayerManager().getRegisterHelper().setJoinMessage(betterLobby.getJoinMessage());
+        }
     }
 
     @Override
@@ -69,7 +76,7 @@ public class CubeBridge extends Addon {
         this.scoreboard.addPlayer(player);
         this.scoreboard.updateBoard();
 
-        for (Rank rank : event.getRanks()){
+        for (Rank rank : event.getPlayerEntry().getRanks()){
             RankData rankData = this.getRankData(rank.getName());
             if (rankData != null){
                 rankData.assignPermissions(player, this.plugin);
