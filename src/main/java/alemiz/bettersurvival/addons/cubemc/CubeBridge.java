@@ -41,11 +41,6 @@ public class CubeBridge extends Addon {
         mainEntry.addTranslation(this::translateMainScore);
         this.scoreboard.addLine(mainEntry, false);
         this.scoreboard.updateBoard();
-
-        if (Addon.getAddon(BetterLobby.class) != null && Addon.getAddon(BetterLobby.class).isEnabled()) {
-            BetterLobby betterLobby = (BetterLobby) Addon.getAddon(BetterLobby.class);
-            CubeConnector.getInstance().getPlayerManager().getRegisterHelper().setJoinMessage(betterLobby.getJoinMessage());
-        }
     }
 
     @Override
