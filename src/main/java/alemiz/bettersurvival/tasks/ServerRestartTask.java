@@ -38,7 +38,7 @@ public class ServerRestartTask implements Runnable{
         }
 
         for (Player player : this.plugin.getServer().getOnlinePlayers().values()){
-            CubeConnector.getInstance().getPlayerManager().sendToLobby(player);
+            CubeConnector.getInstance().getPlayerManager().sendToLobby(player, true);
         }
         this.plugin.getServer().shutdown();
     }
