@@ -83,7 +83,8 @@ public class CubeBridge extends Addon {
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         this.scoreboard.removePlayer(player);
-        this.scoreboard.updateBoard();
+        this.plugin.getServer().getScheduler().scheduleDelayedTask(() ->
+                this.scoreboard.updateBoard(), 10);
     }
 
     public void loadRanks(List<Rank> ranks){

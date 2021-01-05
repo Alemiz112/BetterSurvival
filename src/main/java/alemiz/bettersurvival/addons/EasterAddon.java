@@ -41,7 +41,25 @@ public class EasterAddon extends Addon {
 
     public EasterAddon(String path){
         super("easteraddon", path);
-        this.loadEggs();
+    }
+
+    @Override
+    public void postLoad() {
+        List<String> skins = configFile.getStringList("eggs");
+        if (skins.isEmpty()){
+            this.plugin.getLogger().info("§eUnable to load easter eggs! Not all data provided!");
+            return;
+        }
+
+        for (String skinFile : skins){
+            Skin skin = this.generateSkin(skinFile);
+            if (skin == null || !skin.isValid()){
+                this.plugin.getLogger().info("§eUnable to load egg "+skinFile+"!");
+                continue;
+            }
+
+            this.eggSkins.add(skin);
+        }
     }
 
     @Override
@@ -113,26 +131,6 @@ public class EasterAddon extends Addon {
     @EventHandler
     public void onQuit(PlayerQuitEvent event){
         this.setters.remove(event.getPlayer().getName());
-    }
-
-    private void loadEggs(){
-        List<String> skins = configFile.getStringList("eggs");
-
-        if (skins.isEmpty()){
-            this.plugin.getLogger().info("§eUnable to load easter eggs! Not all data provided!");
-            return;
-        }
-
-        for (String skinFile : skins){
-            Skin skin = this.generateSkin(skinFile);
-
-            if (skin == null || !skin.isValid()){
-                this.plugin.getLogger().info("§eUnable to load egg "+skinFile+"!");
-                continue;
-            }
-
-            this.eggSkins.add(skin);
-        }
     }
 
     private Skin generateSkin(String skinFile){
