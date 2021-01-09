@@ -115,62 +115,87 @@ public class CubeBridge extends Addon {
     }
 
     private void initAddonPermissions(){
+        MoreVanilla moreVanilla = Addon.getAddon(MoreVanilla.class);
+        MyHomes myHomes = Addon.getAddon(MyHomes.class);
+        MyLandProtect myLandProtect = Addon.getAddon(MyLandProtect.class);
+        SurvivalShop survivalShop = Addon.getAddon(SurvivalShop.class);
+        Troller troller = Addon.getAddon(Troller.class);
+
         RankData subscriber = this.getRankData("subscriber");
         if (subscriber != null){
-            subscriber.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-feed"));
-            subscriber.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-jump"));
+            if (moreVanilla != null) {
+                subscriber.addPermission(moreVanilla.configFile.getString("permission-feed"));
+                subscriber.addPermission(moreVanilla.configFile.getString("permission-jump"));
+            }
         }
 
         RankData cubePlus = this.getRankData("cube+");
         if (cubePlus != null){
-            cubePlus.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-feed"));
-            cubePlus.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-near"));
-            cubePlus.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-keepInvAll"));
-            cubePlus.addPermission(Addon.getAddon(MyHomes.class).configFile.getString("permission-vip"));
+            if (moreVanilla != null) {
+                cubePlus.addPermission(moreVanilla.configFile.getString("permission-feed"));
+                cubePlus.addPermission(moreVanilla.configFile.getString("permission-near"));
+                cubePlus.addPermission(moreVanilla.configFile.getString("permission-keepInvAll"));
+            }
+            if (myHomes != null) {
+                cubePlus.addPermission(myHomes.configFile.getString("permission-vip"));
+            }
         }
 
         RankData vip = this.getRankData("vip");
         if (vip != null){
-            vip.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-heal"));
-            vip.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-fly"));
-            vip.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-near"));
-            vip.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-jump"));
-
-            vip.addPermission(Addon.getAddon(MyLandProtect.class).configFile.getString("landsVipPermission"));
-            vip.addPermission(Addon.getAddon(SurvivalShop.class).configFile.getString("shopVipPermission"));
+            if (moreVanilla != null) {
+                vip.addPermission(moreVanilla.configFile.getString("permission-heal"));
+                vip.addPermission(moreVanilla.configFile.getString("permission-fly"));
+                vip.addPermission(moreVanilla.configFile.getString("permission-near"));
+                vip.addPermission(moreVanilla.configFile.getString("permission-jump"));
+            }
+            if (myLandProtect != null) {
+                vip.addPermission(myLandProtect.configFile.getString("landsVipPermission"));
+            }
+            if (survivalShop  != null) {
+                vip.addPermission(survivalShop.configFile.getString("shopVipPermission"));
+            }
         }
 
         RankData staffRank = this.getRankData("moderator");
         if (staffRank != null){
-            staffRank.addPermission(Addon.getAddon(Troller.class).configFile.getString("permission-vanish"));
-            staffRank.addPermission(Addon.getAddon(Troller.class).configFile.getString("permission-troll"));
-            staffRank.addPermission(Addon.getAddon(Troller.class).configFile.getString("permission-troll-advanced"));
-            staffRank.addPermission(Addon.getAddon(Troller.class).configFile.getString("permission-invsee"));
-
-            staffRank.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-mute"));
-            staffRank.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-manage"));
-            staffRank.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-keepInvAll"));
-
-            staffRank.addPermission(Addon.getAddon(MyLandProtect.class).configFile.getString("chestsAccessPermission"));
-            staffRank.addPermission(Addon.getAddon(MyLandProtect.class).configFile.getString("landsAccessPermission"));
+            if (troller != null) {
+                staffRank.addPermission(troller.configFile.getString("permission-vanish"));
+                staffRank.addPermission(troller.configFile.getString("permission-troll"));
+                staffRank.addPermission(troller.configFile.getString("permission-troll-advanced"));
+                staffRank.addPermission(troller.configFile.getString("permission-invsee"));
+            }
+            if (moreVanilla != null) {
+                staffRank.addPermission(moreVanilla.configFile.getString("permission-mute"));
+                staffRank.addPermission(moreVanilla.configFile.getString("permission-manage"));
+                staffRank.addPermission(moreVanilla.configFile.getString("permission-keepInvAll"));
+            }
+            if (myLandProtect != null) {
+                staffRank.addPermission(myLandProtect.configFile.getString("chestsAccessPermission"));
+                staffRank.addPermission(myLandProtect.configFile.getString("landsAccessPermission"));
+            }
         }
 
         RankData helperRank = this.getRankData("helper");
         if (helperRank != null){
-            helperRank.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-near"));
-            helperRank.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-mute"));
-            helperRank.addPermission(Addon.getAddon(Troller.class).configFile.getString("permission-invsee"));
-            helperRank.addPermission(Addon.getAddon(MoreVanilla.class).configFile.getString("permission-fly"));
+            if (moreVanilla != null) {
+                helperRank.addPermission(moreVanilla.configFile.getString("permission-near"));
+                helperRank.addPermission(moreVanilla.configFile.getString("permission-mute"));
+                helperRank.addPermission(moreVanilla.configFile.getString("permission-fly"));
+            }
+            if (troller != null) {
+                helperRank.addPermission(troller.configFile.getString("permission-invsee"));
+            }
         }
     }
 
     private String translateMainScore(String text, Player player) {
-        Addon addon = Addon.getAddon(Troller.class);
-        if (addon == null || !addon.isEnabled()) {
+        Troller troller = Addon.getAddon(Troller.class);
+        if (troller == null || !troller.isEnabled()) {
             return text.replace("{vanish}", "");
         }
 
-        boolean vanished = ((Troller) addon).getVanishPlayers().contains(player.getName());
+        boolean vanished = troller.getVanishPlayers().contains(player.getName());
         return text.replace("{vanish}", vanished? "§7 - §cVanished": "");
     }
 
