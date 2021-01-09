@@ -36,7 +36,7 @@ import cn.nukkit.level.particle.FloatingTextParticle;
 import cn.nukkit.level.particle.HeartParticle;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.scheduler.Task;
-import cubemc.nukkit.connector.events.CubeVoteEvent;
+import cubemc.commons.nukkit.events.CubeVoteEvent;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -114,9 +114,15 @@ public class BetterVoting extends Addon {
     }
 
     @EventHandler
-    public void onVote(CubeVoteEvent event){
-        boolean success = this.voteReceive(event.getPlayer());
-        event.setCancelled(!success);
+    public void onVote(CubeVoteEvent event) {
+        int succeed = 0;
+        for (int i = 0; i < event.getPendingVotes(); i++) {
+            if (!this.voteReceive(event.getPlayer())) {
+                break;
+            }
+            succeed++;
+        }
+        event.setAppliedVotes(succeed);
     }
 
     @EventHandler
