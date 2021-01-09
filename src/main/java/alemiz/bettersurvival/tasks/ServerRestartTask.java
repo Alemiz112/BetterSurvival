@@ -16,8 +16,6 @@
 package alemiz.bettersurvival.tasks;
 
 import alemiz.bettersurvival.BetterSurvival;
-import cn.nukkit.Player;
-import cubemc.nukkit.connector.CubeConnector;
 
 public class ServerRestartTask implements Runnable{
 
@@ -30,16 +28,18 @@ public class ServerRestartTask implements Runnable{
     @Override
     public void run() {
         int restartIn = this.plugin.getRestartTime();
-
-        if (restartIn > 0){
-            if (restartIn <= 20) this.plugin.getServer().broadcastMessage("§c»§7Server restarts in "+restartIn+" minutes!");
-            this.plugin.setRestartTime(restartIn-10);
+        if (restartIn <= 0) {
+            this.onRestart();
             return;
         }
 
-        for (Player player : this.plugin.getServer().getOnlinePlayers().values()){
-            CubeConnector.getInstance().getPlayerManager().sendToLobby(player, true);
+        this.plugin.setRestartTime(restartIn - 1);
+        if (restartIn <= 10) {
+            this.plugin.getServer().broadcastMessage("§c»§7Server restarts in "+restartIn+" minutes!");
         }
+    }
+
+    private void onRestart() {
         this.plugin.getServer().shutdown();
     }
 }
