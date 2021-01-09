@@ -29,23 +29,18 @@ import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class Addon implements Listener{
+public abstract class Addon implements Listener {
 
-    public String PATH = null;
-    public Config configFile = null;
-    protected boolean enabled = false;
-    protected Map<String, Command> commands = new HashMap<>();
+    private static final Map<Class<? extends Addon>, Addon> addons = new HashMap<>();
 
-    protected static Map<Class<?>, Addon> addons = new HashMap<>();
-
-    public static Map<Class<?>, Addon> getAddons() {
+    public static Map<Class<? extends Addon>, Addon> getAddons() {
         return addons;
     }
 
-    public static void loadAddon(Class<?> clazz, String configName){
+    public static void loadAddon(Class<? extends Addon> clazz, String configName){
         try {
-            Constructor<?> constructor = clazz.getConstructor(String.class);
-            Addon addon = (Addon) constructor.newInstance(configName);
+            Constructor<? extends Addon> constructor = clazz.getConstructor(String.class);
+            Addon addon = constructor.newInstance(configName);
             boolean enable = addon.configFile.getBoolean("enable", false);
             addon.setEnabled(enable);
             if (enable){
@@ -56,8 +51,21 @@ public abstract class Addon implements Listener{
         }
     }
 
-    public static Addon getAddon(Class<?> clazz){
-        return Addon.addons.get(clazz);
+    public static <T extends Addon> T getAddon(Class<T> clazz){
+        Addon addon = Addon.addons.get(clazz);
+        if (addon == null) {
+            return null;
+        }
+
+        if (clazz.isAssignableFrom(addon.getClass())) {
+            return (T) addon;
+        }
+        return null;
+    }
+
+    public static boolean isAddonEnabled(Class<? extends Addon> clazz) {
+        Addon addon = Addon.addons.get(clazz);
+        return addon != null && addon.isEnabled();
     }
 
     public static void disableAddons(){
@@ -67,8 +75,12 @@ public abstract class Addon implements Listener{
     }
 
 
-    public String name;
-    public BetterSurvival plugin;
+    public final BetterSurvival plugin;
+    public final String name;
+    public final String PATH;
+    public final Config configFile;
+    protected boolean enabled = false;
+    protected final Map<String, Command> commands = new HashMap<>();
 
     public Addon(String name, String path){
         this.PATH = path;
@@ -80,14 +92,14 @@ public abstract class Addon implements Listener{
 
     public void setEnabled(boolean enabled) {
         if (enabled && this.preLoad()){
-            this.plugin.getLogger().info("§eLoading BetterSurvival addon: §3"+name);
+            this.plugin.getLogger().info("§eLoading BetterSurvival addon: §3"+this.name);
             Server.getInstance().getPluginManager().registerEvents(this, this.plugin);
 
             this.postLoad();
             this.loadListeners();
             this.registerCommands();
         }else {
-            if (this.enabled) this.plugin.getLogger().info("§eUnloading BetterSurvival addon: §3"+name);
+            if (this.enabled) this.plugin.getLogger().info("§eUnloading BetterSurvival addon: §3"+this.name);
             this.onUnload();
         }
         this.enabled = enabled;
@@ -95,8 +107,11 @@ public abstract class Addon implements Listener{
 
     public abstract void loadConfig();
 
-    public void registerCommands(){
-        //Should be implemented
+    /**
+     * Once addon is enabled this method is called and should be used to register commands.
+     * It is recommended to use addon.registerCommand() method to assign registered command to current addon.
+     */
+    public void registerCommands() {
     }
 
     public void registerCommand(String fallbackPrefix, Command command){
@@ -105,8 +120,9 @@ public abstract class Addon implements Listener{
 
     public boolean registerCommand(String fallbackPrefix, Command command, boolean map){
         boolean registered = this.plugin.getServer().getCommandMap().register(fallbackPrefix, command);;
-
-        if (registered && map) this.commands.put(fallbackPrefix, command);
+        if (registered && map) {
+            this.commands.put(fallbackPrefix, command);
+        }
         return registered;
     }
 
@@ -134,31 +150,38 @@ public abstract class Addon implements Listener{
         return ConfigManager.getInstance().loadJson(ConfigManager.ADDONS_PATH+"/"+fileName);
     }
 
+    /**
+     * Implement in parent.
+     */
     public void loadListeners(){
-        //Implemented by parent
     }
 
 
+    /**
+     * Implement in parent.
+     * @return if enable addon.
+     */
     public boolean preLoad(){
-        //Implemented by parent
-        //true = load
         return true;
     }
 
+    /**
+     * Implement in parent.
+     */
     public void postLoad(){
-        //Implemented by parent
     }
 
+    /**
+     * Implement in parent.
+     */
     public void onUnload(){
-        //Implemented by parent
     }
-
 
     public boolean isEnabled() {
-        return enabled;
+        return this.enabled;
     }
 
     public Map<String, Command> getCommands() {
-        return commands;
+        return this.commands;
     }
 }
