@@ -64,7 +64,7 @@ public class BetterSurvival extends PluginBase implements Listener {
 
         this.autoRestart = this.configManager.cfg.getBoolean("auto-restart");
         this.restartTime = this.configManager.cfg.getInt("restartInterval", 120);
-        this.getServer().getScheduler().scheduleRepeatingTask(this, new ServerRestartTask(this), 20*60*10);
+        this.getServer().getScheduler().scheduleRepeatingTask(this, new ServerRestartTask(this), 1200);
 
         this.loadAddons();
         this.getServer().getPluginManager().registerEvents(this, this);
