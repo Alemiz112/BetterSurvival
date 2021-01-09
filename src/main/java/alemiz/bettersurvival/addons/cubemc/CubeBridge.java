@@ -10,6 +10,7 @@ import alemiz.bettersurvival.utils.Addon;
 import cn.nukkit.Player;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.player.PlayerQuitEvent;
+import cn.nukkit.event.plugin.PluginEnableEvent;
 import cubemc.commons.nukkit.events.CubePlayerJoinEvent;
 import cubemc.commons.nukkit.events.RanksLoadEvent;
 import cubemc.commons.nukkit.utils.scoreboard.AdvancedScoreboard;
@@ -54,6 +55,19 @@ public class CubeBridge extends Addon {
             configFile.set("rank.moderator", new ArrayList<>(Collections.emptyList()));
             configFile.set("rank.helper", new ArrayList<>(Collections.emptyList()));
             configFile.save();
+        }
+    }
+
+    @EventHandler
+    public void onNetworkLoad(PluginEnableEvent event) {
+        if (!(event.getPlugin() instanceof CubeConnector)) {
+            return;
+        }
+
+        CubeConnector connector = (CubeConnector) event.getPlugin();
+        BetterLobby betterLobby = Addon.getAddon(BetterLobby.class);
+        if (betterLobby != null && betterLobby.isEnabled()) {
+            connector.getPlayerManager().getRegisterHelper().setJoinMessage(betterLobby.getJoinMessage());
         }
     }
 

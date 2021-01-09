@@ -16,6 +16,10 @@
 package alemiz.bettersurvival.tasks;
 
 import alemiz.bettersurvival.BetterSurvival;
+import cn.nukkit.Player;
+import cubemc.nukkit.connector.CubeConnector;
+
+import java.util.Collection;
 
 public class ServerRestartTask implements Runnable{
 
@@ -40,6 +44,11 @@ public class ServerRestartTask implements Runnable{
     }
 
     private void onRestart() {
-        this.plugin.getServer().shutdown();
+        CubeConnector connector = CubeConnector.getInstance();
+        Collection<Player> players = this.plugin.getServer().getOnlinePlayers().values();
+        for (Player player : players) {
+            connector.getPlayerManager().sendToLobby(player, true);
+        }
+        this.plugin.getServer().getScheduler().scheduleDelayedTask(() -> this.plugin.getServer().shutdown(), 20);
     }
 }
