@@ -42,6 +42,7 @@ import cn.nukkit.event.entity.EntityExplodeEvent;
 import cn.nukkit.event.inventory.InventoryMoveItemEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.inventory.ChestInventory;
+import cn.nukkit.inventory.DoubleChestInventory;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3;
@@ -231,10 +232,14 @@ public class MyLandProtect extends Addon {
         Player player = event.getPlayer();
         String[] lines = sign.getText();
 
-        if (!lines[0].equals("[private]") && !lines[0].equals("§r§f[§clocked§f]")) return false;
-        BlockEntityChest chest = this.getChestBySign(sign);
+        if (lines == null || lines.length < 1 || !(lines[0].equals("[private]") || lines[0].equals("§r§f[§clocked§f]"))) {
+            return false;
+        }
 
-        if (chest == null) return false;
+        BlockEntityChest chest = this.getChestBySign(sign);
+        if (chest == null) {
+            return false;
+        }
 
         switch (lines[0]){
             case "§r§f[§clocked§f]":
@@ -260,25 +265,31 @@ public class MyLandProtect extends Addon {
 
         LandRegion region = this.getLandByPos(block, true);
         if (!this.interact(player, region)){
-            event.setCancelled();
+            event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onExplode(EntityExplodeEvent event){
         for (Position block : event.getBlockList()){
-            if (!this.isPrivateChest(block) && this.getLandByPos(block) == null) continue;
-            event.setBlockList(new ArrayList<>());
-            return;
+            if (this.isPrivateChest(block) || this.getLandByPos(block) != null) {
+                event.setBlockList(new ArrayList<>());
+                return;
+            }
         }
     }
 
     @EventHandler
     public void onInventoryMove(InventoryMoveItemEvent event){
-        if (!(event.getSource() instanceof BlockEntityHopper) || !(event.getInventory() instanceof ChestInventory)) return;
-        ChestInventory inv = (ChestInventory) event.getInventory();
-        BlockEntityChest chest = inv.getHolder();
+        if (!(event.getSource() instanceof BlockEntityHopper)) {
+            return;
+        }
 
+        if (!(event.getInventory().getHolder() instanceof BlockEntityChest)) {
+            return;
+        }
+
+        BlockEntityChest chest = (BlockEntityChest) event.getInventory().getHolder();
         if (this.isPrivateChest(chest)){
             event.setCancelled(true);
         }
@@ -297,7 +308,9 @@ public class MyLandProtect extends Addon {
 
     @EventHandler
     public void onDamage(EntityDamageByEntityEvent event){
-        if (!(event.getDamager() instanceof Player)) return;
+        if (!(event.getDamager() instanceof Player)) {
+            return;
+        }
         Player player = (Player) event.getDamager();
         Entity entity = event.getEntity();
 

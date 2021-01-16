@@ -363,7 +363,7 @@ public class BetterEconomy extends Addon {
             return false;
         }
         CompoundTag tag = itemFrame.namedTag;
-        return tag.contains("trade_owner") && tag.contains("trade_count") && tag.contains("trade_price");
+        return tag.contains("trade_owner") && tag.contains("trade_count");
     }
 
     public boolean isTradeFramePayed(BlockEntityItemFrame itemFrame){
@@ -399,10 +399,14 @@ public class BetterEconomy extends Addon {
         if (itemFrameBlock == null || (blockEntity = player.getLevel().getBlockEntity(itemFrameBlock)) == null){
             return;
         }
+
+        if (!(blockEntity instanceof BlockEntityItemFrame)) {
+            return;
+        }
         BlockEntityItemFrame itemFrame = (BlockEntityItemFrame) blockEntity;
 
         Item item = itemFrame.getItem();
-        if (item == null || item.getId() == Item.AIR || this.isTradeFramePayed(itemFrame)){
+        if (item == null || item.getId() == Item.AIR || !this.isTradeFrame(itemFrame) || this.isTradeFramePayed(itemFrame)){
             return;
         }
 
