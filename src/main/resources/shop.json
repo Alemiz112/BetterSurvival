@@ -497,13 +497,6 @@
           "price": 800,
           "image": "items/apple_golden",
           "sell": 26
-        },
-        "spawner": {
-          "id": 52,
-          "count": 1,
-          "price": 450000,
-          "image": false,
-          "sell": 100000
         }
       }
     },
@@ -1476,13 +1469,12 @@
     },
     "weekly offers": {
       "items": {
-        "skeleton horse spawn egg": {
-          "id": 383,
-          "count": 1,
-          "meta": 26,
-          "price": 12000,
-          "image": "items/egg_skeletonhorse",
-          "sell": 1750
+        "nether brick": {
+          "id": 405,
+          "count": 32,
+          "price": 500,
+          "image": "items/netherbrick",
+          "sell": 3
         },
         "bone": {
           "id": 352,
@@ -1491,13 +1483,21 @@
           "image": "items/bone",
           "sell": 7
         },
-        "cocoa beans": {
-          "id": 351,
-          "meta": 3,
-          "count": 16,
-          "price": 425,
-          "sell": 5,
-          "image": false
+        "night vision": {
+          "id": 373,
+          "count": 1,
+          "meta": 5,
+          "price": 2000,
+          "image": "items/potion_bottle_nightVision",
+          "sell": 262
+        },
+        "lime shulker box": {
+          "image": false,
+          "id": 218,
+          "meta": 5,
+          "count": 1,
+          "price": 10000,
+          "sell": 1750
         },
         "brown dye": {
           "id": 351,
@@ -1506,13 +1506,6 @@
           "price": 1000,
           "image": "items/dye_powder_brown",
           "sell": 10
-        },
-        "netherite shovel": {
-          "image": false,
-          "id": 744,
-          "count": 1,
-          "price": 10000,
-          "sell": 4500
         }
       }
     }
@@ -1888,14 +1881,14 @@
           "price": 500,
           "sell": 30
         },
-        "diamond pickaxe": {
+        "diamond axe": {
           "image": "items/diamond_axe",
           "id": 279,
           "count": 1,
           "price": 4000,
           "sell": 150
         },
-        "netherite pickaxe": {
+        "netherite axe": {
           "image": false,
           "id": 746,
           "count": 1,
