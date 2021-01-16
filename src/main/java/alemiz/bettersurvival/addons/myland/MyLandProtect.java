@@ -41,8 +41,10 @@ import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityExplodeEvent;
 import cn.nukkit.event.inventory.InventoryMoveItemEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
+import cn.nukkit.inventory.BaseInventory;
 import cn.nukkit.inventory.ChestInventory;
 import cn.nukkit.inventory.DoubleChestInventory;
+import cn.nukkit.inventory.Inventory;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3;
@@ -285,11 +287,12 @@ public class MyLandProtect extends Addon {
             return;
         }
 
-        if (!(event.getInventory().getHolder() instanceof BlockEntityChest)) {
+        Inventory inventory = event.getInventory();
+        if (inventory == null || !(inventory.getHolder() instanceof BlockEntityChest)) {
             return;
         }
 
-        BlockEntityChest chest = (BlockEntityChest) event.getInventory().getHolder();
+        BlockEntityChest chest = (BlockEntityChest) inventory.getHolder();
         if (this.isPrivateChest(chest)){
             event.setCancelled(true);
         }
