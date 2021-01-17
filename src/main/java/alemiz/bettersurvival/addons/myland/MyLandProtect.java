@@ -234,7 +234,7 @@ public class MyLandProtect extends Addon {
         Player player = event.getPlayer();
         String[] lines = sign.getText();
 
-        if (lines == null || lines.length < 1 || !(lines[0].equals("[private]") || lines[0].equals("§r§f[§clocked§f]"))) {
+        if (lines == null || lines.length < 1 || lines[0] == null || !(lines[0].equals("[private]") || lines[0].equals("§r§f[§clocked§f]"))) {
             return false;
         }
 
