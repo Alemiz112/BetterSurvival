@@ -34,10 +34,7 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.item.EntityArmorStand;
 import cn.nukkit.entity.item.EntityPainting;
 import cn.nukkit.event.EventHandler;
-import cn.nukkit.event.block.BlockBreakEvent;
-import cn.nukkit.event.block.BlockPlaceEvent;
-import cn.nukkit.event.block.ItemFrameDropItemEvent;
-import cn.nukkit.event.block.LiquidFlowEvent;
+import cn.nukkit.event.block.*;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityExplodeEvent;
 import cn.nukkit.event.inventory.InventoryMoveItemEvent;
@@ -353,6 +350,18 @@ public class MyLandProtect extends Addon {
         LandRegion region = this.getLandByPos(source, true, false);
         if (region != null && !region.canLiquidFlow()){
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPiston(BlockPistonEvent event) {
+        for (Block block : event.getBlocks()) {
+            // No vertical checks to block pistons even under/above land
+            LandRegion region = this.getLandByPos(block, true, false);
+            if (region != null && !region.isPistonMovementEnabled()){
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 
