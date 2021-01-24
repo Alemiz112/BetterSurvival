@@ -33,6 +33,8 @@ import java.nio.charset.StandardCharsets;
 
 public class FakeHuman extends EntityHuman {
 
+    private boolean canMountEntity;
+
     public FakeHuman(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
@@ -80,6 +82,18 @@ public class FakeHuman extends EntityHuman {
     }
 
     @Override
+    protected void initEntity() {
+        super.initEntity();
+        this.canMountEntity = this.namedTag.contains("CanMountEntity") && this.namedTag.getBoolean("CanMountEntity");
+    }
+
+    @Override
+    public void saveNBT() {
+        this.namedTag.putBoolean("CanMountEntity", this.canMountEntity);
+        super.saveNBT();
+    }
+
+    @Override
     public void spawnTo(Player player) {
         if (this.hasSpawned.containsKey(player.getLoaderId())) return;
 
@@ -121,5 +135,21 @@ public class FakeHuman extends EntityHuman {
         source.setCancelled(true);
         super.attack(source);
         return false;
+    }
+
+    @Override
+    public boolean mountEntity(Entity entity, byte mode) {
+        if (!this.canMountEntity) {
+            return false;
+        }
+        return super.mountEntity(entity, mode);
+    }
+
+    public void setCanMountEntity(boolean canMountEntity) {
+        this.canMountEntity = canMountEntity;
+    }
+
+    public boolean canMountEntity() {
+        return this.canMountEntity;
     }
 }
