@@ -56,7 +56,8 @@ public class ClanCommand extends Command {
                 "§7/clan land remove: Removes clan land\n" +
                 "§7/clan land access <on|off>: Allow clan members open chests\n" +
                 "§7/clan land whitelist <add|remove|list|on|off> <value - optional>: Allow clan members open chests\n" +
-                "§7/clan land <flow> <on|off> : Allow water and lava flow in land\n" +
+                "§7/clan land flow <on|off> : Allow water and lava flow in land\n" +
+                "§7/clan land piston <on|off> : Allow pistons in your land\n" +
                 "§7/clan home <create|remove|home>: Classic clan homes\n" +
                 "§7/clan listhome : Lists all homes\n" +
                 "§aYou can use clan chat by starting message with §6%§a!";
@@ -176,22 +177,19 @@ public class ClanCommand extends Command {
                 player.sendMessage("§6»§7You have denied invitation from clan §6"+args[1]+"§7!");
                 break;
             case "info":
-                clan = this.checkForClan(player);
-                if (clan == null) break;
-
-                player.sendMessage(clan.buildTextInfo());
+                if ((clan = this.checkForClan(player)) != null) {
+                    player.sendMessage(clan.buildTextInfo());
+                }
                 break;
             case "leave":
-                clan = this.checkForClan(player);
-                if (clan == null) break;
-
-                clan.removePlayer(player);
+                if ((clan = this.checkForClan(player)) != null) {
+                    clan.removePlayer(player);
+                }
                 break;
             case "destroy":
-                clan = this.checkForClan(player);
-                if (clan == null) break;
-
-                this.loader.destroyClan(player, clan);
+                if ((clan = this.checkForClan(player)) != null) {
+                    this.loader.destroyClan(player, clan);
+                }
                 break;
             case "admin":
                 if (args.length < 3){
@@ -199,8 +197,9 @@ public class ClanCommand extends Command {
                     return true;
                 }
 
-                clan = this.checkForClan(player);
-                if (clan == null) break;
+                if ((clan = this.checkForClan(player)) == null) {
+                    break;
+                }
 
                 switch (args[1]){
                     case "add":
@@ -220,47 +219,8 @@ public class ClanCommand extends Command {
                     return true;
                 }
 
-                clan = this.checkForClan(player);
-                if (clan == null) break;
-
-                switch (args[1]){
-                    case "status":
-                        player.sendMessage("§a"+clan.getName()+"§a Clan:\n§3»§7 Money: §e"+clan.getMoney()+"§7/§6"+clan.getMaxMoney()+"$");
-                    break;
-                    case "note":
-                        try {
-                            clan.createBankNote(player, Integer.parseInt(args[2]));
-                        }catch (Exception e){
-                            player.sendMessage("§c»§7Please provide numerical value!");
-                        }
-                        break;
-                    case "apply":
-                        clan.applyBankNote(player);
-                        break;
-                    case "donate":
-                        try {
-                            int value = Integer.parseInt(args[2]);
-                            boolean success = (Money.getInstance().getMoney(player, false) - value) >= 0;
-
-                            if (!success){
-                                player.sendMessage("§c»§7You do not have enough coins to donate!");
-                                break;
-                            }
-
-                            if (!clan.addMoney(value)){
-                                player.sendMessage("§c»§7Clan bank limit has been reached!");
-                                break;
-                            }
-
-                            Money.getInstance().reduceMoney(player, value);
-                            clan.onDonate(player, value);
-                        }catch (Exception e){
-                            player.sendMessage("§c»§7Please provide numerical value!");
-                        }
-                        break;
-                    default:
-                        player.sendMessage(this.getUsageMessage());
-                        break;
+                if ((clan = this.checkForClan(player)) != null) {
+                    this.onBankCommand(player, clan, args);
                 }
                 break;
             case "land":
@@ -269,63 +229,8 @@ public class ClanCommand extends Command {
                     return true;
                 }
 
-                clan = this.checkForClan(player);
-                if (clan == null) break;
-                ClanLand land = clan.getLand();
-                boolean state;
-
-                switch (args[1]){
-                    case "create":
-                        clan.createLand(player);
-                        break;
-                    case "remove":
-                        clan.removeLand(player);
-                        break;
-                    case "access":
-                        if (args.length < 3){
-                            player.sendMessage(this.getUsageMessage());
-                            break;
-                        }
-
-                        if (land == null){
-                            player.sendMessage("§c»§7Your clan has not land!");
-                            break;
-                        }
-                        if (!clan.getOwner().equalsIgnoreCase(player.getName())){
-                            player.sendMessage("§c»§7Land settings can be configured by clan owner only!");
-                            break;
-                        }
-
-                        state = args[2].equalsIgnoreCase("on");
-                        land.setRestriction(state);
-                        player.sendMessage("§a»§7Land restrictions was turned §6"+(state? "on" : "off")+"§7!");
-                        break;
-                    case "whitelist":
-                        if (args.length < 3){
-                            player.sendMessage(this.getUsageMessage());
-                            break;
-                        }
-                        clan.landWhitelist(player, args[2], Arrays.copyOfRange(args, 3, args.length));
-                        break;
-                    case "flow":
-                        if (args.length < 3){
-                            player.sendMessage(this.getUsageMessage());
-                            break;
-                        }
-
-                        if (land == null){
-                            player.sendMessage("§c»§7Your clan has not land!");
-                            break;
-                        }
-
-                        state = args[2].equalsIgnoreCase("on");
-                        land.setLiquidFlow(state);
-                        player.sendMessage("§a»§7Water and lava flow was §6"+(state? "enabled" : "disabled")+"§7!");
-                        break;
-                    default:
-                        player.sendMessage(this.getUsageMessage());
-                        break;
-
+                if ((clan = this.checkForClan(player)) != null) {
+                    this.onLandCommand(player, clan, clan.getLand(), args);
                 }
                 break;
             case "home":
@@ -334,35 +239,14 @@ public class ClanCommand extends Command {
                     return true;
                 }
 
-                clan = this.checkForClan(player);
-                if (clan == null) break;
-
-                switch (args[1]){
-                    case "create":
-                    case "add":
-                        if (args.length < 3){
-                            player.sendMessage(this.getUsageMessage());
-                            return true;
-                        }
-
-                        clan.createHome(player, String.join(" ", Arrays.copyOfRange(args, 2, args.length)));
-                        break;
-                    case "remove":
-                        if (args.length < 3){
-                            player.sendMessage(this.getUsageMessage());
-                            return true;
-                        }
-
-                        clan.removeHome(player, String.join(" ", Arrays.copyOfRange(args, 2, args.length)));
-                        break;
-                    default:
-                        clan.teleportToHome(player, String.join(" ", Arrays.copyOfRange(args, 1, args.length)));
-                        break;
+                if ((clan = this.checkForClan(player)) != null) {
+                    this.onHomeCommand(player, clan, args);
                 }
                 break;
             case "listhome":
-                clan = this.checkForClan(player);
-                if (clan == null) break;
+                if ((clan = this.checkForClan(player)) == null) {
+                    break;
+                }
 
                 int homeLimit = clan.getConfig().getInt("homeLimit");
                 player.sendMessage("§a"+clan.getName()+"§a Clan:\n" +
@@ -374,6 +258,135 @@ public class ClanCommand extends Command {
                 break;
         }
         return true;
+    }
+
+    private void onBankCommand(Player player, Clan clan, String[] args) {
+        switch (args[1]){
+            case "status":
+                player.sendMessage("§a"+clan.getName()+"§a Clan:\n§3»§7 Money: §e"+clan.getMoney()+"§7/§6"+clan.getMaxMoney()+"$");
+                break;
+            case "note":
+                try {
+                    clan.createBankNote(player, Integer.parseInt(args[2]));
+                }catch (Exception e){
+                    player.sendMessage("§c»§7Please provide numerical value!");
+                }
+                break;
+            case "apply":
+                clan.applyBankNote(player);
+                break;
+            case "donate":
+                try {
+                    int value = Integer.parseInt(args[2]);
+                    boolean success = (Money.getInstance().getMoney(player, false) - value) >= 0;
+
+                    if (!success){
+                        player.sendMessage("§c»§7You do not have enough coins to donate!");
+                        break;
+                    }
+
+                    if (!clan.addMoney(value)){
+                        player.sendMessage("§c»§7Clan bank limit has been reached!");
+                        break;
+                    }
+
+                    Money.getInstance().reduceMoney(player, value);
+                    clan.onDonate(player, value);
+                }catch (Exception e){
+                    player.sendMessage("§c»§7Please provide numerical value!");
+                }
+                break;
+            default:
+                player.sendMessage(this.getUsageMessage());
+                break;
+        }
+    }
+
+    private void onLandCommand(Player player, Clan clan, ClanLand land, String[] args) {
+        if (!args[1].equals("create") && !args[1].equals("remove") && land == null) {
+            player.sendMessage("§c»§7Your clan has not land!");
+            return;
+        }
+
+        boolean state;
+        switch (args[1]){
+            case "create":
+                clan.createLand(player);
+                break;
+            case "remove":
+                clan.removeLand(player);
+                break;
+            case "access":
+                if (args.length < 3){
+                    player.sendMessage(this.getUsageMessage());
+                    break;
+                }
+
+                if (!clan.getOwner().equalsIgnoreCase(player.getName())){
+                    player.sendMessage("§c»§7Land settings can be configured by clan owner only!");
+                    break;
+                }
+
+                state = args[2].equalsIgnoreCase("on");
+                land.setRestriction(state);
+                player.sendMessage("§a»§7Land restrictions was turned §6"+(state? "on" : "off")+"§7!");
+                break;
+            case "whitelist":
+                if (args.length < 3){
+                    player.sendMessage(this.getUsageMessage());
+                    break;
+                }
+                clan.landWhitelist(player, args[2], Arrays.copyOfRange(args, 3, args.length));
+                break;
+            case "flow":
+                if (args.length < 3){
+                    player.sendMessage(this.getUsageMessage());
+                    break;
+                }
+
+                state = args[2].equalsIgnoreCase("on");
+                land.setLiquidFlow(state);
+                player.sendMessage("§a»§7Water and lava flow was §6"+(state? "enabled" : "disabled")+"§7!");
+                break;
+            case "piston":
+                if (args.length < 3){
+                    player.sendMessage(this.getUsageMessage());
+                    break;
+                }
+
+                state = args[2].equalsIgnoreCase("on");
+                land.setPistonMovement(state);
+                player.sendMessage("§a»§7Pistons in clan land were §6"+(state? "enabled" : "disabled")+"§7!");
+                break;
+            default:
+                player.sendMessage(this.getUsageMessage());
+                break;
+        }
+    }
+
+    private void onHomeCommand(Player player, Clan clan, String[] args) {
+        switch (args[1]){
+            case "create":
+            case "add":
+                if (args.length < 3){
+                    player.sendMessage(this.getUsageMessage());
+                    break;
+                }
+
+                clan.createHome(player, String.join(" ", Arrays.copyOfRange(args, 2, args.length)));
+                break;
+            case "remove":
+                if (args.length < 3){
+                    player.sendMessage(this.getUsageMessage());
+                    break;
+                }
+
+                clan.removeHome(player, String.join(" ", Arrays.copyOfRange(args, 2, args.length)));
+                break;
+            default:
+                clan.teleportToHome(player, String.join(" ", Arrays.copyOfRange(args, 1, args.length)));
+                break;
+        }
     }
 
     private Clan checkForClan(Player player){

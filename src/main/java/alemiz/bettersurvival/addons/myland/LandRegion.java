@@ -45,6 +45,7 @@ public class LandRegion {
     protected List<String> whitelist = new ArrayList<>();;
 
     protected boolean liquidFlow = true;
+    protected boolean pistonMovement = true;
 
     public LandRegion(String owner, String name){
         this.owner = owner;
@@ -82,11 +83,14 @@ public class LandRegion {
 
         this.whitelist = config.getStringList("whitelist");
         this.liquidFlow = config.getBoolean("liquidFlow", true);
+        this.pistonMovement = config.getBoolean("pistonMovement");
     }
 
     public void save(){
         Config config = ConfigManager.getInstance().loadPlayer(owner);
-        if (config == null) return;
+        if (config == null) {
+            return;
+        }
 
         config.set("land."+land.toLowerCase()+".level", this.level.getFolderName().toLowerCase());
         config.set("land."+land.toLowerCase()+".pos0", new float[]{pos1.getX(), pos1.getY(), pos1.getZ()});
@@ -94,6 +98,7 @@ public class LandRegion {
 
         config.set("land."+land.toLowerCase()+".whitelist", this.whitelist);
         config.set("land."+land.toLowerCase()+".liquidFlow", this.liquidFlow);
+        config.set("land."+land.toLowerCase()+".pistonMovement", this.pistonMovement);
         config.save();
     }
 
@@ -133,5 +138,14 @@ public class LandRegion {
 
     public boolean canLiquidFlow() {
         return this.liquidFlow;
+    }
+
+    public void setPistonMovement(boolean pistonMovement) {
+        this.pistonMovement = pistonMovement;
+        this.save();
+    }
+
+    public boolean isPistonMovementEnabled() {
+        return this.pistonMovement;
     }
 }

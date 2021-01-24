@@ -289,52 +289,59 @@ public class Clan {
     }
 
     public void createBankNote(Player player, int value){
-        if (player == null || value == 0) return;
+        if (player == null || value == 0) {
+            return;
+        }
 
         if (!this.owner.equalsIgnoreCase(player.getName()) && !this.isAdmin(player)){
             player.sendMessage("§c»§7You do not have permission to create clan bank note!");
             return;
         }
 
-        if (Addon.getAddon(BetterEconomy.class) == null){
+        BetterEconomy economy = Addon.getAddon(BetterEconomy.class);
+        if (economy == null || !economy.isEnabled()) {
             player.sendMessage("§c»§7Economy addon is not enabled!");
             return;
         }
 
-        BetterEconomy economy = (BetterEconomy) Addon.getAddon(BetterEconomy.class);
         economy.createNote(player, value, true);
     }
 
     public void applyBankNote(Player player){
-        if (Addon.getAddon(BetterEconomy.class) == null){
+        BetterEconomy economy = Addon.getAddon(BetterEconomy.class);
+        if (economy == null || !economy.isEnabled()) {
             player.sendMessage("§c»§7Economy addon is not enabled!");
             return;
         }
 
-        BetterEconomy economy = (BetterEconomy) Addon.getAddon(BetterEconomy.class);
         Item item = player.getInventory().getItemInHand();
-
         if (item.getId() == Item.AIR){
             player.sendMessage("§c»§r§7You must hold Bank Note item!");
             return;
         }
+
         Item result = economy.applyNote(player, item, true);
-        if (result != null) player.getInventory().setItemInHand(result);
+        if (result != null) {
+            player.getInventory().setItemInHand(result);
+        }
     }
 
     public void createLand(Player player){
-        if (player == null) return;
+        if (player == null) {
+            return;
+        }
 
         if (!this.owner.equalsIgnoreCase(player.getName())){
             player.sendMessage("§c»§7You do not have permission to create clan land!");
             return;
         }
 
-        if (Addon.getAddon(MyLandProtect.class) == null){
+        MyLandProtect landProtect = Addon.getAddon(MyLandProtect.class);
+        if (landProtect == null || !landProtect.isEnabled()) {
             player.sendMessage("§c»§7MyLandProtect addon is not enabled!");
+            return;
         }
 
-        MyLandProtect landProtect = (MyLandProtect) Addon.getAddon(MyLandProtect.class);
         landProtect.createLand(player, "", true);
     }
 
@@ -346,11 +353,11 @@ public class Clan {
             return;
         }
 
-        if (Addon.getAddon(MyLandProtect.class) == null){
+        MyLandProtect landProtect = Addon.getAddon(MyLandProtect.class);
+        if (landProtect == null || !landProtect.isEnabled()) {
             player.sendMessage("§c»§7MyLandProtect addon is not enabled!");
+            return;
         }
-
-        MyLandProtect landProtect = (MyLandProtect) Addon.getAddon(MyLandProtect.class);
         landProtect.removeClanLand(player);
     }
 
@@ -366,11 +373,11 @@ public class Clan {
             return;
         }
 
-        if (Addon.getAddon(MyLandProtect.class) == null){
+        MyLandProtect landProtect = Addon.getAddon(MyLandProtect.class);
+        if (landProtect == null || !landProtect.isEnabled()) {
             player.sendMessage("§c»§7MyLandProtect addon is not enabled!");
+            return;
         }
-
-        MyLandProtect landProtect = (MyLandProtect) Addon.getAddon(MyLandProtect.class);
 
         if (!action.equals("on") && !action.equals("off")){
             if (args.length < 1 && !action.equals(LandRegion.WHITELIST_LIST)){
@@ -388,11 +395,11 @@ public class Clan {
     }
 
     public ClanLand getLand(){
-        if (Addon.getAddon(MyLandProtect.class) == null){
+        MyLandProtect landProtect = Addon.getAddon(MyLandProtect.class);
+        if (landProtect == null || !landProtect.isEnabled()) {
             return null;
         }
 
-        MyLandProtect landProtect = (MyLandProtect) Addon.getAddon(MyLandProtect.class);
         LandRegion land = landProtect.getLands().get(this.rawName);
         return (land instanceof ClanLand)? (ClanLand) land : null;
     }
@@ -451,7 +458,7 @@ public class Clan {
         player.sendMessage("§6»§7Woosh! Welcome at clan home §6"+home+" @"+player.getDisplayName()+"§7!");
     }
 
-    //May be useful in feature
+    // May be useful in feature
     public void onApplyNote(Player player, int value){
         this.onDonate(player, value);
     }
@@ -485,10 +492,17 @@ public class Clan {
         int playerLimit = this.config.getInt("playerLimit");
         int homeLimit = this.config.getInt("homeLimit", 10);
 
+        String landText;
+        if (this.hasLand() && this.getLand() != null) {
+            landText = "§eYes §7Whitelist: §e"+(this.getLand().isWhitelistEnabled()? "Enabled" : "Disabled");
+        } else {
+            landText = "§eNo";
+        }
+
         return "§a"+this.name+"§a Clan:\n" +
                 "§3»§7 Owner: "+this.owner+"\n" +
                 "§3»§7 Money: §e"+this.money+"§7/§6"+moneyLimit+"$\n" +
-                "§3»§7 Land: §e"+(this.hasLand()? "Yes" : "No")+"\n" +
+                "§3»§7 Land: "+landText+"\n" +
                 "§3»§7 Admin List: §e"+(this.admins.size() == 0? "None" : String.join(", ", this.admins))+"\n" +
                 "§3»§7 Players: §c"+this.players.size()+"§7/§4"+playerLimit+"\n" +
                 "§3»§7 Player List: §e"+String.join(", ", this.players)+"\n" +

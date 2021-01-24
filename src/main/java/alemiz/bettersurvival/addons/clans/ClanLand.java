@@ -43,12 +43,16 @@ public class ClanLand extends LandRegion {
     @Override
     public boolean onInteract(Player player, Block block) throws CancelException {
         boolean isMember = this.clan.isMember(player);
-        if (!isMember) return false;
+        if (!isMember) {
+            return false;
+        }
 
         boolean isAdmin = this.clan.isAdmin(player);
-        if (isAdmin) return true;
+        if (isAdmin) {
+            return true;
+        }
 
-        if (whitelistEnabled && !this.whitelist.contains(player.getName().toLowerCase())){
+        if (this.whitelistEnabled && !this.whitelist.contains(player.getName().toLowerCase())){
             player.sendMessage("§c»§7Your clan land has restricted access to whitelisted members only!");
             throw new CancelException(false);
         }
@@ -71,7 +75,9 @@ public class ClanLand extends LandRegion {
     @Override
     public void save() {
         Config config = this.clan.getConfig();
-        if (config == null) return;
+        if (config == null) {
+            return;
+        }
 
         config.set("land.level", level.getFolderName().toLowerCase());
         config.set("land.pos0", new float[]{pos1.getX(), pos1.getY(), pos1.getZ()});
@@ -80,6 +86,7 @@ public class ClanLand extends LandRegion {
         config.set("land.whitelistEnabled", this.whitelistEnabled);
         config.set("land.whitelist", this.whitelist);
         config.set("land.liquidFlow", this.liquidFlow);
+        config.set("land.pistonMovement", this.pistonMovement);
         config.save();
     }
 

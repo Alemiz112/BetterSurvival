@@ -137,6 +137,7 @@ public class MyLandProtect extends Addon {
             configFile.set("landWhitelist", "§6»§7Whitelist for §6{land}§7 saved§7!");
             configFile.set("landWhitelistList", "§6»{land}§7 access: {players}");
             configFile.set("landFlowSetting", "§6»§7Water and lava flow in land §6{land}§7 was §6{state}§7!");
+            configFile.set("landPistonSetting", "§6»§7Pistons in land §6{land}§7 were §6{state}§7!");
             configFile.set("landHere", "§6»§7The land §6{land}§7 is owned by §6{owner}§7!");
             configFile.set("landList", "§6»§7Your lands: {lands}");
 
@@ -155,7 +156,7 @@ public class MyLandProtect extends Addon {
     @Override
     public void registerCommands() {
         if (configFile.getBoolean("enable", true)){
-            registerCommand("land", new LandCommand("land", this));
+            this.registerCommand("land", new LandCommand("land", this));
         }
     }
 
@@ -187,13 +188,17 @@ public class MyLandProtect extends Addon {
             return;
         }
 
-        LandRegion region = this.getLandByPos(block, true);
-        if (!this.interact(player, region, block)) {
-            event.setCancelled(true);
-            return;
+        Collection<LandRegion> regions = this.getLandsByPos(block);
+        for (LandRegion region : regions) {
+            if (!this.interact(player, region, block)) {
+                event.setCancelled(true);
+                return;
+            }
         }
 
-        if (!configFile.getBoolean("enablePrivateChests", false)) return;
+        if (!configFile.getBoolean("enablePrivateChests", false)) {
+            return;
+        }
 
         if (block.getId() == Block.CHEST && (block.getLevel().getBlockEntity(block) instanceof BlockEntityChest)){
             BlockEntityChest chest = (BlockEntityChest) block.getLevel().getBlockEntity(block);
@@ -209,13 +214,17 @@ public class MyLandProtect extends Addon {
         Block block = event.getBlock();
         Player player = event.getPlayer();
 
-        LandRegion region = this.getLandByPos(block, true);
-        if (!this.interact(player, region)){
-            event.setCancelled(true);
-            return;
+        Collection<LandRegion> regions = this.getLandsByPos(block);
+        for (LandRegion region : regions) {
+            if (!this.interact(player, region)){
+                event.setCancelled(true);
+                return;
+            }
         }
 
-        if (!configFile.getBoolean("enablePrivateChests", false)) return;
+        if (!configFile.getBoolean("enablePrivateChests", false)) {
+            return;
+        }
 
         if ((block.getId() == Block.WALL_SIGN || block.getId() == Block.SIGN_POST) && (player.getLevel().getBlockEntity(block) instanceof BlockEntitySign)){
             BlockEntitySign sign =  (BlockEntitySign) player.getLevel().getBlockEntity(block);
@@ -266,9 +275,12 @@ public class MyLandProtect extends Addon {
         Block block = event.getBlock();
         Player player = event.getPlayer();
 
-        LandRegion region = this.getLandByPos(block, true);
-        if (!this.interact(player, region)){
-            event.setCancelled(true);
+        Collection<LandRegion> regions = this.getLandsByPos(block);
+        for (LandRegion region : regions) {
+            if (!this.interact(player, region)){
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 
@@ -304,9 +316,12 @@ public class MyLandProtect extends Addon {
         Position pos = event.getItemFrame();
         Player player = event.getPlayer();
 
-        LandRegion region = this.getLandByPos(pos, true);
-        if (!this.interact(player, region)){
-            event.setCancelled(true);
+        Collection<LandRegion> regions = this.getLandsByPos(pos);
+        for (LandRegion region : regions) {
+            if (!this.interact(player, region)){
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 
@@ -322,9 +337,12 @@ public class MyLandProtect extends Addon {
             return;
         }
 
-        LandRegion region = this.getLandByPos(entity);
-        if (!this.interact(player, region)){
-            event.setCancelled(true);
+        Collection<LandRegion> regions = this.getLandsByPos(entity);
+        for (LandRegion region : regions) {
+            if (!this.interact(player, region)){
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 
@@ -381,26 +399,36 @@ public class MyLandProtect extends Addon {
      * Priority helps in clan land block restriction
      * @param vertical check if Y coordination matches too
      */
-    public LandRegion getLandByPos(Position position, boolean prioritize, boolean vertical){
+    public LandRegion getLandByPos(Position position, boolean prioritize, boolean vertical) {
+        Collection<LandRegion> foundRegions = this.getLandsByPos(position, vertical);
         LandRegion foundregion = null;
 
-        for (LandRegion region : this.lands.values()){
-            if (position.getLevel() != null && !region.level.getFolderName().equals(position.getLevel().getFolderName())){
-                continue;
-            }
-
-            if (!this.isInside(position.asVector3f(), region.getPos1(), region.getPos2(), vertical)){
-                continue;
-            }
-
+        for (LandRegion region : foundRegions) {
             if (prioritize && !(region instanceof ClanLand)){
                 return region;
             }
 
             foundregion = region;
         }
-
         return foundregion;
+    }
+
+    public Collection<LandRegion> getLandsByPos(Position position) {
+        return this.getLandsByPos(position, true);
+    }
+
+    public Collection<LandRegion> getLandsByPos(Position position, boolean vertical) {
+        List<LandRegion> regions = new ArrayList<>();
+        for (LandRegion region : this.lands.values()) {
+            if (position.getLevel() != null && !region.level.getFolderName().equals(position.getLevel().getFolderName())){
+                continue;
+            }
+
+            if (this.isInside(position.asVector3f(), region.getPos1(), region.getPos2(), vertical)){
+                regions.add(region);
+            }
+        }
+        return regions;
     }
 
     public boolean isInside(Vector3 position, Vector3 in1, Vector3 in2){
@@ -885,6 +913,14 @@ public class MyLandProtect extends Addon {
 
     public void waterFlowMessage(Player player, String landName, boolean state){
         String message = configFile.getString("landFlowSetting");
+        message = message.replace("{player}", player.getName());
+        message = message.replace("{land}", landName);
+        message = message.replace("{state}", state? "enabled" : "disabled");
+        player.sendMessage(message);
+    }
+
+    public void pistonMovementMessage(Player player, String landName, boolean state){
+        String message = configFile.getString("landPistonSetting");
         message = message.replace("{player}", player.getName());
         message = message.replace("{land}", landName);
         message = message.replace("{state}", state? "enabled" : "disabled");
