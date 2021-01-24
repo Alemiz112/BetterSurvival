@@ -35,6 +35,7 @@ public class LandCommand extends Command {
                 "§7/land <remove|del> <land>: Deny players request\n"+
                 "§7/land <whitelist> <add|remove|list> <land> <player> : Manage lands whitelist\n" +
                 "§7/land <flow> <land> <on|off> : Allow water and lava flow in land\n"+
+                "§7/land <piston> <land> <on|off> : Allow pistons in your land\n"+
                 "§7/land <here> : Shows area where you are\n" +
                 "§7/land <list> : Shows your lands";
         this.setUsage(getUsageMessage());
@@ -57,7 +58,7 @@ public class LandCommand extends Command {
         Player player = (Player) sender;
 
         if (args.length < 1){
-            player.sendMessage(getUsageMessage());
+            player.sendMessage(this.getUsageMessage());
             return true;
         }
 
@@ -75,7 +76,7 @@ public class LandCommand extends Command {
             case "create":
             case "add":
                 if (args.length < 2){
-                    player.sendMessage(getUsageMessage());
+                    player.sendMessage(this.getUsageMessage());
                     break;
                 }
 
@@ -84,7 +85,7 @@ public class LandCommand extends Command {
             case "remove":
             case "del":
                 if (args.length < 2){
-                    player.sendMessage(getUsageMessage());
+                    player.sendMessage(this.getUsageMessage());
                     break;
                 }
 
@@ -92,7 +93,7 @@ public class LandCommand extends Command {
                 break;
             case "flow":
                 if (args.length < 3){
-                    player.sendMessage(getUsageMessage());
+                    player.sendMessage(this.getUsageMessage());
                     break;
                 }
 
@@ -105,6 +106,22 @@ public class LandCommand extends Command {
                 boolean state = args[2].equalsIgnoreCase("on");
                 region.setLiquidFlow(state);
                 this.loader.waterFlowMessage(player, region.getName(), state);
+                break;
+            case "piston":
+                if (args.length < 3){
+                    player.sendMessage(this.getUsageMessage());
+                    break;
+                }
+
+                region = this.loader.getLand(player, args[1]);
+                if (region == null){
+                    this.loader.regionNotFound(player);
+                    break;
+                }
+
+                boolean pistonState = args[2].equalsIgnoreCase("on");
+                region.setPistonMovement(pistonState);
+                this.loader.pistonMovementMessage(player, region.getName(), pistonState);
                 break;
             case "here":
                 this.loader.findLand(player);

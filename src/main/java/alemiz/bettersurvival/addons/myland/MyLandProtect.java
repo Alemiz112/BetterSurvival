@@ -136,6 +136,7 @@ public class MyLandProtect extends Addon {
             configFile.set("landWhitelist", "§6»§7Whitelist for §6{land}§7 saved§7!");
             configFile.set("landWhitelistList", "§6»{land}§7 access: {players}");
             configFile.set("landFlowSetting", "§6»§7Water and lava flow in land §6{land}§7 was §6{state}§7!");
+            configFile.set("landPistonSetting", "§6»§7Pistons in land §6{land}§7 were §6{state}§7!");
             configFile.set("landHere", "§6»§7The land §6{land}§7 is owned by §6{owner}§7!");
             configFile.set("landList", "§6»§7Your lands: {lands}");
 
@@ -884,6 +885,14 @@ public class MyLandProtect extends Addon {
 
     public void waterFlowMessage(Player player, String landName, boolean state){
         String message = configFile.getString("landFlowSetting");
+        message = message.replace("{player}", player.getName());
+        message = message.replace("{land}", landName);
+        message = message.replace("{state}", state? "enabled" : "disabled");
+        player.sendMessage(message);
+    }
+
+    public void pistonMovementMessage(Player player, String landName, boolean state){
+        String message = configFile.getString("landPistonSetting");
         message = message.replace("{player}", player.getName());
         message = message.replace("{land}", landName);
         message = message.replace("{state}", state? "enabled" : "disabled");
