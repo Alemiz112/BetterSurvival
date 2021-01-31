@@ -17,6 +17,8 @@ package alemiz.bettersurvival.addons.clans;
 
 import alemiz.bettersurvival.addons.myland.MyLandProtect;
 import alemiz.bettersurvival.commands.ClanCommand;
+import alemiz.bettersurvival.commands.ClanTopCommand;
+import alemiz.bettersurvival.commands.ClanWarCommand;
 import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.ConfigManager;
 import alemiz.bettersurvival.utils.SuperConfig;
@@ -24,6 +26,9 @@ import alemiz.bettersurvival.utils.TextUtils;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.event.EventHandler;
+import cn.nukkit.event.EventPriority;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.player.PlayerChatEvent;
 import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.utils.Config;
@@ -36,6 +41,7 @@ import java.util.*;
 public class PlayerClans extends Addon {
 
     private final Map<String, Clan> clans = new HashMap<>();
+    private final Map<Integer, Integer> clanLevels = new HashMap<>();
 
     public PlayerClans(String path) {
         super("playerclans", path);
@@ -43,8 +49,13 @@ public class PlayerClans extends Addon {
 
     @Override
     public void postLoad() {
-        int failedAttempts = 0;
+        Map<String, Integer> levelMap = (Map<String, Integer>) this.configFile.get("clanLevels");
+        for (String level : levelMap.keySet()) {
+            int minPoints = this.configFile.getInt("clanLevels." + level);
+            this.clanLevels.put(Integer.parseInt(level), minPoints);
+        }
 
+        int failedAttempts = 0;
         for (SuperConfig config : ConfigManager.getInstance().loadAllFromFolder(ConfigManager.PATH+"/clans")){
             String rawName = config.getName().split("\\.")[0];
             try {
@@ -54,8 +65,13 @@ public class PlayerClans extends Addon {
                 this.plugin.getLogger().error("§cFailed to load clan §4"+rawName+"§c!", e);
             }
         }
+
         this.plugin.getLogger().info("§eAll clans loaded! Entries: §3"+this.clans.size());
         this.plugin.getLogger().info("§eFailed: §c"+failedAttempts);
+
+        for (Clan clan : this.clans.values()) {
+            clan.loadWarClans();
+        }
     }
 
     @Override
@@ -67,8 +83,21 @@ public class PlayerClans extends Addon {
             configFile.set("playerLimit", 10);
             configFile.set("homeLimit", 10);
             configFile.set("moneyLimit", 400000);
+            configFile.set("warKillPoints", 5);
 
             configFile.set("clanCreateMessage", "§6»§7New clan §6@{clan}§7 was created successfully!");
+            configFile.set("clanWarInviteFormMessage", "§fYou can invite any of clans to war. Fighting with players from the clan will increase your clan points!\n§7Some server rules during clan war may be different!");
+            configFile.set("clanWarInvitesFormMessage", "§fThis is the list of pending clan war invites. Would you like to join the war?\n§7Click the clan to manage it.");
+            configFile.set("clanWarJoinFormMessage", "§fWould you like to join in war with clan §e{clan}§f?\n§7Keep in mind that some pvp rules may be different when you are in clan war!");
+            configFile.set("clanWarLeaveFormMessage", "§fYou are in war with clan §e{clan}!\n§7Would you like to leave war?");
+
+            configFile.set("warKillMessage", "§eKilled {target}! §7[+{points}XP]");
+
+            Map<String, Integer> clanLevels = new HashMap<>();
+            clanLevels.put("1", 1000);
+            clanLevels.put("2", 3000);
+            clanLevels.put("3", 6000);
+            configFile.set("clanLevels", clanLevels);
             configFile.save();
         }
 
@@ -78,25 +107,80 @@ public class PlayerClans extends Addon {
 
     @Override
     public void registerCommands() {
-        registerCommand("clan", new ClanCommand("clan", this));
+        this.registerCommand("clan", new ClanCommand("clan", this));
+        this.registerCommand("clanwar", new ClanWarCommand("clanwar", this));
+        this.registerCommand("topclans", new ClanTopCommand("topclans", this));
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onJoin(PlayerJoinEvent event){
         Player player = event.getPlayer();
-        this.plugin.getServer().getScheduler().scheduleDelayedTask(this.plugin, () -> this.sendInvitationsMessage(player), 20*4);
+        this.plugin.getServer().getScheduler().scheduleDelayedTask(this.plugin, () -> this.onPlayerInitialize(player), 80);
+    }
+
+    private void onPlayerInitialize(Player player) {
+        if (player == null || !player.isConnected()) {
+            return;
+        }
+
+        this.sendInvitationsMessage(player);
+
+        Clan clan = this.getClan(player);
+        if (clan == null || (!clan.isAdmin(player) && !clan.isOwner(player)) || clan.getWarClanInvites().isEmpty()) {
+            return;
+        }
+
+        StringBuilder builder = new StringBuilder("§3»§7Your clan was invited to war by this clans:");
+        for (Clan warClan : clan.getWarClanInvites()) {
+            builder.append("\n§7- §e").append(warClan.getName());
+        }
+        player.sendMessage(builder.toString());
     }
 
     @EventHandler
     public void onChat(PlayerChatEvent event){
         String message = event.getMessage();
-        if (!message.startsWith("%")) return;
+        if (!message.startsWith("%")) {
+            return;
+        }
 
         Clan clan = this.getClan(event.getPlayer());
-        if (clan == null) return;
+        if (clan != null) {
+            clan.chat(message.substring(1), event.getPlayer());
+            event.setCancelled(true);
+        }
+    }
 
-        clan.chat(message.substring(1), event.getPlayer());
-        event.setCancelled(true);
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onDamage(EntityDamageEvent event) {
+        if (!(event.getEntity() instanceof Player)) {
+            return;
+        }
+
+        Player target = (Player) event.getEntity();
+        if ((target.getHealth() - event.getFinalDamage()) > 0.5){
+            return;
+        }
+
+        Player player = null;
+        if (event instanceof EntityDamageByEntityEvent && ((EntityDamageByEntityEvent) event).getDamager() instanceof Player) {
+            player = (Player) ((EntityDamageByEntityEvent) event).getDamager();
+        } else if (target.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
+            EntityDamageByEntityEvent cause = (EntityDamageByEntityEvent) target.getLastDamageCause();
+            if (cause.getDamager() instanceof Player) {
+                player = (Player) cause.getDamager();
+            }
+        }
+
+        if (player == null) {
+            return;
+        }
+
+        Clan clan;
+        Clan targetClan;
+        if ((clan = this.getClan(player)) != null && (targetClan = this.getClan(target)) != null) {
+            clan.onEnemyKilled(player, target, targetClan);
+        }
     }
 
     private void loadClan(String rawName, SuperConfig config){
@@ -104,7 +188,7 @@ public class PlayerClans extends Addon {
         this.clans.put(rawName, clan);
 
         if (config.exists("land") && Addon.getAddon(MyLandProtect.class) != null){
-            ((MyLandProtect) Addon.getAddon(MyLandProtect.class)).loadClanLand(clan);
+            Addon.getAddon(MyLandProtect.class).loadClanLand(clan);
         }
     }
 
@@ -231,8 +315,14 @@ public class PlayerClans extends Addon {
         return null;
     }
 
+    public Clan getClanByName(String clanRawName) {
+        return this.clans.get(clanRawName);
+    }
+
     public boolean isOwner(Player player, String clanName){
-        if (player == null) return false;
+        if (player == null) {
+            return false;
+        }
 
         for (Clan clan : this.clans.values()){
             if (!clan.getName().equals(clanName) || !clan.getRawName().equals(clanName)) continue;
@@ -245,8 +335,19 @@ public class PlayerClans extends Addon {
     }
 
     public boolean isOwner(Player player, Clan clan){
-        if (player == null || clan == null) return false;
+        if (player == null || clan == null) {
+            return false;
+        }
         return clan.getOwner().equals(player.getName());
+    }
+
+    public int getLevelFromPoints(int points, int oldLevel) {
+        int minPoints = this.getLevelMinPoints(oldLevel + 1);
+        return points >= minPoints? oldLevel + 1 : oldLevel;
+    }
+
+    public int getLevelMinPoints(int level) {
+        return this.clanLevels.getOrDefault(level, 0);
     }
 
     public Map<String, Clan> getClans() {
