@@ -27,6 +27,7 @@ import cn.nukkit.Server;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
+import cn.nukkit.level.Sound;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.ConfigSection;
 
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class Clan {
 
@@ -42,7 +44,7 @@ public class Clan {
     private final String rawName;
     private final String name;
 
-    private Config config;
+    private final Config config;
 
     private final String owner;
     private final List<String> players = new ArrayList<>();
@@ -50,7 +52,12 @@ public class Clan {
 
     private final Map<String, Position> homes = new HashMap<>();
 
+    private final List<Clan> warClanInvites = new ArrayList<>();
+    private final List<Clan> clansInWar = new ArrayList<>();
+
     private int money;
+    private int clanPoints;
+    private int clanLevel;
 
     public Clan(String rawName, String name, Config config, PlayerClans loader){
         this.rawName = rawName;
@@ -59,38 +66,68 @@ public class Clan {
         this.players.addAll(config.getStringList("players"));
         this.admins.addAll(config.getStringList("admins"));
         this.money = config.getInt("money");
+        this.clanPoints = config.getInt("clanPoints");
+        this.clanLevel = config.getInt("clanLevel", 0);
 
         this.loader = loader;
         this.config = config;
-
         this.loadHomes();
     }
 
     public void setMoney(int value){
         this.money = value;
-        config.set("money", value);
-        config.save();
+        this.config.set("money", value);
+        this.writeConfig();
     }
 
     public boolean addMoney(int value){
-        int balance = this.money+value;
-
-        if (balance > this.config.getInt("maxMoney")) return false;
+        int balance = this.money + value;
+        if (balance > this.config.getInt("maxMoney")) {
+            return false;
+        }
         this.setMoney(balance);
         return true;
     }
 
     public boolean reduceMoney(int value){
-        if ((this.money - value) < 0) return false;
-
+        if ((this.money - value) < 0)  {
+            return false;
+        }
         this.setMoney(this.money - value);
         return true;
     }
 
+    public void setPoints(int points) {
+        this.clanPoints = points;
+        this.recalculateClanLevel();
+        this.config.set("clanPoints", points);
+        this.writeConfig();
+    }
+
+    public void addPoints(int points) {
+        this.setPoints(this.clanPoints + points);
+    }
+
+    private void recalculateClanLevel() {
+        int level = this.loader.getLevelFromPoints(this.clanPoints, this.clanLevel);
+        if (this.onClanLevelChanged(this.clanLevel, level)) {
+            this.clanLevel = level;
+            this.config.set("clanLevel", level);
+        }
+    }
+
+    public int getClanPoints() {
+        return this.clanPoints;
+    }
+
+    public int getClanLevel() {
+        return this.clanLevel;
+    }
+
     private void savePlayerList(){
-        config.set("players", this.players);
-        config.set("admins", this.admins);
-        config.save();
+        this.config.set("players", this.players);
+        this.config.set("admins", this.admins);
+        this.writeConfig();
     }
 
     private void saveHomes(){
@@ -100,8 +137,38 @@ public class Clan {
             String homeString = home.getX()+","+home.getY()+","+home.getZ()+","+home.getLevel().getFolderName();
             homeMap.put(homeName, homeString);
         }
-        config.set("home", homeMap);
-        config.save();
+        this.config.set("home", homeMap);
+        this.writeConfig();
+    }
+
+    private void saveWarInvites(boolean write) {
+        List<String> clanWarInvites = new ArrayList<>();
+        for (Clan clan : this.warClanInvites) {
+            if (clan != null) {
+                clanWarInvites.add(clan.getRawName());
+            }
+        }
+        this.config.set("clanWarInvites", clanWarInvites);
+        if (write) {
+            this.writeConfig();
+        }
+    }
+
+    private void saveClansInWar(boolean write) {
+        List<String> warClans = new ArrayList<>();
+        for (Clan clan : this.clansInWar) {
+            if (clan != null) {
+                warClans.add(clan.getRawName());
+            }
+        }
+        this.config.set("clansInWar", warClans);
+        if (write) {
+            this.writeConfig();
+        }
+    }
+
+    public void writeConfig() {
+        CompletableFuture.runAsync(this.config::save);
     }
 
     private void loadHomes(){
@@ -111,14 +178,116 @@ public class Clan {
             String[] data = homeString.split(",");
 
             Level level = Server.getInstance().getLevelByName(data[3]);
-            if (level == null) continue;
-
-            try {
-                this.homes.put(home.toLowerCase(), new Position(Double.parseDouble(data[0]), Double.parseDouble(data[1]), Double.parseDouble(data[2]), level));
-            }catch (Exception e){
-                BetterSurvival.getInstance().getLogger().warning("§cUnable to load home §4"+home+"§c for clan §4"+this.rawName);
+            if (level != null) {
+                try {
+                    this.homes.put(home.toLowerCase(), new Position(Double.parseDouble(data[0]), Double.parseDouble(data[1]), Double.parseDouble(data[2]), level));
+                }catch (Exception e){
+                    BetterSurvival.getInstance().getLogger().warning("§cUnable to load home §4"+home+"§c for clan §4"+this.rawName);
+                }
             }
         }
+    }
+
+    public List<Clan> getWarClanInvites() {
+        return this.warClanInvites;
+    }
+
+    public List<Clan> getClansInWar() {
+        return this.clansInWar;
+    }
+
+    protected void loadWarClans() {
+        List<String> warInvites = this.config.getStringList("clanWarInvites");
+        List<String> warClans = this.config.getStringList("clansInWar");
+
+        for (String invite : warInvites) {
+            Clan clan = this.loader.getClanByName(invite);
+            if (clan != null) {
+                this.warClanInvites.add(clan);
+            }
+        }
+
+        for (String warClan : warClans) {
+            Clan clan = this.loader.getClanByName(warClan);
+            if (clan != null) {
+                this.clansInWar.add(clan);
+            }
+        }
+    }
+
+    public boolean addClanWarInvite(Clan clan) {
+        if (this.warClanInvites.contains(clan) || this.clansInWar.contains(clan)) {
+            return false;
+        }
+        this.sendMessage("§eYour clan was invited to war with §6"+clan.getName()+"§e! Your clan admin can accept this invite.");
+
+        this.warClanInvites.add(clan);
+        this.saveWarInvites(true);
+        return true;
+    }
+
+    public void onClanWarAccepted(Clan clan) {
+        if (!this.warClanInvites.remove(clan)) {
+            return;
+        }
+        this.clansInWar.add(clan);
+        this.saveWarInvites(false);
+        this.saveClansInWar(true);
+
+        clan.clansInWar.add(this);
+        clan.saveClansInWar(true);
+
+        this.sendMessage("§aYour clan has joined war with §2"+clan.getName()+"§a!");
+        this.sendSound(Sound.RAID_HORN);
+
+        clan.sendMessage("§aClan §2"+clan.getName()+"§a has accepted your war invite!");
+        clan.sendSound(Sound.RAID_HORN);
+    }
+
+    public void onClanWarRejected(Clan clan) {
+        if (!this.warClanInvites.remove(clan)) {
+            return;
+        }
+        this.saveWarInvites(true);
+
+        this.sendMessage("§eYour clan has rejected war with §6"+clan.getName()+"§a!");
+        clan.sendMessage("§eClan §6"+clan.getName()+"§e has rejected your war invite!");
+    }
+
+    public void onClanWarLeft(Clan clan) {
+        if (!this.clansInWar.remove(clan)) {
+            return;
+        }
+        this.saveClansInWar(true);
+
+        clan.clansInWar.remove(this);
+        clan.saveClansInWar(true);
+
+        this.sendMessage("§eYour clan has left war with §6"+clan.getName()+"§a!");
+        clan.sendMessage("§eClan §6"+clan.getName()+"§e has left war!");
+    }
+
+    public void onEnemyKilled(Player player, Player target, Clan targetClan) {
+        if (!this.isInWarWith(targetClan)) {
+            return;
+        }
+
+        int points = this.loader.configFile.getInt("warKillPoints");
+        this.addPoints(points);
+
+        String message = this.loader.configFile.getString("warKillMessage");
+        message = message.replace("{target}", target.getDisplayName());
+        message = message.replace("{points}", String.valueOf(points));
+        this.sendMessage(message);
+        this.sendSound(Sound.RANDOM_LEVELUP);
+    }
+
+    public boolean hasClanWarInvite(Clan fromClan) {
+        return this.warClanInvites.contains(fromClan);
+    }
+
+    public boolean isInWarWith(Clan clan) {
+        return this.clansInWar.contains(clan);
     }
 
     public boolean isMember(Player player){
@@ -135,6 +304,14 @@ public class Clan {
 
     public boolean isAdmin(String player){
         return this.admins.contains(player.toLowerCase());
+    }
+
+    public boolean isOwner(Player player) {
+        return player != null && this.isOwner(player.getName());
+    }
+
+    public boolean isOwner(String player) {
+        return this.owner.equalsIgnoreCase(player);
     }
 
     public void addAdmin(String player, Player executor){
@@ -267,6 +444,7 @@ public class Clan {
 
         this.sendMessage("Player §6@"+playerName+" was kicked from your clan!");
         this.players.remove(playerName);
+        this.admins.remove(playerName);
         this.savePlayerList();
 
         Player player = Server.getInstance().getPlayer(playerName);
@@ -282,6 +460,7 @@ public class Clan {
         }
 
         this.players.remove(player.getName());
+        this.admins.remove(player.getName());
         this.sendMessage("Player @6"+player.getDisplayName()+" left your Clan!");
         this.savePlayerList();
 
@@ -467,6 +646,21 @@ public class Clan {
         this.sendMessage("Player §6@"+player.getDisplayName()+"§f donated to clan bank value of §e"+TextUtils.formatBigNumber(value)+"$§f!");
     }
 
+    private boolean onClanLevelChanged(int oldLevel, int newLevel) {
+        if (oldLevel >= newLevel) {
+            return false;
+        }
+
+        for (String playerName : this.players) {
+            Player player = Server.getInstance().getPlayer(playerName);
+            if (player != null) {
+                player.sendTitle("§3ClanUP!", "§f" + oldLevel + " ->" + newLevel);
+                player.getLevel().addSound(player, Sound.FIREWORK_TWINKLE, 1, 1, player);
+            }
+        }
+        return true;
+    }
+
     public void chat(String message, Player player){
         if (message == null || message.isEmpty() || player == null) return;
         this.sendMessage(message, player.getName());
@@ -481,9 +675,18 @@ public class Clan {
 
         for (String playerName : this.players){
             Player member = Server.getInstance().getPlayer(playerName);
+            if (member != null) {
+                member.sendMessage(formattedMessage);
+            }
+        }
+    }
 
-            if (member == null) continue;
-            member.sendMessage(formattedMessage);
+    public void sendSound(Sound sound) {
+        for (String playerName : this.players) {
+            Player player = Server.getInstance().getPlayer(playerName);
+            if (player != null) {
+                player.getLevel().addSound(player, sound, 1, 1, player);
+            }
         }
     }
 
@@ -491,6 +694,7 @@ public class Clan {
         int moneyLimit = this.config.getInt("maxMoney");
         int playerLimit = this.config.getInt("playerLimit");
         int homeLimit = this.config.getInt("homeLimit", 10);
+        int nexLevelPoints = this.loader.getLevelMinPoints(this.clanLevel + 1);
 
         String landText;
         if (this.hasLand() && this.getLand() != null) {
@@ -499,15 +703,16 @@ public class Clan {
             landText = "§eNo";
         }
 
-        return "§a"+this.name+"§a Clan:\n" +
-                "§3»§7 Owner: "+this.owner+"\n" +
-                "§3»§7 Money: §e"+this.money+"§7/§6"+moneyLimit+"$\n" +
-                "§3»§7 Land: "+landText+"\n" +
-                "§3»§7 Admin List: §e"+(this.admins.size() == 0? "None" : String.join(", ", this.admins))+"\n" +
-                "§3»§7 Players: §c"+this.players.size()+"§7/§4"+playerLimit+"\n" +
-                "§3»§7 Player List: §e"+String.join(", ", this.players)+"\n" +
-                "§3»§7 Homes: §a"+this.homes.size()+"§7/§2"+homeLimit+"\n" +
-                "§3»§7 Home List: §e"+(this.homes.size() == 0? "None" : String.join(", ", this.homes.keySet()));
+        return "§a" + this.name + "§a Clan:\n" +
+                "§3»§7 Owner: " + this.owner+"\n" +
+                "§3»§7 Level: §3" + this.clanLevel + " §7[§3" + this.clanPoints + "§7/§2" + nexLevelPoints + "§7]\n" +
+                "§3»§7 Money: §e" + this.money + "§7/§6" + moneyLimit + "$\n" +
+                "§3»§7 Land: " + landText + "\n" +
+                "§3»§7 Admin List: §e" + (this.admins.size() == 0? "None" : String.join(", ", this.admins)) + "\n" +
+                "§3»§7 Players: §c" + this.players.size() + "§7/§4" + playerLimit + "\n" +
+                "§3»§7 Player List: §e" + String.join(", ", this.players) + "\n" +
+                "§3»§7 Homes: §a" + this.homes.size() + "§7/§2" + homeLimit + "\n" +
+                "§3»§7 Home List: §e" + (this.homes.size() == 0? "None" : String.join(", ", this.homes.keySet()));
     }
 
     public String getRawName() {
