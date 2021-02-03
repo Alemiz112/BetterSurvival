@@ -21,8 +21,8 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.Sound;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.Config;
+import cubemc.commons.nukkit.utils.exception.InvalidSkinException;
 import cubemc.nukkit.connector.modules.npc.NpcModule;
-import cubemc.nukkit.connector.utils.exception.InvalidSkinException;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
