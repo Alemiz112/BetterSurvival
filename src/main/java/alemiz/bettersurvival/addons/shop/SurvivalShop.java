@@ -196,7 +196,7 @@ public class SurvivalShop extends Addon {
         BlockEntitySign sign =  (BlockEntitySign) player.getLevel().getBlockEntity(block);
         String[] oldLines = sign.getText();
 
-        if (!this.hasCategory(oldLines[1])){
+        if (oldLines == null || oldLines[1] == null || !this.hasCategory(oldLines[1])){
             return;
         }
 
