@@ -134,7 +134,7 @@ public class EasterAddon extends Addon {
     }
 
     private Skin generateSkin(String skinFile){
-        String path = ConfigManager.getInstance().ADDONS_PATH+"/skins";
+        String path = ConfigManager.ADDONS_PATH +"/skins";
         String geometryFile = configFile.getString("eggGeometryFile");
         String geometryName = configFile.getString("eggGeometryName");
 
