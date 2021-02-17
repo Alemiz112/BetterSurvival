@@ -45,6 +45,10 @@ public class Clan {
     private final String name;
 
     private final Config config;
+    private int playerLimit;
+    private int maxMoney;
+    private int homeLimit;
+    private int maxLandSize;
 
     private final String owner;
     private final List<String> players = new ArrayList<>();
@@ -65,9 +69,13 @@ public class Clan {
         this.owner = config.getString("owner");
         this.players.addAll(config.getStringList("players"));
         this.admins.addAll(config.getStringList("admins"));
+        this.playerLimit = config.getInt("playerLimit");
         this.money = config.getInt("money");
+        this.maxMoney = config.getInt("maxMoney");
         this.clanPoints = config.getInt("clanPoints");
         this.clanLevel = config.getInt("clanLevel", 0);
+        this.homeLimit = config.getInt("homeLimit", 10);
+        this.maxLandSize = config.getInt("maxLandSize", 375);
 
         this.loader = loader;
         this.config = config;
@@ -82,7 +90,7 @@ public class Clan {
 
     public boolean addMoney(int value){
         int balance = this.money + value;
-        if (balance > this.config.getInt("maxMoney")) {
+        if (balance > this.maxMoney) {
             return false;
         }
         this.setMoney(balance);
@@ -108,11 +116,20 @@ public class Clan {
         this.setPoints(this.clanPoints + points);
     }
 
+    /**
+     * Calculates new level according to current points.
+     * WARNING: If level was changes calling writeConfig() is required!
+     */
     private void recalculateClanLevel() {
-        int level = this.loader.getLevelFromPoints(this.clanPoints, this.clanLevel);
-        if (this.onClanLevelChanged(this.clanLevel, level)) {
-            this.clanLevel = level;
-            this.config.set("clanLevel", level);
+        ClanLevelInfo oldLevel = this.getLevelInfo();
+        ClanLevelInfo newLevel = this.loader.getLevelFromPoints(this.clanPoints, oldLevel);
+        if (newLevel != null && this.onClanLevelChanged(oldLevel, newLevel)) {
+            this.clanLevel = newLevel.getLevel();
+            this.config.set("clanLevel", newLevel.getLevel());
+            this.setMaxMoney(newLevel.getMaxLandSize(), false);
+            this.setPlayerLimit(newLevel.getPlayerLimit(), false);
+            this.setHomeLimit(newLevel.getHomeLimit(), false);
+            this.setMaxLandSize(newLevel.getMaxLandSize(), false);
         }
     }
 
@@ -124,10 +141,26 @@ public class Clan {
         return this.clanLevel;
     }
 
+    public ClanLevelInfo getLevelInfo() {
+        return this.loader.getLevel(this.clanLevel);
+    }
+
     private void savePlayerList(){
         this.config.set("players", this.players);
         this.config.set("admins", this.admins);
         this.writeConfig();
+    }
+
+    public int getPlayerLimit() {
+        return this.playerLimit;
+    }
+
+    public void setPlayerLimit(int playerLimit, boolean write) {
+        this.playerLimit = playerLimit;
+        this.config.set("playerLimit", playerLimit);
+        if (write) {
+            this.writeConfig();
+        }
     }
 
     private void saveHomes(){
@@ -139,6 +172,30 @@ public class Clan {
         }
         this.config.set("home", homeMap);
         this.writeConfig();
+    }
+
+    public int getHomeLimit() {
+        return this.homeLimit;
+    }
+
+    public void setHomeLimit(int homeLimit, boolean write) {
+        this.homeLimit = homeLimit;
+        this.config.set("homeLimit", homeLimit);
+        if (write) {
+            this.writeConfig();
+        }
+    }
+
+    public int getMaxLandSize() {
+        return this.maxLandSize;
+    }
+
+    public void setMaxLandSize(int maxLandSize, boolean write) {
+        this.maxLandSize = maxLandSize;
+        this.config.set("maxLandSize", maxLandSize);
+        if (write) {
+            this.writeConfig();
+        }
     }
 
     private void saveWarInvites(boolean write) {
@@ -378,9 +435,8 @@ public class Clan {
             return;
         }
 
-        int limit = this.config.getInt("playerLimit");
-        if (this.players.size() >= limit){
-            if (executor != null) executor.sendMessage("§c»§7Your clan player limit is §6"+limit+"§7 players. You can not add another player! " +
+        if (this.players.size() >= this.playerLimit){
+            if (executor != null) executor.sendMessage("§c»§7Your clan player limit is §6"+this.playerLimit+"§7 players. You can not add another player! " +
                     "TIP: Upgrade your clan and get more player slots!");
             return;
         }
@@ -399,8 +455,7 @@ public class Clan {
     public boolean addPlayer(Player player){
         if (player == null) return false;
 
-        int limit = this.config.getInt("playerLimit");
-        if (this.players.size() >= limit){
+        if (this.players.size() >= this.playerLimit){
             player.sendMessage("§c»§7Clan §6@"+this.name+"§7 is full at the moment! You can not join!");
             return false;
         }
@@ -591,9 +646,8 @@ public class Clan {
             return;
         }
 
-        int homeLimit = this.config.getInt("homeLimit", 10);
-        if (this.homes.size() >= homeLimit){
-            player.sendMessage("§c»§7Your clan has passed home limit which is §6"+homeLimit+"§7 homes!");
+        if (this.homes.size() >= this.homeLimit){
+            player.sendMessage("§c»§7Your clan has passed home limit which is §6"+this.homeLimit+"§7 homes!");
             return;
         }
 
@@ -646,17 +700,36 @@ public class Clan {
         this.sendMessage("Player §6@"+player.getDisplayName()+"§f donated to clan bank value of §e"+TextUtils.formatBigNumber(value)+"$§f!");
     }
 
-    private boolean onClanLevelChanged(int oldLevel, int newLevel) {
-        if (oldLevel >= newLevel) {
+    private boolean onClanLevelChanged(ClanLevelInfo oldLevel, ClanLevelInfo newLevel) {
+        if (oldLevel.getRequiredPoints() >= newLevel.getRequiredPoints()) {
             return false;
+        }
+
+        List<String> messages = new ArrayList<>();
+        if (newLevel.getMoneyLimit() > oldLevel.getMoneyLimit()) {
+            messages.add("§l§3»§7Clan money level increased!");
+        }
+        if (newLevel.getPlayerLimit() > oldLevel.getPlayerLimit()) {
+            messages.add("§l§3»§7Clan player limit increased!!");
+        }
+        if (newLevel.getHomeLimit() > oldLevel.getHomeLimit()) {
+            messages.add("§l§3»§7Clan home limit increased!");
+        }
+        if (newLevel.getMaxLandSize() > oldLevel.getMaxLandSize()) {
+            messages.add("§l§3»§7Clan land size increased!");
         }
 
         for (String playerName : this.players) {
             Player player = Server.getInstance().getPlayer(playerName);
-            if (player != null) {
-                player.sendTitle("§3ClanUP!", "§f" + oldLevel + " ->" + newLevel);
-                player.getLevel().addSound(player, Sound.FIREWORK_TWINKLE, 1, 1, player);
+            if (player == null) {
+               continue;
             }
+
+            for (String message : messages) {
+                player.sendMessage(message);
+            }
+            player.sendTitle("§3ClanUP!", "§f" + oldLevel + " -> " + newLevel);
+            player.getLevel().addSound(player, Sound.FIREWORK_TWINKLE, 1, 1, player);
         }
         return true;
     }
@@ -691,11 +764,7 @@ public class Clan {
     }
 
     public String buildTextInfo(){
-        int moneyLimit = this.config.getInt("maxMoney");
-        int playerLimit = this.config.getInt("playerLimit");
-        int homeLimit = this.config.getInt("homeLimit", 10);
         int nexLevelPoints = this.loader.getLevelMinPoints(this.clanLevel + 1);
-
         String landText;
         if (this.hasLand() && this.getLand() != null) {
             landText = "§eYes §7Whitelist: §e"+(this.getLand().isWhitelistEnabled()? "Enabled" : "Disabled");
@@ -706,12 +775,12 @@ public class Clan {
         return "§a" + this.name + "§a Clan:\n" +
                 "§3»§7 Owner: " + this.owner+"\n" +
                 "§3»§7 Level: §3" + this.clanLevel + " §7[§3" + this.clanPoints + "§7/§2" + nexLevelPoints + "§7]\n" +
-                "§3»§7 Money: §e" + this.money + "§7/§6" + moneyLimit + "$\n" +
+                "§3»§7 Money: §e" + this.money + "§7/§6" + this.maxMoney + "$\n" +
                 "§3»§7 Land: " + landText + "\n" +
                 "§3»§7 Admin List: §e" + (this.admins.size() == 0? "None" : String.join(", ", this.admins)) + "\n" +
-                "§3»§7 Players: §c" + this.players.size() + "§7/§4" + playerLimit + "\n" +
+                "§3»§7 Players: §c" + this.players.size() + "§7/§4" + this.playerLimit + "\n" +
                 "§3»§7 Player List: §e" + String.join(", ", this.players) + "\n" +
-                "§3»§7 Homes: §a" + this.homes.size() + "§7/§2" + homeLimit + "\n" +
+                "§3»§7 Homes: §a" + this.homes.size() + "§7/§2" + this.homeLimit + "\n" +
                 "§3»§7 Home List: §e" + (this.homes.size() == 0? "None" : String.join(", ", this.homes.keySet()));
     }
 
@@ -735,12 +804,20 @@ public class Clan {
         return this.money;
     }
 
-    public int getMaxMoney(){
-        return this.config.getInt("maxMoney");
+    public int getMaxMoney() {
+        return this.maxMoney;
+    }
+
+    public void setMaxMoney(int maxMoney, boolean write) {
+        this.maxMoney = maxMoney;
+        this.config.set("maxMoney", maxMoney);
+        if (write) {
+            this.writeConfig();
+        }
     }
 
     public Config getConfig(){
-        return config;
+        return this.config;
     }
 
     public boolean hasLand(){

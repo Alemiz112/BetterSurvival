@@ -530,13 +530,16 @@ public class MyLandProtect extends Addon {
             }
         }
 
+        Clan playerClan = null;
         if (region != null && !region.canManage(player.getName()) && !player.hasPermission(PERM_ACCESS)){
             boolean cancel = true;
-            if (Addon.getAddon(PlayerClans.class) != null && (region instanceof ClanLand)){
-                PlayerClans playerClans = (PlayerClans) Addon.getAddon(PlayerClans.class);
-                Clan clan = playerClans.getClan(player);
-                if (clan != null && clan.getName().equals(((ClanLand) region).getClan().getName())){
-                    cancel = false;
+            if ((region instanceof ClanLand)){
+                PlayerClans playerClans = Addon.getAddon(PlayerClans.class);
+                if (playerClans != null) {
+                    playerClan = playerClans.getClan(player);
+                    if (playerClan != null && playerClan.getName().equals(((ClanLand) region).getClan().getName())){
+                        cancel = false;
+                    }
                 }
             }
 
@@ -553,7 +556,7 @@ public class MyLandProtect extends Addon {
         // 3. Check land sizes
         int landSize;
         if (clanMode){
-            landSize = 5*75; //TODO: calculate by clan player count & allow resizing
+            landSize = playerClan == null ? 375 : playerClan.getMaxLandSize();
         }else {
             landSize = configFile.getInt("landsLimitSize");
             if (player != null && player.hasPermission(PERM_VIP)){

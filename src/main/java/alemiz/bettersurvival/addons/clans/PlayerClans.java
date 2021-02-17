@@ -17,6 +17,7 @@ package alemiz.bettersurvival.addons.clans;
 
 import alemiz.bettersurvival.addons.myland.MyLandProtect;
 import alemiz.bettersurvival.commands.ClanCommand;
+import alemiz.bettersurvival.commands.ClanLevelsCommand;
 import alemiz.bettersurvival.commands.ClanTopCommand;
 import alemiz.bettersurvival.commands.ClanWarCommand;
 import alemiz.bettersurvival.utils.Addon;
@@ -32,6 +33,7 @@ import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.player.PlayerChatEvent;
 import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.utils.Config;
+import cn.nukkit.utils.ConfigSection;
 import cn.nukkit.utils.TextFormat;
 import cubemc.nukkit.connector.modules.Money;
 
@@ -41,7 +43,7 @@ import java.util.*;
 public class PlayerClans extends Addon {
 
     private final Map<String, Clan> clans = new HashMap<>();
-    private final Map<Integer, Integer> clanLevels = new HashMap<>();
+    private final Map<Integer, ClanLevelInfo> clanLevels = new HashMap<>();
 
     public PlayerClans(String path) {
         super("playerclans", path);
@@ -49,10 +51,26 @@ public class PlayerClans extends Addon {
 
     @Override
     public void postLoad() {
-        Map<String, Integer> levelMap = (Map<String, Integer>) this.configFile.get("clanLevels");
-        for (String level : levelMap.keySet()) {
-            int minPoints = this.configFile.getInt("clanLevels." + level);
-            this.clanLevels.put(Integer.parseInt(level), minPoints);
+        ConfigSection section = this.configFile.getSection("clanLevels");
+        for (String levelText : section.getKeys(false)) {
+            ConfigSection levelData = section.getSection(levelText);
+            int level = levelData.getInt("level");
+            int requiredPoints = levelData.getInt("points");
+
+            ClanLevelInfo levelInfo = new ClanLevelInfo(level, requiredPoints);
+            if (levelData.exists("moneyLimit")) {
+                levelInfo.setMoneyLimit(levelData.getInt("moneyLimit"));
+            }
+            if (levelData.exists("playerLimit")) {
+                levelInfo.setPlayerLimit(levelData.getInt("playerLimit"));
+            }
+            if (levelData.exists("homeLimit")) {
+                levelInfo.setHomeLimit(levelData.getInt("homeLimit"));
+            }
+            if (levelData.exists("landSize")) {
+                levelInfo.setMaxLandSize(levelData.getInt("landSize"));
+            }
+            this.clanLevels.put(level, levelInfo);
         }
 
         int failedAttempts = 0;
@@ -83,6 +101,7 @@ public class PlayerClans extends Addon {
             configFile.set("playerLimit", 10);
             configFile.set("homeLimit", 10);
             configFile.set("moneyLimit", 400000);
+            configFile.set("maxLandSize", 375);
             configFile.set("warKillPoints", 5);
 
             configFile.set("clanCreateMessage", "§6»§7New clan §6@{clan}§7 was created successfully!");
@@ -93,10 +112,23 @@ public class PlayerClans extends Addon {
 
             configFile.set("warKillMessage", "§eKilled {target}! §7[+{points}XP]");
 
-            Map<String, Integer> clanLevels = new HashMap<>();
-            clanLevels.put("1", 1000);
-            clanLevels.put("2", 3000);
-            clanLevels.put("3", 6000);
+            ConfigSection clanLevels = new ConfigSection();
+            ConfigSection level1 = new ConfigSection();
+            level1.set("level", 1);
+            level1.set("moneyLimit", 600000);
+            level1.set("playerLimit", 12);
+            level1.set("homeLimit", 12);
+            level1.set("landSize", 400);
+            clanLevels.set("level1", level1);
+
+            ConfigSection level2 = new ConfigSection();
+            level2.set("level", 2);
+            level2.set("moneyLimit", 800000);
+            level2.set("playerLimit", 16);
+            level2.set("homeLimit", 16);
+            level2.set("landSize", 450);
+            clanLevels.set("level2", level2);
+
             configFile.set("clanLevels", clanLevels);
             configFile.save();
         }
@@ -110,6 +142,7 @@ public class PlayerClans extends Addon {
         this.registerCommand("clan", new ClanCommand("clan", this));
         this.registerCommand("clanwar", new ClanWarCommand("clanwar", this));
         this.registerCommand("topclans", new ClanTopCommand("topclans", this));
+        this.registerCommand("clanlevels", new ClanLevelsCommand("clanlevels", this));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -222,6 +255,7 @@ public class PlayerClans extends Addon {
         config.set("maxMoney", configFile.getInt("moneyLimit", 400000));
         config.set("playerLimit", configFile.getInt("playerLimit", 10));
         config.set("homeLimit", configFile.getInt("homeLimit", 10));
+        config.set("maxLandSize", configFile.getInt("maxLandSize", 375));
         config.save();
 
         Clan clan = new Clan(rawName, name, config, this);
@@ -341,13 +375,25 @@ public class PlayerClans extends Addon {
         return clan.getOwner().equals(player.getName());
     }
 
-    public int getLevelFromPoints(int points, int oldLevel) {
-        int minPoints = this.getLevelMinPoints(oldLevel + 1);
-        return points >= minPoints? oldLevel + 1 : oldLevel;
+    public ClanLevelInfo getLevelFromPoints(int points, ClanLevelInfo oldLevel) {
+        ClanLevelInfo levelInfo = this.clanLevels.get(oldLevel.getLevel()+ 1);
+        if (levelInfo == null) {
+            return oldLevel;
+        }
+        return points >= levelInfo.getRequiredPoints()? levelInfo : oldLevel;
     }
 
     public int getLevelMinPoints(int level) {
-        return this.clanLevels.getOrDefault(level, 0);
+        ClanLevelInfo levelInfo = this.clanLevels.get(level);
+        return levelInfo == null ? 0 : levelInfo.getRequiredPoints();
+    }
+
+    public ClanLevelInfo getLevel(int level) {
+        return this.clanLevels.get(level);
+    }
+
+    public Collection<ClanLevelInfo> getClanLevels() {
+        return this.clanLevels.values();
     }
 
     public Map<String, Clan> getClans() {
