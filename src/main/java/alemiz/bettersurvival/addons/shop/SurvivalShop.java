@@ -300,7 +300,8 @@ public class SurvivalShop extends Addon {
 
     public boolean isShopSign(BlockEntitySign sign){
         String[] lines = sign.getText();
-        return lines[0].equals(configFile.getString("signTitle")) && lines.length >= 2 && this.hasCategory(lines[1].substring(2).toLowerCase());
+        return lines != null && lines.length >= 2 && lines[0] != null && lines[1] != null &&
+                lines[0].equals(configFile.getString("signTitle")) && this.hasCategory(lines[1].substring(2).toLowerCase());
     }
 
     public boolean hasCategory(String category){
@@ -308,7 +309,7 @@ public class SurvivalShop extends Addon {
     }
 
     public ShopCategory getCategory(String category){
-        return this.categories.getOrDefault(category.toLowerCase(), null);
+        return category == null ? null : this.categories.getOrDefault(category.toLowerCase(), null);
     }
 
     public JsonObject getSubCategoryJson(String subName){
