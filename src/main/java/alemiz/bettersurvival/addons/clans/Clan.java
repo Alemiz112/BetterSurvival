@@ -126,10 +126,10 @@ public class Clan {
         if (newLevel != null && this.onClanLevelChanged(oldLevel, newLevel)) {
             this.clanLevel = newLevel.getLevel();
             this.config.set("clanLevel", newLevel.getLevel());
-            this.setMaxMoney(newLevel.getMaxLandSize(), false);
-            this.setPlayerLimit(newLevel.getPlayerLimit(), false);
-            this.setHomeLimit(newLevel.getHomeLimit(), false);
-            this.setMaxLandSize(newLevel.getMaxLandSize(), false);
+            this.setMaxMoney(Math.max(newLevel.getMaxLandSize(), this.maxMoney), false);
+            this.setPlayerLimit(Math.max(newLevel.getPlayerLimit(), this.playerLimit), false);
+            this.setHomeLimit(Math.max(newLevel.getHomeLimit(), this.homeLimit), false);
+            this.setMaxLandSize(Math.max(newLevel.getMaxLandSize(), this.maxLandSize), false);
         }
     }
 

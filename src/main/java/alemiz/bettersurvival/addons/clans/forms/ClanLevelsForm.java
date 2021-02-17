@@ -41,11 +41,19 @@ public class ClanLevelsForm extends CustomForm {
 
         List<ClanLevelInfo> levels = new ArrayList<>(this.loader.getClanLevels());
         for (ClanLevelInfo levelInfo : levels) {
-            String text = "§3Level "+levelInfo.getLevel()+":\n" +
-                    "§7- "+levelInfo.getPlayerLimit()+" players\n" +
-                    "§7- "+levelInfo.getMoneyLimit()+" max coins\n" +
-                    "§7- "+levelInfo.getHomeLimit()+" homes\n" +
-                    "§7- "+levelInfo.getMaxLandSize()+" blocks land size";
+            String text = "§3Level "+levelInfo.getLevel()+":";
+            if (levelInfo.getPlayerLimit() > 0) {
+                text += "\n§7- "+levelInfo.getPlayerLimit()+" players";
+            }
+            if (levelInfo.getMoneyLimit() > 0) {
+                text += "\n§7- "+levelInfo.getMoneyLimit()+" max coins";
+            }
+            if (levelInfo.getHomeLimit() > 0) {
+                text += "\n§7- "+levelInfo.getHomeLimit()+" homes";
+            }
+            if (levelInfo.getMaxLandSize() > 0) {
+                text += "\n§7- "+levelInfo.getMaxLandSize()+" blocks land size";
+            }
             this.addElement(new ElementLabel(text));
         }
         return this;
