@@ -27,9 +27,11 @@ import cn.nukkit.event.block.BlockGrowEvent;
 import cn.nukkit.event.block.ItemFrameDropItemEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityExplodeEvent;
+import cn.nukkit.event.entity.EntityPortalEnterEvent;
 import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.event.player.PlayerQuitEvent;
 import cn.nukkit.event.server.DataPacketReceiveEvent;
+import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.particle.FloatingTextParticle;
 import cn.nukkit.math.Vector3;
@@ -97,6 +99,7 @@ public class BetterLobby extends Addon {
             configFile.set("broadcastInterval", 1800);
             configFile.set("joinMessage", "§6»§7Be careful, §6@{player}§7 joined!");
             configFile.set("quitMessage", "§6»§7Oops §6@{player}§7 left!");
+            configFile.set("wrongPortalMessage", "§c»§7Can not create portal near the spawn!");
 
             configFile.set("bossBar", true);
             configFile.set("bossBarText", "§bCube§eMC §cSurvival");
@@ -207,6 +210,24 @@ public class BetterLobby extends Addon {
     public void onBlockGrow(BlockGrowEvent event){
         Block block = event.getBlock();
         if (!this.growOnSpawn && this.isSafeSpawn(block)){
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onNetherPortal(EntityPortalEnterEvent event) {
+        if (!(event.getEntity() instanceof Player) || event.getPortalType() != EntityPortalEnterEvent.PortalType.NETHER) {
+            return;
+        }
+
+        Player player = (Player) event.getEntity();
+        if (player.portalPos == null) {
+            return;
+        }
+
+        Position portalPos = player.portalPos;
+        if (portalPos.getLevel().isInSpawnRadius(portalPos)) {
+            player.sendMessage(configFile.getString("wrongPortalMessage"));
             event.setCancelled(true);
         }
     }
