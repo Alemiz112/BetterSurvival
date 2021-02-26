@@ -112,10 +112,6 @@ public class Troller extends Addon {
         for (String playerName : new ArrayList<>(this.vanishPlayers)){
             Player player = this.plugin.getServer().getPlayer(playerName);
             this.showPlayer(spectator, player);
-
-            if (!player.canSee(spectator)){
-                this.showPlayer(player, spectator);
-            }
         }
     }
 
@@ -123,21 +119,15 @@ public class Troller extends Addon {
         for (String playerName : new ArrayList<>(this.vanishPlayers)){
             Player player = this.plugin.getServer().getPlayer(playerName);
             this.hidePlayer(spectator, player);
-
-            if (player.canSee(spectator)){
-                this.hidePlayer(player, spectator);
-            }
         }
     }
 
     private void showPlayer(Player spectator, Player player){
-        this.plugin.getServer().updatePlayerListData(player.getUniqueId(), player.getId(), player.getDisplayName(), player.getSkin(), player.getLoginChainData().getXUID(), new Player[]{spectator});
         spectator.showPlayer(player);
     }
 
     private void hidePlayer(Player spectator, Player player){
         spectator.hidePlayer(player);
-        this.plugin.getServer().removePlayerListData(player.getUniqueId(), new Player[]{spectator});
     }
 
     public void vanish(Player player){
@@ -148,10 +138,10 @@ public class Troller extends Addon {
 
         DummyBossBar bossBar = null;
         long bossBarId = 0;
-        Addon addon = Addon.getAddon(BetterLobby.class);
+        BetterLobby addon = Addon.getAddon(BetterLobby.class);
         if (addon != null && addon.isEnabled() && addon.configFile.getBoolean("bossBar")){
-            bossBarId = ((BetterLobby) Addon.getAddon(BetterLobby.class)).getBossBars().get(player.getName());
-            bossBar = ((BetterLobby) Addon.getAddon(BetterLobby.class)).buildBossBar(player);
+            bossBarId = addon.getBossBars().get(player.getName());
+            bossBar = addon.buildBossBar(player);
         }
 
         boolean hidden = this.vanishPlayers.contains(player.getName());
