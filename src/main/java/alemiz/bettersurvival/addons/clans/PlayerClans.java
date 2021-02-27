@@ -44,6 +44,7 @@ public class PlayerClans extends Addon {
 
     private final Map<String, Clan> clans = new HashMap<>();
     private final Map<Integer, ClanLevelInfo> clanLevels = new HashMap<>();
+    private ClanLevelInfo lowestLevel;
 
     public PlayerClans(String path) {
         super("playerclans", path);
@@ -70,7 +71,11 @@ public class PlayerClans extends Addon {
             if (levelData.exists("landSize")) {
                 levelInfo.setMaxLandSize(levelData.getInt("landSize"));
             }
+
             this.clanLevels.put(level, levelInfo);
+            if (this.lowestLevel == null || this.lowestLevel.getLevel() > level) {
+                this.lowestLevel = levelInfo;
+            }
         }
 
         int failedAttempts = 0;
@@ -389,7 +394,15 @@ public class PlayerClans extends Addon {
     }
 
     public ClanLevelInfo getLevel(int level) {
-        return this.clanLevels.get(level);
+        ClanLevelInfo levelInfo = this.clanLevels.get(level);
+        if (levelInfo == null) {
+            return this.lowestLevel;
+        }
+        return levelInfo;
+    }
+
+    public ClanLevelInfo getLowestLevel() {
+        return this.lowestLevel;
     }
 
     public Collection<ClanLevelInfo> getClanLevels() {
