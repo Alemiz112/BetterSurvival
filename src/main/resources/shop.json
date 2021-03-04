@@ -384,7 +384,7 @@
           "sell": 5
         },
         "prismarine crystal": {
-          "id": 410,
+          "id": 422,
           "count": 12,
           "price": 200,
           "image": "items/prismarine_crystals",
@@ -422,7 +422,7 @@
           "sell": 12
         },
         "hopper": {
-          "id": 154,
+          "id": 410,
           "count": 4,
           "price": 1200,
           "image": "items/hopper",
@@ -443,7 +443,7 @@
           "image": false
         },
         "dropper": {
-          "id": 158,
+          "id": 125,
           "count": 4,
           "price": 450,
           "sell": 5,
