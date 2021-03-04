@@ -46,13 +46,23 @@ public class FakeInventoryManager {
                 break;
         }
 
-        inventories.put(player.getName(), inventory);
+        storeInventory(player, inventory);
         return inventory;
+    }
+
+    public static void storeInventory(Player player, FakeInventory inventory) {
+        inventories.put(player.getName(), inventory);
     }
 
     public static void removeInventory(Player player){
         FakeInventory inventory = inventories.remove(player.getName());
-        if (inventory != null) inventory.removeInventory(player);
+        if (inventory != null) {
+            inventory.close(player);
+        }
+    }
+
+    public static FakeInventory getWindow(Player player) {
+        return inventories.get(player.getName());
     }
 
     public static boolean hasWindow(Player player){

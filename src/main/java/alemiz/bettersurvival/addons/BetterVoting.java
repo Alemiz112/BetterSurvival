@@ -178,7 +178,7 @@ public class BetterVoting extends Addon {
         Player player = event.getPlayer();
         SlotChangeAction action = event.getAction();
 
-        if (event.getInventory().getInventoryFlag(FakeInventory.Flags.IS_VOTE_INV) == null){
+        if (!event.getInventory().getInventoryFlag(FakeInventory.Flags.IS_VOTE_INV)){
             return;
         }
 
@@ -204,7 +204,7 @@ public class BetterVoting extends Addon {
         }
 
         if (update) player.getInventory().addItem(action.getSourceItem().clearNamedTag());
-        event.getInventory().removeInventory(player);
+        event.getInventory().close(player);
     }
 
     @EventHandler
