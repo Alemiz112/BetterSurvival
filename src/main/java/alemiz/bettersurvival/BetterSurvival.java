@@ -83,39 +83,24 @@ public class BetterSurvival extends PluginBase implements Listener {
     }
 
     @EventHandler
-    public void onInventoryClose(InventoryCloseEvent event){
-        FakeInventoryManager.removeInventory(event.getPlayer());
-    }
-
-    @EventHandler
     public void onInventoryTranslation(InventoryTransactionEvent event){
         Player player = event.getTransaction().getSource();
-        Map<FakeInventory, List<SlotChangeAction>> actions = new HashMap<>();
-
         for (InventoryAction action : event.getTransaction().getActions()){
-            if (!(action instanceof SlotChangeAction)) continue;
+            if (!(action instanceof SlotChangeAction)) {
+                continue;
+            }
 
             SlotChangeAction slotChange = (SlotChangeAction) action;
-            if (!(slotChange.getInventory() instanceof FakeInventory)) continue;
+            if (!(slotChange.getInventory() instanceof FakeInventory)) {
+                continue;
+            }
 
             FakeInventory inventory = (FakeInventory) slotChange.getInventory();
-            List<SlotChangeAction> slotChanges = actions.computeIfAbsent(inventory, fakeInventory -> new ArrayList<>());
-            slotChanges.add(slotChange);
-        }
-
-        AtomicBoolean cancel = new AtomicBoolean(false);
-        actions.forEach((FakeInventory inv, List<SlotChangeAction> aactions)->{
-            if (inv.getInventoryFlag(FakeInventory.Flags.IS_LOCKED)){
-                cancel.set(true);
+            if (inventory.getInventoryFlag(FakeInventory.Flags.IS_LOCKED) || !inventory.slotChange(player, slotChange)) {
+                event.setCancelled(true);
                 return;
             }
-
-            for (SlotChangeAction action : aactions){
-                if (!inv.slotChange(player, action)) cancel.set(true);
-            }
-        });
-
-        if (cancel.get()) event.setCancelled(true);
+        }
     }
 
     public void loadAddons(){

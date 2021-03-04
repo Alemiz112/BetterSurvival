@@ -22,14 +22,14 @@ import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 
-public class InvseeCommand extends Command {
+public class EndSeeCommand extends Command {
 
     public Troller loader;
 
-    public InvseeCommand(String name, Troller loader) {
-        super(name, "Show players inventory", "");
+    public EndSeeCommand(String name, Troller loader) {
+        super(name, "Show players ender chest inventory", "");
 
-        this.usage = "§7/invsee <player>: Show players inventory ";
+        this.usage = "§7/endsee <player>: Show players ender chest inventory ";
         this.setUsage(getUsageMessage());
 
         this.commandParameters.clear();
@@ -39,7 +39,7 @@ public class InvseeCommand extends Command {
 
         this.ignoreInHelpTexts = true;
 
-        this.setPermission(loader.configFile.getString("permission-invsee"));
+        this.setPermission(loader.configFile.getString("permission-endsee"));
         this.loader = loader;
     }
 
@@ -55,11 +55,11 @@ public class InvseeCommand extends Command {
         }
 
         if (args.length < 1){
-            sender.sendMessage(getUsageMessage());
+            sender.sendMessage(this.getUsageMessage());
             return true;
         }
 
-        this.loader.showPlayerInv((Player) sender, args[0]);
+        this.loader.showPlayerEnderChestInv((Player) sender, args[0]);
         return true;
     }
 }

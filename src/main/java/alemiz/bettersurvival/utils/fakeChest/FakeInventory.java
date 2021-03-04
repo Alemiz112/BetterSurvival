@@ -128,8 +128,9 @@ public class FakeInventory extends ContainerInventory {
     }
 
     public void removeInventory(Player player){
-        if (player == null) return;
-        player.getLevel().sendBlocks(new Player[]{player}, new Vector3[]{player.add(0, 2, 0)});
+        if (player != null) {
+            player.getLevel().sendBlocks(new Player[]{player}, new Vector3[]{player.add(0, 2, 0)});
+        }
     }
 
     public boolean slotChange(Player player, SlotChangeAction action){
@@ -138,6 +139,11 @@ public class FakeInventory extends ContainerInventory {
         return !event.isCancelled();
     }
 
+    @Override
+    public void onClose(Player who) {
+        this.removeInventory(who);
+        super.onClose(who);
+    }
 
     public Boolean getItemFlag(Flags flag){
         return this.itemFlags.getOrDefault(flag, null);
@@ -167,12 +173,12 @@ public class FakeInventory extends ContainerInventory {
         });
     }
 
-    public Boolean getInventoryFlag(Flags flags){
+    public boolean getInventoryFlag(Flags flags){
         return this.inventoryFlags.getOrDefault(flags, false);
     }
 
-    public Boolean hasInventoryFlag(Flags flags){
-        return this.getInventoryFlag(flags) != null;
+    public boolean hasInventoryFlag(Flags flags){
+        return this.inventoryFlags.containsKey(flags);
     }
 
     public void setInventoryFlag(Flags flag, Boolean value){

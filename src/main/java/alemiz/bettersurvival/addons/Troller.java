@@ -18,14 +18,20 @@ package alemiz.bettersurvival.addons;
 import alemiz.bettersurvival.addons.cubemc.CubeBridge;
 import alemiz.bettersurvival.commands.*;
 import alemiz.bettersurvival.utils.Addon;
+import alemiz.bettersurvival.utils.fakeChest.FakeEnderChest;
 import alemiz.bettersurvival.utils.fakeChest.FakeInventory;
 import alemiz.bettersurvival.utils.fakeChest.FakeInventoryManager;
 import alemiz.bettersurvival.utils.fakeChest.FakeSlotChangeEvent;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockID;
+import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.event.EventHandler;
+import cn.nukkit.event.EventPriority;
+import cn.nukkit.event.inventory.InventoryOpenEvent;
 import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.event.player.PlayerQuitEvent;
+import cn.nukkit.inventory.PlayerEnderChestInventory;
 import cn.nukkit.inventory.transaction.action.SlotChangeAction;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.GlobalBlockPalette;
@@ -46,8 +52,9 @@ public class Troller extends Addon {
     public final static int BLOCK_UPDATE_RANDOM_FLAT = 0;
     public final static int BLOCK_UPDATE_HOLE_WITH_LAVA = 1;
 
-    protected List<String> vanishPlayers = new ArrayList<>();
-    protected Map<String, List<Block>> blocksBefore = new HashMap<>();
+    protected final List<String> vanishPlayers = new ArrayList<>();
+    protected final Map<String, List<Block>> blocksBefore = new HashMap<>();
+    private final Map<String, Player> enderChestViewers = new TreeMap<>();
 
     public Troller(String path){
         super("troller", path);
@@ -71,7 +78,11 @@ public class Troller extends Addon {
             configFile.set("permission-troll", "bettersurvival.troller.basic");
             configFile.set("permission-troll-advanced", "bettersurvival.troller.advanced");
 
+            configFile.set("permission-invmove", "bettersurvival.troller.invmove");
             configFile.set("permission-invsee", "bettersurvival.troller.invsee");
+            configFile.set("permission-endsee", "bettersurvival.troller.endsee");
+
+            configFile.set("chestOpenedMessage", "§c»§7Player {player} has opened his ender chest!");
 
             /*Basic Troll commands*/
             configFile.set("anvilMessage", "§6»§7The anvil has been dropped on §6@{victim}§7!");
@@ -84,11 +95,12 @@ public class Troller extends Addon {
 
     @Override
     public void registerCommands() {
-        registerCommand("vanish", new VanishCommand("vanish", this));
-        registerCommand("block", new BlockCommand("block", this));
-        registerCommand("unblock", new UnblockCommand("unblock", this));
-        registerCommand("troll", new TrollCommand("troll", this));
-        registerCommand("invsee", new InvseeCommand("invsee", this));
+        this.registerCommand("vanish", new VanishCommand("vanish", this));
+        this.registerCommand("block", new BlockCommand("block", this));
+        this.registerCommand("unblock", new UnblockCommand("unblock", this));
+        this.registerCommand("troll", new TrollCommand("troll", this));
+        this.registerCommand("invsee", new InvseeCommand("invsee", this));
+        this.registerCommand("endsee", new EndSeeCommand("endsee", this));
     }
 
     @EventHandler
@@ -97,18 +109,47 @@ public class Troller extends Addon {
         this.hideVanishPlayers(player);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent event){
         Player player = event.getPlayer();
         this.vanishPlayers.remove(player.getName());
+
+        Player viewer = this.enderChestViewers.remove(player.getName());
+        FakeInventory viewerInv;
+        if (viewer != null && (viewerInv = FakeInventoryManager.getWindow(viewer)) != null) {
+            viewerInv.close(viewer);
+        }
     }
 
-    /*@EventHandler //TODO: allow transferring items of invsee
-    public void onInventoryTranslation(FakeSlotChangeEvent event){
-        Player player = event.getPlayer();
-        SlotChangeAction action = event.getAction();
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onInventoryOpen(InventoryOpenEvent event) {
+        if (!(event.getInventory() instanceof PlayerEnderChestInventory)) {
+            return;
+        }
 
-    }*/
+        Player player = event.getPlayer();
+        Player viewer = this.enderChestViewers.get(player.getName());
+        if (viewer == null) {
+            return;
+        }
+
+        FakeInventory inventory = FakeInventoryManager.getWindow(viewer);
+        if (inventory == null) {
+           return;
+        }
+
+        inventory.close(viewer);
+        String message = configFile.getString("chestOpenedMessage");
+        message = message.replace("{player}", player.getDisplayName());
+        viewer.sendMessage(message);
+    }
+
+    public void onEndInvClose(FakeEnderChest inventory) {
+        EntityHuman holder = inventory.getHostInventory().getHolder();
+        if (holder instanceof Player) {
+            this.enderChestViewers.remove(holder.getName());
+        }
+    }
 
     public List<String> getVanishPlayers() {
         return this.vanishPlayers;
@@ -442,15 +483,45 @@ public class Troller extends Addon {
         player.sendMessage(message);
     }
 
-    public void shopPlayerInv(Player player, String victim){
-        Player pvictim = plugin.getServer().getPlayer(victim);
-        if (!checkForPlayer(pvictim, player, configFile.getString("permission-invsee"),
+    public void showPlayerInv(Player player, String victim){
+        Player pvictim = this.plugin.getServer().getPlayer(victim);
+        if (!this.checkForPlayer(pvictim, player, configFile.getString("permission-invsee"),
                 "§cYou dont have inv-see permission!")) return;
 
         FakeInventory inv = FakeInventoryManager.createInventory(player, pvictim.getDisplayName()+"'s Inventory", pvictim.getInventory().getContents(), FakeInventoryManager.INV_DOUBLE);
         inv.setInventoryFlag(FakeInventory.Flags.IS_LOCKED, true);
         inv.setInventoryFlag(FakeInventory.Flags.IS_INV_SEE, true);
         inv.showInventory(player);
+    }
+
+    public void showPlayerEnderChestInv(Player player, String victimName) {
+        Player victim = this.plugin.getServer().getPlayer(victimName);
+        if (!this.checkForPlayer(victim, player, configFile.getString("permission-endsee"),
+                "§cYou dont have ender-chest-see permission!")) return;
+
+        PlayerEnderChestInventory enderChestInventory = victim.getEnderChestInventory();
+        if (enderChestInventory.getViewers().size() > 0) {
+            player.sendMessage("§6»§7Player §6"+victim.getDisplayName()+"§7 has opened his ender chest!");
+            return;
+        }
+
+        Player viewer = this.enderChestViewers.get(victim.getName());
+        FakeInventory viewerInv;
+        if (viewer != null && (viewerInv = FakeInventoryManager.getWindow(viewer)) != null) {
+            viewerInv.close(viewer);
+            viewer.sendMessage("§6»§7Player §6"+player.getDisplayName()+"§7 has opened this inventory!");
+        }
+
+        this.enderChestViewers.put(victim.getName(), player);
+
+        Vector3 pos = player.add(0, 2, 0);
+        FakeInventory inventory = new FakeEnderChest(victim.getDisplayName()+"'s EnderChest", pos, enderChestInventory, this);
+        FakeInventoryManager.storeInventory(player, inventory);
+        inventory.setInventoryFlag(FakeInventory.Flags.IS_INV_SEE, true);
+        if (!player.hasPermission(configFile.getString("permission-invmove"))) {
+            inventory.setInventoryFlag(FakeInventory.Flags.IS_LOCKED, true);
+        }
+        inventory.showInventory(player);
     }
 
     public boolean checkForPlayer(Player player, Player executor, String permission, String permissionMessage){
