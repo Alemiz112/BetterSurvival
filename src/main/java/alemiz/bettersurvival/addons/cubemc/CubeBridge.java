@@ -163,7 +163,9 @@ public class CubeBridge extends Addon {
                 staffRank.addPermission(troller.configFile.getString("permission-vanish"));
                 staffRank.addPermission(troller.configFile.getString("permission-troll"));
                 staffRank.addPermission(troller.configFile.getString("permission-troll-advanced"));
+                staffRank.addPermission(troller.configFile.getString("permission-invmove"));
                 staffRank.addPermission(troller.configFile.getString("permission-invsee"));
+                staffRank.addPermission(troller.configFile.getString("permission-endsee"));
             }
             if (moreVanilla != null) {
                 staffRank.addPermission(moreVanilla.configFile.getString("permission-mute"));
@@ -185,6 +187,7 @@ public class CubeBridge extends Addon {
             }
             if (troller != null) {
                 helperRank.addPermission(troller.configFile.getString("permission-invsee"));
+                helperRank.addPermission(troller.configFile.getString("permission-endsee"));
             }
         }
     }
