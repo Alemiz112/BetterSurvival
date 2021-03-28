@@ -131,7 +131,9 @@ public class EconomySpawners implements Listener {
 
     @EventHandler
     public void onSpawnerBreak(BlockBreakEvent event){
-        if (!this.canBreakSpawner || event.isCancelled() || event.getBlock().getId() != Block.MONSTER_SPAWNER) return;
+        if (!this.canBreakSpawner || event.isCancelled() || event.getBlock().getId() != Block.MONSTER_SPAWNER) {
+            return;
+        }
         Player player = event.getPlayer();
         Block block = event.getBlock();
 

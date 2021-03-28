@@ -1200,7 +1200,7 @@
           "sell": 13
         },
         "anvil": {
-          "id": 47,
+          "id": 145,
           "count": 1,
           "price": 700,
           "image": false,
@@ -1792,7 +1792,7 @@
         },
         "diamond pickaxe": {
           "image": "items/diamond_pickaxe",
-          "id": 274,
+          "id": 278,
           "count": 1,
           "price": 4500,
           "sell": 150
@@ -1876,7 +1876,7 @@
         },
         "golden axe": {
           "image": "items/gold_axe",
-          "id": 285,
+          "id": 286,
           "count": 1,
           "price": 500,
           "sell": 30
