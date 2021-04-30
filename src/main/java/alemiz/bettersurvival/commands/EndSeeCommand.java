@@ -22,11 +22,11 @@ import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 
-public class EndSeeCommand extends Command {
+public class EndseeCommand extends Command {
 
     public Troller loader;
 
-    public EndSeeCommand(String name, Troller loader) {
+    public EndseeCommand(String name, Troller loader) {
         super(name, "Show players ender chest inventory", "");
 
         this.usage = "§7/endsee <player>: Show players ender chest inventory ";
