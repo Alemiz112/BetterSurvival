@@ -39,9 +39,6 @@ import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityExplodeEvent;
 import cn.nukkit.event.inventory.InventoryMoveItemEvent;
 import cn.nukkit.event.player.PlayerInteractEvent;
-import cn.nukkit.inventory.BaseInventory;
-import cn.nukkit.inventory.ChestInventory;
-import cn.nukkit.inventory.DoubleChestInventory;
 import cn.nukkit.inventory.Inventory;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
@@ -51,7 +48,7 @@ import cn.nukkit.utils.Config;
 import cn.nukkit.utils.ConfigSection;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 
 public class MyLandProtect extends Addon {
@@ -59,7 +56,7 @@ public class MyLandProtect extends Addon {
     public static final BitSet INTERACT_BLOCKS = new BitSet();
 
     private final Map<String, LinkedList<Block>> selectors = new HashMap<>();
-    private final Map<String, LandRegion> lands = new ConcurrentHashMap<>();
+    private final Map<String, LandRegion> lands = new ConcurrentSkipListMap<>(String.CASE_INSENSITIVE_ORDER);
 
     public static String WAND = "§6LandWand";
     public static String PERM_VIP = "bettersurvival.land.vip";
@@ -635,8 +632,8 @@ public class MyLandProtect extends Addon {
             int freeLands = 0;
 
             if (clanMode){
-                clan = ((PlayerClans) Addon.getAddon(PlayerClans.class)).getClan(player);
-                if (clan == null) {
+                PlayerClans playerClans = Addon.getAddon(PlayerClans.class);
+                if (playerClans == null || (clan = playerClans.getClan(player)) == null) {
                     player.sendMessage("§c»§7You are not in any clan!");
                     return;
                 }
@@ -719,17 +716,21 @@ public class MyLandProtect extends Addon {
     }
 
     public void removeLand(Player player, String land){
-        if (player == null || !player.isConnected()) return;
+        if (player == null || !player.isConnected()) {
+            return;
+        }
 
         Config config = ConfigManager.getInstance().loadPlayer(player);
-        if (config == null) return;
+        if (config == null) {
+            return;
+        }
 
         if (!config.exists("land."+land)){
             this.regionNotFound(player);
             return;
         }
 
-        ((Map) config.get("land")).remove(land);
+        ((Map<?, ?>) config.get("land")).remove(land);
         config.save();
 
         this.lands.remove(player.getName().toLowerCase()+"-"+land);

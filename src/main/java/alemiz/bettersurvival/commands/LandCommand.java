@@ -23,6 +23,8 @@ import cn.nukkit.command.CommandSender;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.enchantment.Enchantment;
 
+import java.util.Arrays;
+
 public class LandCommand extends Command {
 
     public MyLandProtect loader;
@@ -129,7 +131,7 @@ public class LandCommand extends Command {
             case "whitelist":
                 if (args.length >= 4){
                     region = this.loader.getLand(player, args[2]);
-                    this.loader.whitelist(player, args[3], region, args[1]);
+                    this.loader.whitelist(player, String.join(" ", Arrays.copyOfRange(args, 3, args.length)), region, args[1]);
                     break;
                 }
                 if (args.length == 3 && args[1].equals(LandRegion.WHITELIST_LIST)){
