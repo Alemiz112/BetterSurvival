@@ -42,7 +42,7 @@ public class LandRegion {
     protected Vector3f pos1;
     protected Vector3f pos2;
 
-    protected List<String> whitelist = new ArrayList<>();;
+    protected List<String> whitelist = new ArrayList<>();
 
     protected boolean liquidFlow = true;
     protected boolean pistonMovement = true;
