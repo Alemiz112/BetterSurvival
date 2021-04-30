@@ -904,7 +904,7 @@
         "elder guardian spawn egg": {
           "id": 383,
           "count": 1,
-          "meta": 51,
+          "meta": 50,
           "price": 15500,
           "image": "items/egg_elderguardian",
           "sell": 1925
