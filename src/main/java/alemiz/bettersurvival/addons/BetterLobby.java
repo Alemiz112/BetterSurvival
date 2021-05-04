@@ -181,13 +181,22 @@ public class BetterLobby extends Addon {
 
     @EventHandler
     public void onDamage(EntityDamageEvent event){
-        if (!(event.getEntity() instanceof Player)) return;
+        if (!(event.getEntity() instanceof Player)) {
+            return;
+        }
+
+        Player player = (Player) event.getEntity();
+        if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
+            player.teleport(this.plugin.getServer().getDefaultLevel().getSafeSpawn());
+            event.setCancelled(true);
+            return;
+        }
 
         if (this.protectSpawn){
-            Player player = (Player) event.getEntity();
-            if (!isSafeSpawn(player.clone())) return;
-
-            event.setCancelled();
+            if (this.isSafeSpawn(player)) {
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 
