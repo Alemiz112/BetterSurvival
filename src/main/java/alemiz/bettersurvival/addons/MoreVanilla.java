@@ -1,36 +1,31 @@
 /*
- * Copyright 2020 Alemiz
+ * Copyright 2021 Alemiz
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package alemiz.bettersurvival.addons;
 
 import alemiz.bettersurvival.commands.*;
-import alemiz.bettersurvival.tasks.MuteCheckTask;
 import alemiz.bettersurvival.tasks.RandomTpTask;
 import alemiz.bettersurvival.utils.Addon;
 import alemiz.bettersurvival.utils.ConfigManager;
 import cn.nukkit.AdventureSettings;
-import cn.nukkit.Server;
-import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
-import cn.nukkit.blockentity.BlockEntity;
-import cn.nukkit.blockentity.BlockEntityChest;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.EventPriority;
 import cn.nukkit.event.block.BlockBreakEvent;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
-import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.event.level.LevelLoadEvent;
 import cn.nukkit.event.player.*;
 import cn.nukkit.Player;
@@ -40,16 +35,15 @@ import cn.nukkit.item.Item;
 import cn.nukkit.level.*;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.network.protocol.PlaySoundPacket;
-import cn.nukkit.network.protocol.SpawnParticleEffectPacket;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.Config;
+import net.jodah.expiringmap.ExpiringMap;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-public class MoreVanilla extends Addon{
+public class MoreVanilla extends Addon {
 
     public static BitSet UNSAFE_BLOCKS = new BitSet();
 
@@ -65,27 +59,23 @@ public class MoreVanilla extends Addon{
         UNSAFE_BLOCKS.set(BlockID.END_PORTAL);
     }
 
-    protected Map<String, String> tpa = new HashMap<>();
-    protected Map<String, Location> back = new HashMap<>();
+    private final Map<String, String> tpaCache = ExpiringMap.builder().expiration(2, TimeUnit.MINUTES).build();
+    private final Map<String, Location> backCache = ExpiringMap.builder().expiration(5, TimeUnit.MINUTES).build();
+    private final ExpiringMap<String, String> mutedPlayers = ExpiringMap.builder().variableExpiration().expirationListener(this::onMuteExpired).build();
+    private final Map<String, Position> randomTpCache = ExpiringMap.builder().expiration(15, TimeUnit.SECONDS).build();
 
-    protected Map<String, Date> mutedPlayers = new HashMap<>();
-    protected Map<String, Integer> randTpDelay = new HashMap<>();
-    protected Map<String, Position> sleepPos = new HashMap<>();
+    private final Map<String, Boolean> keepInvCache = new HashMap<>();
+    private final Map<String, String> keepInvDamagerCache = ExpiringMap.builder().expiration(20, TimeUnit.SECONDS).build();
 
-    protected Map<String, Boolean> keepInvCache = new HashMap<>();
+    private final Map<String, Position> sleepPos = new HashMap<>();
 
-    public MoreVanilla(String path){
+    public MoreVanilla(String path) {
         super("morevanilla", path);
     }
 
     @Override
-    public void postLoad() {
-        plugin.getServer().getScheduler().scheduleRepeatingTask(new MuteCheckTask(this), 20*60, true);
-    }
-
-    @Override
     public void loadConfig() {
-        if (!configFile.exists("enable")){
+        if (!configFile.exists("enable")) {
             configFile.set("enable", true);
 
             configFile.set("keepInvCommand", true);
@@ -101,7 +91,7 @@ public class MoreVanilla extends Addon{
             configFile.set("flyMessage", "§6»§7Flying mode has been turned §6{state}§7!");
 
             configFile.set("permission-tpa", "bettersurvival.tpa");
-            configFile.set("tpaMessage", "§6»§7Teleport request was sent to @{player}§7!");
+            configFile.set("tpaMessage", "§6»§7Teleport request was sent to @{player}§7! It will expire after §62§7 minutes!");
             configFile.set("tpaRequestMessage", "§6»§7Player @{player}§7 wants teleport to you. Write §8/tpa a§7!");
             configFile.set("tpaAcceptMessage", "§6»§7Player @{player}§7 accepted your request!");
             configFile.set("tpaDennyMessage", "§6»§7Player @{player}§7 denied your request!");
@@ -141,21 +131,23 @@ public class MoreVanilla extends Addon{
 
     @Override
     public void registerCommands() {
-        registerCommand("tpa", new TpaCommand("tpa", this));
-        registerCommand("fly", new FlyCommand("fly", this));
-        registerCommand("heal", new HealCommand("heal", this));
-        registerCommand("feed", new FeedCommand("feed", this));
-        registerCommand("back", new BackCommand("back", this));
-        registerCommand("near", new NearCommand("near", this));
-        registerCommand("jump", new JumpCommand("jump", this));
-        registerCommand("rand", new RandCommand("rand", this));
-        registerCommand("mute", new MuteCommand("mute", this));
-        registerCommand("unmute", new UnmuteCommand("unmute", this));
-        if (configFile.getBoolean("keepInvCommand")) registerCommand("keepinv", new KeepInvCommand("keepinv", this));
+        this.registerCommand("tpa", new TpaCommand("tpa", this));
+        this.registerCommand("fly", new FlyCommand("fly", this));
+        this.registerCommand("heal", new HealCommand("heal", this));
+        this.registerCommand("feed", new FeedCommand("feed", this));
+        this.registerCommand("back", new BackCommand("back", this));
+        this.registerCommand("near", new NearCommand("near", this));
+        this.registerCommand("jump", new JumpCommand("jump", this));
+        this.registerCommand("rand", new RandCommand("rand", this));
+        this.registerCommand("mute", new MuteCommand("mute", this));
+        this.registerCommand("unmute", new UnmuteCommand("unmute", this));
+        if (configFile.getBoolean("keepInvCommand")) {
+            this.registerCommand("keepinv", new KeepInvCommand("keepinv", this));
+        }
     }
 
     @EventHandler
-    public void onLevelLoad(LevelLoadEvent event){
+    public void onLevelLoad(LevelLoadEvent event) {
         GameRules gameRules = event.getLevel().getGameRules();
         gameRules.setGameRule(GameRule.SHOW_COORDINATES,
                 configFile.getBoolean("showCoordinates", true));
@@ -164,13 +156,13 @@ public class MoreVanilla extends Addon{
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onJoin(PlayerJoinEvent event){
+    public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        /* Set Default Permissions*/
-        player.addAttachment(plugin, configFile.getString("permission-tpa"), true);
-        player.addAttachment(plugin, configFile.getString("permission-back"), true);
-        player.addAttachment(plugin, configFile.getString("permission-randtp"), true);
+        // Set Default Permissions
+        player.addAttachment(this.plugin, configFile.getString("permission-tpa"), true);
+        player.addAttachment(this.plugin, configFile.getString("permission-back"), true);
+        player.addAttachment(this.plugin, configFile.getString("permission-randtp"), true);
 
         if (configFile.getBoolean("keepInvCommand")){
             Config config = ConfigManager.getInstance().loadPlayer(player);
@@ -179,147 +171,119 @@ public class MoreVanilla extends Addon{
     }
 
     @EventHandler
-    public void onQuit(PlayerQuitEvent event){
+    public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-
-        this.back.remove(player.getName());
-        this.randTpDelay.remove(player.getName());
+        this.backCache.remove(player.getName());
+        this.randomTpCache.remove(player.getName());
         this.sleepPos.remove(player.getName());
         this.keepInvCache.remove(player.getName());
     }
 
     @EventHandler
-    public void onTell(PlayerCommandPreprocessEvent event){
+    public void onTell(PlayerCommandPreprocessEvent event) {
         if (!event.getMessage().startsWith("/tell")){
             return;
         }
 
         Player player = event.getPlayer();
-        if (this.onMuteChat(player)){
+        if (this.onMuteChat(player)) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onChat(PlayerChatEvent event){
+    public void onChat(PlayerChatEvent event) {
         Player player = event.getPlayer();
-        if (this.onMuteChat(player)){
+        if (this.onMuteChat(player)) {
             event.setCancelled(true);
-            return;
-        }
-
-        String format = configFile.getString("chatFormat");
-        format = format.replace("{player}", player.getDisplayName());
-        format = format.replace("{message}", event.getMessage());
-        event.setFormat(format);
-
-        for (Player pplayer : this.plugin.getServer().getOnlinePlayers().values()){
-            if (!event.getMessage().contains("@"+pplayer.getDisplayName())) continue;
-
-            PlaySoundPacket packet = new PlaySoundPacket();
-            packet.name = "note.hat"; //cubemc use as info sound
-            packet.volume = 1;
-            packet.pitch = 1;
-            packet.x = (int) player.getX();
-            packet.y = (int) player.getY();
-            packet.z = (int) player.getZ();
-            pplayer.dataPacket(packet);
         }
     }
 
     @EventHandler
-    public void onSleep(PlayerBedEnterEvent event){
+    public void onSleep(PlayerBedEnterEvent event) {
         Player player = event.getPlayer();
         this.sleepPos.put(player.getName(), player.clone());
     }
 
     @EventHandler
-    public void onWakeUp(PlayerBedLeaveEvent event){
+    public void onWakeUp(PlayerBedLeaveEvent event) {
         Player player = event.getPlayer();
-        Position safeSpawn = this.sleepPos.getOrDefault(player.getName(), player.getLevel().getSafeSpawn(player.getSpawn()));
-        player.teleport(safeSpawn);
+        Position spawn = this.sleepPos.remove(player.getName());
+        if (spawn == null) {
+            spawn = player.getLevel().getSafeSpawn(player.getSpawn());
+        }
+        player.teleport(spawn);
     }
 
     @EventHandler
-    public void onDamageByEntity(EntityDamageByEntityEvent event){
-        if (!(event.getDamager() instanceof Player) || !(event.getEntity() instanceof Player)) return;
-        Player player = (Player) event.getDamager();
+    public void onDamageByEntity(EntityDamageByEntityEvent event) {
+        if (!(event.getDamager() instanceof Player) || !(event.getEntity() instanceof Player)) {
+            return;
+        }
 
-        boolean canFly = player.getAdventureSettings().get(AdventureSettings.Type.ALLOW_FLIGHT);
-        if (!player.isCreative() && !player.isOp() && canFly){
-            player.getAdventureSettings().set(AdventureSettings.Type.FLYING, false);
-            player.getAdventureSettings().set(AdventureSettings.Type.ALLOW_FLIGHT, false);
-            player.getAdventureSettings().update();
-            player.sendMessage("§c»§7You can not attack player while flying!");
+        Player player = (Player) event.getEntity();
+        Player damager = (Player) event.getDamager();
+
+        // Store last damager of player
+        this.keepInvDamagerCache.put(player.getName(), damager.getName());
+
+        boolean canFly = damager.getAdventureSettings().get(AdventureSettings.Type.ALLOW_FLIGHT);
+        if (canFly && !damager.isCreative() && !damager.isOp()){
+            damager.getAdventureSettings().set(AdventureSettings.Type.FLYING, false);
+            damager.getAdventureSettings().set(AdventureSettings.Type.ALLOW_FLIGHT, false);
+            damager.getAdventureSettings().update();
+            damager.sendMessage("§c»§7You can not attack player while flying!");
         }
     }
 
     @EventHandler
-    public void onDeath(PlayerDeathEvent event){
+    public void onDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
-        this.back.put(player.getName(), player.clone());
+        this.backCache.put(player.getName(), player.getLocation());
+        player.sendMessage("§6»§7Your death position was saved! You have §65§7 minutes to return!");
 
-        if (configFile.getBoolean("keepInvCommand") && this.keepInventory(player) &&
-                (player.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK ||
-                player.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION)){
+        // Keep inventory check
+        if (!configFile.getBoolean("keepInvCommand") || !this.keepInventory(player)) {
+            return;
+        }
+
+        String lastDamager = this.keepInvDamagerCache.remove(player.getName());
+        DamageCause cause = player.getLastDamageCause().getCause();
+
+        if (lastDamager != null || (cause == DamageCause.ENTITY_ATTACK || cause == DamageCause.ENTITY_EXPLOSION)) {
             event.setKeepInventory(true);
             this.dropDeathItems(player, event.getDrops());
         }
     }
 
     @EventHandler
-    public void onInteract(PlayerInteractEvent event){
-        Player player = event.getPlayer();
-        Item item = event.getItem();
-        if (event.getAction() != PlayerInteractEvent.Action.RIGHT_CLICK_AIR) return;
-
-        if (changeArmor(player, item)){
-            event.setCancelled();
+    public void onForm(PlayerFormRespondedEvent event) {
+        if (!(event.getWindow() instanceof FormWindowSimple) || event.getResponse() == null) {
+            return;
         }
-    }
-
-    @EventHandler
-    public void onForm(PlayerFormRespondedEvent event){
-        if (!(event.getWindow() instanceof FormWindowSimple) || event.getResponse() == null) return;
 
         FormWindowSimple form = (FormWindowSimple) event.getWindow();
         Player player = event.getPlayer();
 
-        if (form.getTitle().equals("Player Teleport")){
+        if (form.getTitle().equals("Player Teleport")) {
             String response = form.getResponse().getClickedButton().getText();
             response = response.substring(2, response.indexOf("\n"));
-            tpa(player, response);
+            this.tpa(player, response);
         }
     }
 
     @EventHandler
-    public void onBreak(BlockBreakEvent event){
+    public void onBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
         Item item = event.getItem();
 
-        switch (item.getId()){
-            case Item.DIAMOND_PICKAXE:
-            case Item.GOLD_PICKAXE:
-            case Item.IRON_PICKAXE:
-            case Item.STONE_PICKAXE:
-            case Item.WOODEN_PICKAXE:
-            case Item.DIAMOND_AXE:
-            case Item.GOLD_AXE:
-            case Item.IRON_AXE:
-            case Item.STONE_AXE:
-            case Item.WOODEN_AXE:
-            case Item.DIAMOND_SHOVEL:
-            case Item.GOLD_SHOVEL:
-            case Item.IRON_SHOVEL:
-            case Item.STONE_SHOVEL:
-            case Item.WOODEN_SHOVEL:
-                break;
-            default:
-                return;
+        if (!item.isAxe() && !item.isPickaxe() &&
+                !item.isSword() && !item.isShovel()) {
+            return;
         }
 
-        CompoundTag namedTag = item.getNamedTag() == null? new CompoundTag() : item.getNamedTag();
-        int broken = namedTag.getInt("brokenBlocks")+1;
+        CompoundTag namedTag = item.getNamedTag() == null ? new CompoundTag() : item.getNamedTag();
+        int broken = namedTag.getInt("brokenBlocks") + 1;
 
         namedTag.putInt("brokenBlocks", broken);
         item.setNamedTag(namedTag);
@@ -327,77 +291,33 @@ public class MoreVanilla extends Addon{
         player.getInventory().setItemInHand(item);
     }
 
-    public boolean changeArmor(Player player, Item item){
-        if (!item.isArmor()) return false;
-        if (item.getId() == Item.SKULL) return false;
-
-        PlayerInventory inv = player.getInventory();
-        Item changed = null;
-
-        inv.remove(item);
-
-        if (item.isHelmet()){
-            changed = inv.getHelmet();
-            inv.setHelmet(item);
-
-        }else if (item.isChestplate()){
-            changed = inv.getChestplate();
-            inv.setChestplate(item);
-
-        }else if (item.isLeggings()){
-            inv.setLeggings(item);
-
-        }else if (item.isBoots()){
-            changed = inv.getBoots();
-            inv.setBoots(item);
-        }
-
-        if (changed != null && changed.getId() != Item.AIR){
-            inv.addItem(changed);
-        }
-        return true;
-    }
-
-    private boolean onMuteChat(Player player){
-        if (!this.mutedPlayers.containsKey(player.getName().toLowerCase())){
-            return false;
-        }
-
-        String message = configFile.getString("muteChatMessage");
-        message = message.replace("{player}", player.getDisplayName());
-        player.sendMessage(message);
-        return true;
-    }
-
-    private void dropDeathItems(Player player, Item[] oldDrops){
-        if (player.hasPermission(configFile.getString("permission-keepInvAll")) || player.isOp()){
+    private void dropDeathItems(Player player, Item[] oldDrops) {
+        if (player.hasPermission(configFile.getString("permission-keepInvAll"))) {
             return;
         }
-
-        List<Item> keep = new ArrayList<>();
-        boolean keepTools = player.hasPermission(configFile.getString("permission-keepinvTools"));
-
         PlayerInventory inv = player.getInventory();
         inv.clearAll();
 
-        for (Item item : oldDrops){
-            if (item.isArmor() || (item.isTool() && keepTools)){
+        List<Item> keep = new ArrayList<>();
+        boolean keepTools = player.hasPermission(configFile.getString("permission-keepinvTools"));
+        for (Item item : oldDrops) {
+            if (item.isArmor() || (item.isTool() && keepTools)) {
                 keep.add(item);
-            }else {
+            } else {
                 player.getLevel().dropItem(player, item, null, true, 40);
             }
         }
         inv.addItem(keep.toArray(new Item[0]));
     }
 
-    public void tpa(Player executor, String player){
-        Player pplayer = Server.getInstance().getPlayer(player);
-
-        if (pplayer == null || !pplayer.isConnected()){
-            executor.sendMessage("§6»§7Player §6@"+player+"§7 is not online!");
+    public void tpa(Player executor, String player) {
+        Player pplayer = this.plugin.getServer().getPlayer(player);
+        if (pplayer == null || !pplayer.isConnected()) {
+            executor.sendMessage("§6»§7Player §6@" + player + "§7 is not online!");
             return;
         }
-        this.tpa.put(pplayer.getName(), executor.getName());
+
+        this.tpaCache.put(pplayer.getName(), executor.getName());
 
         String message = configFile.getString("tpaMessage");
         message = message.replace("{player}", pplayer.getDisplayName());
@@ -408,60 +328,59 @@ public class MoreVanilla extends Addon{
         pplayer.sendMessage(rmessage);
     }
 
-    public void tpaAccept(Player player){
-        if (!tpa.containsKey(player.getName()) || tpa.get(player.getName()) == null){
+    public void tpaAccept(Player player) {
+        String targetName = this.tpaCache.remove(player.getName());
+        if (targetName == null) {
             String message = configFile.getString("tpaNoRequests").replace("{player}", player.getDisplayName());
             player.sendMessage(message);
             return;
         }
 
-        Player requester = Server.getInstance().getPlayer(tpa.get(player.getName()));
-        if (requester == null || !requester.isConnected()){
+        Player target = this.plugin.getServer().getPlayer(targetName);
+        if (target == null || !target.isConnected()) {
             player.sendMessage("§cPlayer is not online!");
-        }else {
-            requester.teleport(player);
+        } else {
+            target.teleport(player);
 
             String message = configFile.getString("tpaAcceptMessage").replace("{player}", player.getDisplayName());
-            requester.sendMessage(message);
+            target.sendMessage(message);
         }
-
-        tpa.remove(player.getName());
     }
 
-    public void tpaDenny(Player player){
-        if (!tpa.containsKey(player.getName())){
+    public void tpaDenny(Player player) {
+        String targetName = this.tpaCache.remove(player.getName());
+        if (targetName == null) {
             return;
         }
 
-        if (tpa.get(player.getName()) != null){
-            Player requester = Server.getInstance().getPlayer(tpa.get(player.getName()));
-            if (requester != null && requester.isConnected()){
-                String message = configFile.getString("tpaDennyMessage").replace("{player}", player.getDisplayName());
-                requester.sendMessage(message);
-            }
+        Player target = this.plugin.getServer().getPlayer(targetName);
+        if (target != null && target.isConnected()){
+            String message = configFile.getString("tpaDennyMessage").replace("{player}", player.getDisplayName());
+            target.sendMessage(message);
         }
-
-        tpa.remove(player.getName());
 
         String message = configFile.getString("tpaDennyConfirmMessage").replace("{player}", player.getDisplayName());
         player.sendMessage(message);
     }
 
-    public void fly(Player player, String executor){
-        Player pexecutor = Server.getInstance().getPlayer(executor);
-        if (!checkForPlayer(player, pexecutor)) return;
+    public void fly(Player player, String executor) {
+        Player pexecutor = this.plugin.getServer().getPlayer(executor);
+        if (!this.checkForPlayer(player, pexecutor)) {
+            return;
+        }
 
-        if (executor.equals(player.getName()) && !player.hasPermission(configFile.getString("permission-fly"))){
+        if (executor.equals(player.getName()) && !player.hasPermission(configFile.getString("permission-fly"))) {
             player.sendMessage("§cYou dont have permission to fly!");
             return;
         }
 
-        if (!executor.equals("console") && !executor.equals(player.getName()) && pexecutor != null && (!pexecutor.hasPermission(configFile.getString("permission-manage")) || !pexecutor.hasPermission(configFile.getString("permission-manage")))) {
+        if (!executor.equals("console") && !executor.equals(player.getName()) && pexecutor != null &&
+                (!pexecutor.hasPermission(configFile.getString("permission-manage")) || !pexecutor.hasPermission(configFile.getString("permission-manage")))) {
             pexecutor.sendMessage("§cYou dont have permission to give fly!");
             return;
         }
 
-        if (pexecutor != null && !executor.equals(player.getName())){
+        if (pexecutor != null && !executor.equals(player.getName())) {
             pexecutor.sendMessage("§6»§7You changed flying mode of §6@"+player.getDisplayName()+"§7!");
         }
 
@@ -476,21 +395,24 @@ public class MoreVanilla extends Addon{
     }
 
 
-    public void feed(Player player, String executor){
-        Player pexecutor = Server.getInstance().getPlayer(executor);
-        if (!checkForPlayer(player, pexecutor)) return;
+    public void feed(Player player, String executor) {
+        Player pexecutor = this.plugin.getServer().getPlayer(executor);
+        if (!this.checkForPlayer(player, pexecutor)) {
+            return;
+        }
 
-        if (executor.equals(player.getName()) && !player.hasPermission(configFile.getString("permission-feed"))){
+        if (executor.equals(player.getName()) && !player.hasPermission(configFile.getString("permission-feed"))) {
             player.sendMessage("§cYou dont have permission to feed!");
             return;
         }
 
-        if (!executor.equals("console") && !executor.equals(player.getName()) && pexecutor != null && (!pexecutor.hasPermission(configFile.getString("permission-manage")) || !pexecutor.hasPermission(configFile.getString("permission-manage")))){
+        if (!executor.equals("console") && !executor.equals(player.getName()) && pexecutor != null &&
+                (!pexecutor.hasPermission(configFile.getString("permission-manage")) || !pexecutor.hasPermission(configFile.getString("permission-manage")))) {
             pexecutor.sendMessage("§cYou dont have permission to give feed to player!");
             return;
         }
 
-        if (pexecutor != null && !executor.equals(player.getName())){
+        if (pexecutor != null && !executor.equals(player.getName())) {
             pexecutor.sendMessage("§6»§7You feeded §6@"+player.getDisplayName()+"§7!");
         }
 
@@ -502,21 +424,24 @@ public class MoreVanilla extends Addon{
         player.sendMessage(message);
     }
 
-    public void heal(Player player, String executor){
-        Player pexecutor = Server.getInstance().getPlayer(executor);
-        if (!checkForPlayer(player, pexecutor)) return;
+    public void heal(Player player, String executor) {
+        Player pexecutor = this.plugin.getServer().getPlayer(executor);
+        if (!this.checkForPlayer(player, pexecutor)) {
+            return;
+        }
 
-        if (executor.equals(player.getName()) && !player.hasPermission(configFile.getString("permission-heal"))){
+        if (executor.equals(player.getName()) && !player.hasPermission(configFile.getString("permission-heal"))) {
             player.sendMessage("§cYou dont have permission to heal yourself!");
             return;
         }
 
-        if (!executor.equals("console") && !executor.equals(player.getName()) && pexecutor != null && (!pexecutor.hasPermission(configFile.getString("permission-manage")) || !pexecutor.hasPermission(configFile.getString("permission-manage")))){
+        if (!executor.equals("console") && !executor.equals(player.getName()) && pexecutor != null &&
+                (!pexecutor.hasPermission(configFile.getString("permission-manage")) || !pexecutor.hasPermission(configFile.getString("permission-manage")))) {
             pexecutor.sendMessage("§cYou dont have permission to heal player!");
             return;
         }
 
-        if (pexecutor != null && !executor.equals(player.getName())){
+        if (pexecutor != null && !executor.equals(player.getName())) {
             pexecutor.sendMessage("§6»§7You healed §6@"+player.getDisplayName()+"§7!");
         }
 
@@ -528,16 +453,14 @@ public class MoreVanilla extends Addon{
         player.sendMessage(message);
     }
 
-    public void back(Player player){
-        Location location = this.back.get(player.getName());
-        if (location == null){
+    public void back(Player player) {
+        Location location = this.backCache.remove(player.getName());
+        if (location == null) {
             String message = configFile.getString("backPosNotFound");
             message = message.replace("{player}", player.getDisplayName());
             player.sendMessage(message);
             return;
         }
-
-        this.back.remove(player.getName());
         player.teleport(location);
 
         String message = configFile.getString("backMessage");
@@ -545,151 +468,148 @@ public class MoreVanilla extends Addon{
         player.sendMessage(message);
     }
 
-    public List<Player> getNearPlayers(Location pos, int radius){
-        Level level = pos.getLevel();
+    public List<Player> getNearPlayers(Location pos, int radius) {
         List<Player> players = new ArrayList<>();
-
-        for (int x = -radius; x < radius; x++){
-            for (int z = -radius; z < radius; z++){
-                players.addAll(level.getChunkPlayers(pos.getChunkX()+x, pos.getChunkZ()+z).values());
+        for (int x = -radius; x < radius; x++) {
+            for (int z = -radius; z < radius; z++) {
+                players.addAll(pos.getLevel().getChunkPlayers(pos.getChunkX() + x, pos.getChunkZ() + z).values());
             }
         }
         return players.stream().distinct().collect(Collectors.toList());
     }
 
-    public void jump(Player player){
-        if (!player.hasPermission(configFile.getString("permission-jump"))){
+    public void jump(Player player) {
+        if (!player.hasPermission(configFile.getString("permission-jump"))) {
             player.sendMessage("§cYou dont have permission to jump!");
             return;
         }
 
         int power = configFile.getInt("jumpPower");
-        int x = 0;
-        int z = 0;
-
-        switch (player.getDirection().getIndex()){
-            case 2:
-                z = -power;
-                break;
-            case 3:
-                z = +power;
-                break;
-            case 4:
-                x = -power;
-                break;
-            case 5:
-                x = +power;
-                break;
-        }
-        Vector3 motion = new Vector3(x, power, z);
-
-
-        SpawnParticleEffectPacket packet = new SpawnParticleEffectPacket();
-        packet.position = player.asVector3f();
-        packet.dimensionId = player.getLevel().getDimension();
-        packet.identifier = "minecraft:water_evaporation_bucket_emitter";
-        for (Player pplayer : player.getViewers().values()){ pplayer.dataPacket(packet);
-}
-        player.addEffect(Effect.getEffect(Effect.DAMAGE_RESISTANCE).setAmplifier(100).setDuration(20*5).setVisible(false));
+        Vector3 motion = player.getDirectionVector().multiply(power);
         player.setMotion(motion);
+
+        player.getLevel().addParticleEffect(player, ParticleEffect.WATER_EVAPORATION_BUCKET);
+        player.addEffect(Effect.getEffect(Effect.DAMAGE_RESISTANCE).setAmplifier(100).setDuration(100).setVisible(false));
 
         String message = configFile.getString("jumpMessage");
         message = message.replace("{player}", player.getDisplayName());
         player.sendMessage(message);
     }
 
-    public void randomTp(Player player){
-        if (!player.hasPermission(configFile.getString("permission-randtp"))){
+    public void randomTp(Player player) {
+        if (!player.hasPermission(configFile.getString("permission-randtp"))) {
             player.sendMessage("§cYou dont have permission to teleport randomly!");
             return;
         }
 
-        Integer lastTp = this.randTpDelay.get(player.getName());
-        int now = Server.getInstance().getTick();
-
-        if (lastTp != null && (now - lastTp < (20 * 10))){
-            player.sendMessage("§c»§7Please wait! you have benn teleported just few seconds ago!");
+        Position lastPos = this.randomTpCache.get(player.getName());
+        if (lastPos != null) {
+            player.sendMessage("§c»§7You are teleporting too fast! Please wait few seconds.");
             return;
         }
 
-        this.randTpDelay.put(player.getName(), Server.getInstance().getTick());
-        player.sendMessage("§6»§7Finding nice location... This usually takes some time!");
+        this.randomTpCache.put(player.getName(), player.getPosition());
+        player.sendMessage("§6»§7Finding nice location... This usually takes few seconds!");
 
         String message = configFile.getString("randtpMessage");
         message = message.replace("{player}", player.getDisplayName());
         this.plugin.getServer().getScheduler().scheduleDelayedTask(new RandomTpTask(player, message), 30);
     }
 
-    public void mute(Player player, String executor, String time){
-        Player pexecutor = Server.getInstance().getPlayer(executor);
-        if (!checkForPlayer(player, pexecutor)) return;
+    public void mute(Player player, String executor, String expiryString) {
+        this.mute(player, executor, expiryString, null);
+    }
 
-        if (executor.equals(player.getName())){
+    public void mute(Player player, String executorName, String expiryString, String reason) {
+        Player executor = this.plugin.getServer().getPlayer(executorName);
+        if (!this.checkForPlayer(player, executor)) {
+            return;
+        }
+
+        if (executorName.equals(player.getName())) {
             player.sendMessage("§cYou cant mute yourself!");
             return;
         }
 
-        if (!executor.equals("console") && pexecutor != null && !pexecutor.hasPermission(configFile.getString("permission-mute"))){
-            pexecutor.sendMessage("§cYou dont have permission to mute player!");
+        if (!executorName.equals("console") && executor != null && !executor.hasPermission(configFile.getString("permission-mute"))) {
+            executor.sendMessage("§cYou dont have permission to mute player!");
             return;
         }
 
-        int minutes = 0;
-        int seconds = 0;
-
+        int muteTime;
         try {
-            String[] data = time.split(":");
-            minutes = Integer.parseInt(data[0]);
-
-            if (data.length > 1){
-                seconds = Integer.parseInt(data[1]);
+            String[] data = expiryString.split(":");
+            muteTime = Integer.parseInt(data[0]) * 60;
+            if (data.length > 1) {
+                muteTime += Integer.parseInt(data[1]);
             }
-        }catch (Exception e){
-            if (pexecutor == null) return;
-            pexecutor.sendMessage("§c»§7Bad time parameter provided. Please use following format: §8mm:ss");
+        } catch (Exception e) {
+            if (executor != null) {
+                executor.sendMessage("§c»§7Bad time parameter provided. Please use following format: §8mm:ss");
+            }
             return;
         }
 
-        if (pexecutor != null && !executor.equals(player.getName())){
-            pexecutor.sendMessage("§6»§7You muted §6@"+player.getDisplayName()+"§7 for §8"+time+"§7!");
+        if (executor != null && !executorName.equals(player.getName())) {
+            executor.sendMessage("§6»§7You muted §6@" + player.getDisplayName() + "§7 for §8" + muteTime + "§7 seconds!");
         }
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MINUTE, minutes);
-        calendar.add(Calendar.SECOND, seconds);
-
-        this.mutedPlayers.put(player.getName().toLowerCase(), calendar.getTime());
+        if (reason == null || reason.trim().isEmpty()) {
+            reason = "unknown";
+        }
+        this.mutedPlayers.put(player.getName(), reason, muteTime, TimeUnit.SECONDS);
 
         String message = configFile.getString("muteMessage");
         message = message.replace("{player}", player.getDisplayName());
-        message = message.replace("{time}", time);
+        message = message.replace("{time}", String.valueOf(muteTime));
+        message = message.replace("{reason}", reason);
         player.sendMessage(message);
     }
 
-    public void unmute(String playerName, String executor){
-        Player pexecutor = Server.getInstance().getPlayer(executor);
-        Player player = Server.getInstance().getPlayer(playerName);
-
-
-        if (!executor.equals("console") && pexecutor != null && !pexecutor.hasPermission(configFile.getString("permission-mute"))){
-            pexecutor.sendMessage("§cYou dont have permission to unmute player!");
+    public void unmute(String playerName, String executorName) {
+        Player executor = this.plugin.getServer().getPlayer(executorName);
+        if (!executorName.equals("console") && executor != null && !executor.hasPermission(configFile.getString("permission-mute"))) {
+            executor.sendMessage("§cYou dont have permission to unmute player!");
             return;
         }
 
-        if (pexecutor != null && !executor.equals(player.getName())){
-            pexecutor.sendMessage("§6»§7You unmuted §6@"+player.getDisplayName()+"§7!");
+        String muteReason = this.mutedPlayers.remove(playerName);
+        if (muteReason == null) {
+            if (executor != null) {
+                executor.sendMessage("§c»§cPlayer §6@" + playerName +"§7 is not muted!");
+            }
+            return;
         }
 
-        this.mutedPlayers.remove(playerName.toLowerCase());
-        if (player == null) return;
-
-        String message = configFile.getString("unmuteMessage");
-        message = message.replace("{player}", player.getDisplayName());
-        player.sendMessage(message);
+        if (executor != null) {
+            executor.sendMessage("§6»§7You unmuted §6@"+playerName+"§7!");
+        }
+        this.onMuteExpired(playerName, muteReason);
     }
 
-    public void setKeepInventory(Player player, boolean enable){
-        if (player == null) return;
+    private boolean onMuteChat(Player player) {
+        if (this.mutedPlayers.containsKey(player.getName())) {
+            String message = configFile.getString("muteChatMessage");
+            message = message.replace("{player}", player.getDisplayName());
+            player.sendMessage(message);
+            return true;
+        }
+        return false;
+    }
+
+    private void onMuteExpired(String playerName, String reason) {
+        Player player = this.plugin.getServer().getPlayer(playerName);
+        if (player != null) {
+            String message = configFile.getString("unmuteMessage");
+            message = message.replace("{player}", player.getDisplayName());
+            player.sendMessage(message);
+        }
+    }
+
+    public void setKeepInventory(Player player, boolean enable) {
+        if (player == null) {
+            return;
+        }
 
         Config config = ConfigManager.getInstance().loadPlayer(player);
         config.set("keepInventory", enable);
@@ -703,22 +623,18 @@ public class MoreVanilla extends Addon{
         player.sendMessage(message);
     }
 
-    public boolean keepInventory(Player player){
+    public boolean keepInventory(Player player) {
         return player != null && this.keepInvCache.getOrDefault(player.getName(), false);
     }
 
-    public boolean checkForPlayer(Player player, Player pexecutor){
-        if (player == null){
-            if (pexecutor != null){
+    public boolean checkForPlayer(Player player, Player pexecutor) {
+        if (player == null) {
+            if (pexecutor != null) {
                 String message = configFile.getString("playerNotFound");
                 pexecutor.sendMessage(message);
             }
             return false;
         }
         return true;
-    }
-
-    public Map<String, Date> getMutedPlayers() {
-        return mutedPlayers;
     }
 }
