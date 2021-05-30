@@ -10,13 +10,12 @@
 
     <repositories>
         <repository>
-            <id>miznet-jenkins</id>
-            <name>miznet</name>
-            <url>http://jenkins.mizerak.eu/plugin/repository/everything/</url>
+            <id>miznet-central</id>
+            <url>https://repo.mizerak.eu/artifactory/main</url>
         </repository>
         <repository>
             <id>onebone</id>
-            <url>http://jenkins.onebone.me/plugin/repository/everything/</url>
+            <url>https://jenkins.onebone.me/plugin/repository/everything/</url>
         </repository>
     </repositories>
 
@@ -43,6 +42,7 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-configuration2</artifactId>
             <version>2.7</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
@@ -55,24 +55,22 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+                    <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.2.1</version>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <appendAssemblyId>false</appendAssemblyId>
-                </configuration>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
-                        <id>make-assembly</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>single</goal>
+                            <goal>shade</goal>
                         </goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
