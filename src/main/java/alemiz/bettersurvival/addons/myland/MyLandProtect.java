@@ -881,7 +881,7 @@ public class MyLandProtect extends Addon {
         if (chest.namedTag.contains("private_owner")) {
             owner = chest.namedTag.getString("private_owner");
         } else if ((pair = chest.getPair()) != null && pair.namedTag.contains("private_owner")) {
-            owner = pair.namedTag.getString("private_owner")
+            owner = pair.namedTag.getString("private_owner");
         }
 
         return owner;
