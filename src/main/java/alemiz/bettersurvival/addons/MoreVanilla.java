@@ -250,7 +250,8 @@ public class MoreVanilla extends Addon {
         String lastDamager = this.keepInvDamagerCache.remove(player.getName());
         DamageCause cause = player.getLastDamageCause().getCause();
 
-        if (lastDamager != null || (cause == DamageCause.ENTITY_ATTACK || cause == DamageCause.ENTITY_EXPLOSION)) {
+        if ((lastDamager != null && cause != DamageCause.SUICIDE && cause != DamageCause.HUNGER) ||
+                (cause == DamageCause.ENTITY_ATTACK || cause == DamageCause.ENTITY_EXPLOSION)) {
             event.setKeepInventory(true);
             this.dropDeathItems(player, event.getDrops());
         }

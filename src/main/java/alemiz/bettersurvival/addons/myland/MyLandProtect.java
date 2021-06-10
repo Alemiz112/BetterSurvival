@@ -881,30 +881,39 @@ public class MyLandProtect extends Addon {
         return this.getPrivateChestOwner((BlockEntityChest) entity);
     }
 
-    public String getPrivateChestOwner(BlockEntityChest chest){
-        if (chest == null) return null;
+    public String getPrivateChestOwner(BlockEntityChest chest) {
+        if (chest == null) {
+            return null;
+        }
 
         String owner = null;
-        if (chest.namedTag.contains("private_owner")){
+        BlockEntityChest pair;
+        if (chest.namedTag.contains("private_owner")) {
             owner = chest.namedTag.getString("private_owner");
-        }else if (chest.getPair() != null && chest.getPair().namedTag.contains("private_owner")){
-            owner = chest.getPair().namedTag.getString("private_owner");
+        } else if ((pair = chest.getPair()) != null && pair.namedTag.contains("private_owner")) {
+            owner = pair.namedTag.getString("private_owner");
         }
 
         return owner;
     }
 
     public BlockEntityChest getPrivateChest(Position pos){
-        if (pos == null) return null;
+        if (pos == null)  {
+            return null;
+        }
         BlockEntity entity = pos.getLevel().getBlockEntity(pos);
 
-        if (!(entity instanceof BlockEntityChest)) return null;
-        BlockEntityChest chest = (BlockEntityChest) entity;
+        if (!(entity instanceof BlockEntityChest)) {
+            return null;
+        }
 
-        if (!chest.namedTag.getString("private_owner").equals("")){
+        BlockEntityChest chest = (BlockEntityChest) entity;
+        BlockEntityChest pair;
+
+        if (!chest.namedTag.getString("private_owner").equals("")) {
             return chest;
-        }else if (chest.isPaired() && !chest.getPair().namedTag.getString("private_owner").equals("")){
-            return chest.getPair();
+        } else if ((pair = chest.getPair()) != null && !pair.namedTag.getString("private_owner").equals("")) {
+            return pair;
         }
         return null;
     }
