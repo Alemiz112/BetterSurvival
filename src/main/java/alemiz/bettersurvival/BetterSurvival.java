@@ -39,6 +39,7 @@ import cn.nukkit.event.player.PlayerFormRespondedEvent;
 import cn.nukkit.inventory.transaction.action.InventoryAction;
 import cn.nukkit.inventory.transaction.action.SlotChangeAction;
 import cn.nukkit.plugin.PluginBase;
+import cubemc.commons.nukkit.modules.npc.NpcModule;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -73,7 +74,7 @@ public class BetterSurvival extends PluginBase implements Listener {
 
     @Override
     public void onLoad() {
-        Entity.registerEntity("FakeHuman", FakeHuman.class);
+        NpcModule.registerEntity("FakeHuman", FakeHuman.class);
     }
 
     @Override

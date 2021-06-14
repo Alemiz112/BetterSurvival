@@ -17,7 +17,6 @@ package alemiz.bettersurvival.utils.enitity;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
@@ -25,13 +24,12 @@ import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
-import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.protocol.AddPlayerPacket;
+import cubemc.commons.nukkit.modules.npc.NpcModule;
+import cubemc.commons.nukkit.modules.npc.entity.NpcHuman;
 
-import java.nio.charset.StandardCharsets;
-
-public class FakeHuman extends EntityHuman {
+public class FakeHuman extends NpcHuman {
 
     private boolean canMountEntity;
 
@@ -39,32 +37,14 @@ public class FakeHuman extends EntityHuman {
         super(chunk, nbt);
     }
 
-    public static CompoundTag createNbt(Location pos, String nameTag, Skin skin, Player player){
-        CompoundTag nbt = new CompoundTag()
-                .putList(new ListTag<>("Pos")
-                        .add(new DoubleTag("", pos.x))
-                        .add(new DoubleTag("", pos.y))
-                        .add(new DoubleTag("", pos.z)))
-                .putList(new ListTag<DoubleTag>("Motion")
-                        .add(new DoubleTag("", 0))
-                        .add(new DoubleTag("", 0))
-                        .add(new DoubleTag("", 0)))
-                .putList(new ListTag<FloatTag>("Rotation")
-                        .add(new FloatTag("", (float) pos.getYaw()))
-                        .add(new FloatTag("", (float) pos.getPitch())))
-                .putString("NameTag", nameTag)
-                .putCompound("Skin", new CompoundTag()
-                        .putByteArray("Data", skin.getSkinData().data)
-                        .putString("ModelId", skin.getSkinId())
-                        .putString("GeometryName", "geometry.humanoid.custom")
-                        .putByteArray("GeometryData", skin.getGeometryData().getBytes(StandardCharsets.UTF_8)));
-
-        if (player != null){
-            nbt.putString("npc_item", player.getInventory().getItemInHand().getName());
-            nbt.putString("npc_helmet", player.getInventory().getHelmet().getName());
-            nbt.putString("npc_chestplate", player.getInventory().getChestplate().getName());
-            nbt.putString("npc_leggings", player.getInventory().getLeggings().getName());
-            nbt.putString("npc_boots", player.getInventory().getBoots().getName());
+    public static CompoundTag createNbt(Location pos, String nameTag, Skin skin, Player player) {
+        Location location = player == null ? pos : player.getLocation();
+        CompoundTag nbt = NpcModule.createNBT(location, nameTag, skin, "geometry.humanoid.custom", FakeHuman.class);
+        if (location != pos) {
+            nbt.putList(new ListTag<>("Pos")
+                    .add(new DoubleTag("", pos.x))
+                    .add(new DoubleTag("", pos.y))
+                    .add(new DoubleTag("", pos.z)));
         }
         return nbt;
     }
@@ -75,24 +55,12 @@ public class FakeHuman extends EntityHuman {
 
     public static FakeHuman createEntity(Location pos, String nameTag, Skin skin, Player player){
         CompoundTag nbt = createNbt(pos, nameTag, skin, player);
-        Entity entity = Entity.createEntity("FakeHuman", pos.getLevel().getChunk(pos.getChunkX(), pos.getChunkZ()), nbt);
+        Entity entity = NpcModule.createBaseEntity(pos, nbt, FakeHuman.class);
         if (entity instanceof FakeHuman) {
             entity.setNameTag(nameTag);
             return (FakeHuman) entity;
         }
         return null;
-    }
-
-    @Override
-    protected void initEntity() {
-        super.initEntity();
-        this.canMountEntity = this.namedTag.contains("CanMountEntity") && this.namedTag.getBoolean("CanMountEntity");
-    }
-
-    @Override
-    public void saveNBT() {
-        this.namedTag.putBoolean("CanMountEntity", this.canMountEntity);
-        super.saveNBT();
     }
 
     @Override
@@ -130,28 +98,5 @@ public class FakeHuman extends EntityHuman {
         this.server.removePlayerListData(this.getUniqueId(), new Player[]{player});
 
         super.spawnTo(player);
-    }
-
-    @Override
-    public boolean attack(EntityDamageEvent source) {
-        source.setCancelled(true);
-        super.attack(source);
-        return false;
-    }
-
-    @Override
-    public boolean mountEntity(Entity entity, byte mode) {
-        if (!this.canMountEntity) {
-            return false;
-        }
-        return super.mountEntity(entity, mode);
-    }
-
-    public void setCanMountEntity(boolean canMountEntity) {
-        this.canMountEntity = canMountEntity;
-    }
-
-    public boolean canMountEntity() {
-        return this.canMountEntity;
     }
 }
