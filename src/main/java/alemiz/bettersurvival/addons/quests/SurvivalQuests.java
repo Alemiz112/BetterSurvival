@@ -55,6 +55,8 @@ public class SurvivalQuests extends Addon {
     private final Map<String, QuestIngredient> questIngredientMap = new HashMap<>();
     private final Map<String, PlayerQuestData> playerQuestDataMap = new HashMap<>();
 
+    private final List<String> npcRemovers = new ArrayList<>();
+
     private final IntSet loggingItems = new IntOpenHashSet();
     private final ObjectList<String> loggingEntities = new ObjectArrayList<>();
 
@@ -164,6 +166,7 @@ public class SurvivalQuests extends Addon {
         if (questData != null){
             questData.save();
         }
+        this.npcRemovers.remove(player.getName());
     }
 
     @EventHandler
@@ -179,8 +182,15 @@ public class SurvivalQuests extends Addon {
             return;
         }
 
-        new QuestMenuForm(player, this).buildForm().sendForm();
         event.setCancelled(true);
+
+        if (this.npcRemovers.remove(player.getName())) {
+            entity.close();
+            player.sendMessage("§6»§7Quest npc removed successfully!");
+            return;
+        }
+
+        new QuestMenuForm(player, this).buildForm().sendForm();
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -223,7 +233,11 @@ public class SurvivalQuests extends Addon {
         }
 
         FakeHuman entity = FakeHuman.createEntity(player, "§l§eQuest Master\n§r§aCheck daily quest!\n§r§7»Punch me!", player.getSkin(), player);
+        if (entity == null) {
+            return;
+        }
         entity.setNameTagAlwaysVisible(true);
+        entity.setCanMountEntity(false);
 
         entity.namedTag.putByte("quest_npc", 1);
         entity.namedTag.putByte("quest_master", 1);
@@ -366,6 +380,18 @@ public class SurvivalQuests extends Addon {
         }
     }
 
+    public void addRemover(Player player){
+        if (player == null) return;
+
+        player.sendMessage("§6»§7Hit quest npc to remove!");
+        this.npcRemovers.add(player.getName());
+    }
+
+    public void removeRemover(Player player){
+        if (player == null) return;
+        this.npcRemovers.remove(player.getName());
+    }
+
     public PlayerQuestData getQuestData(Player player){
         if (player == null){
             return null;
@@ -379,5 +405,9 @@ public class SurvivalQuests extends Addon {
 
     public int getParticleDelay() {
         return this.particleDelay;
+    }
+
+    public List<String> getNpcRemovers() {
+        return this.npcRemovers;
     }
 }

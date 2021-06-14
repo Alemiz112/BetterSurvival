@@ -78,11 +78,14 @@ public class SmithShop {
         }
 
         FakeHuman entity = FakeHuman.createEntity(player, "§l§aSmith\n§r§7»Punch me!", player.getSkin(), player);
+        if (entity == null) {
+            return;
+        }
         entity.setNameTagAlwaysVisible(true);
+        entity.setCanMountEntity(false);
 
         entity.namedTag.putByte("shop_npc", 1);
         entity.namedTag.putByte("shop_smith", 1);
-
         entity.spawnToAll();
         entity.saveNBT();
     }
