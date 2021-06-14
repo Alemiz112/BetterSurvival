@@ -63,10 +63,18 @@ public class QuestCommand extends Command {
             case "spawn":
                 this.loader.spawnQuestMaster(player);
                 break;
+            case "remove":
+                if (this.loader.getNpcRemovers().contains(player.getName())){
+                    this.loader.removeRemover(player);
+                    break;
+                }
+                this.loader.addRemover(player);
+                break;
             default:
                 player.sendMessage("§6Quests Commands:\n" +
                         "§7/quest : Visit QuestMaster\n"+
                         "§7/quest spawn : Spawn QuestMaster\n" +
+                        "§7/quest remove : Remove QuestMaster\n" +
                         "§7/quest setup : Save quest spawn position");
                 break;
         }

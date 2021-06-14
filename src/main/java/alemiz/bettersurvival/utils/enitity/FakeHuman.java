@@ -75,10 +75,12 @@ public class FakeHuman extends EntityHuman {
 
     public static FakeHuman createEntity(Location pos, String nameTag, Skin skin, Player player){
         CompoundTag nbt = createNbt(pos, nameTag, skin, player);
-        FakeHuman entity = (FakeHuman) Entity.createEntity("FakeHuman", pos.getLevel().getChunk(pos.getChunkX(), pos.getChunkZ()), nbt);
-
-        entity.setNameTag(nameTag);
-        return entity;
+        Entity entity = Entity.createEntity("FakeHuman", pos.getLevel().getChunk(pos.getChunkX(), pos.getChunkZ()), nbt);
+        if (entity instanceof FakeHuman) {
+            entity.setNameTag(nameTag);
+            return (FakeHuman) entity;
+        }
+        return null;
     }
 
     @Override
