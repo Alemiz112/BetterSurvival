@@ -39,6 +39,7 @@ import cn.nukkit.network.protocol.LevelEventPacket;
 import cn.nukkit.network.protocol.SetLocalPlayerAsInitializedPacket;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.DummyBossBar;
+import cubemc.nukkit.connector.CubeConnector;
 
 import java.util.*;
 
@@ -85,6 +86,11 @@ public class BetterLobby extends Addon {
         String motd = configFile.getString("motd");
         if (!motd.equals("")){
             plugin.getServer().getNetwork().setName(motd);
+        }
+
+        CubeConnector connector = CubeConnector.getInstance();
+        if (connector != null) {
+            connector.getPlayerManager().getRegisterHelper().setJoinMessage(this.joinMessage);
         }
     }
 
@@ -143,8 +149,7 @@ public class BetterLobby extends Addon {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event){
-        Player player = event.getPlayer();
-        event.setJoinMessage(this.joinMessage);
+        event.setJoinMessage("");
     }
 
     @EventHandler
