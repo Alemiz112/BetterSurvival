@@ -46,6 +46,14 @@ public class FakeHuman extends NpcHuman {
                     .add(new DoubleTag("", pos.y))
                     .add(new DoubleTag("", pos.z)));
         }
+
+        if (player != null) {
+            nbt.putString("npc_item", player.getInventory().getItemInHand().getName());
+            nbt.putString("npc_helmet", player.getInventory().getHelmet().getName());
+            nbt.putString("npc_chestplate", player.getInventory().getChestplate().getName());
+            nbt.putString("npc_leggings", player.getInventory().getLeggings().getName());
+            nbt.putString("npc_boots", player.getInventory().getBoots().getName());
+        }
         return nbt;
     }
 
