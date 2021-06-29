@@ -1286,6 +1286,38 @@
           "image": false,
           "sell": 9
         },
+        "crimson stem": {
+          "id": -225,
+          "count": 8,
+          "meta": 0,
+          "price": 4900,
+          "image": false,
+          "sell": 9
+        },
+        "warped stem": {
+          "id": -226,
+          "count": 8,
+          "meta": 0,
+          "price": 4900,
+          "image": false,
+          "sell": 9
+        },
+        "crimson planks": {
+          "id": -242,
+          "count": 4,
+          "meta": 0,
+          "price": 2100,
+          "image": false,
+          "sell": 9
+        },
+        "warped planks": {
+          "id": -243,
+          "count": 4,
+          "meta": 0,
+          "price": 2100,
+          "image": false,
+          "sell": 9
+        },
         "vines": {
           "id": 106,
           "count": 8,
@@ -1394,6 +1426,27 @@
           "id": -132,
           "count": 4,
           "price": 700,
+          "image": false,
+          "sell": 17
+        },
+        "warped wart block": {
+          "id": -227,
+          "count": 4,
+          "price": 2100,
+          "image": false,
+          "sell": 17
+        },
+        "crimson nylium": {
+          "id": -232,
+          "count": 4,
+          "price": 2100,
+          "image": false,
+          "sell": 17
+        },
+        "warped nylium": {
+          "id": -233,
+          "count": 4,
+          "price": 2100,
           "image": false,
           "sell": 17
         }
