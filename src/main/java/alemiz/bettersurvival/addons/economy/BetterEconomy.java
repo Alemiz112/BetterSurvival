@@ -162,7 +162,10 @@ public class BetterEconomy extends Addon {
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onItemFrameDrop(ItemFrameDropItemEvent event){
+    public void onItemFrameDrop(ItemFrameDropItemEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
         Player player = event.getPlayer();
         Item item = event.getItem();
 
