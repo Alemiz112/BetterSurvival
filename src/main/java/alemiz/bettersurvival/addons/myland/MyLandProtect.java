@@ -182,7 +182,7 @@ public class MyLandProtect extends Addon {
             return;
         }
 
-        if (block.getId() == Block.ITEM_FRAME_BLOCK) {
+        if (block.getId() == Block.ITEM_FRAME_BLOCK && event.getAction() == PlayerInteractEvent.Action.LEFT_CLICK_BLOCK) {
             // Allow ItemFrameDropItemEvent to be called
             return;
         }
@@ -317,7 +317,7 @@ public class MyLandProtect extends Addon {
 
         Collection<LandRegion> regions = this.getLandsByPos(pos);
         for (LandRegion region : regions) {
-            if (!this.interact(player, region)){
+            if (!this.interact(player, region, false)) {
                 event.setCancelled(true);
                 return;
             }
@@ -367,11 +367,19 @@ public class MyLandProtect extends Addon {
         }
     }
 
-    public boolean interact(Player player, LandRegion region){
-        return this.interact(player, region, null);
+    public boolean interact(Player player, LandRegion region) {
+        return this.interact(player, region, null, true);
     }
 
-    public boolean interact(Player player, LandRegion region, Block block){
+    public boolean interact(Player player, LandRegion region, boolean message) {
+        return this.interact(player, region, null, message);
+    }
+
+    public boolean interact(Player player, LandRegion region, Block block) {
+        return this.interact(player, region, block, true);
+    }
+
+    public boolean interact(Player player, LandRegion region, Block block, boolean sendMessage) {
         if (region == null) return true;
         if (region.owner.equals(player.getName().toLowerCase())) return true;
         if (player.isOp() || player.hasPermission(PERM_ACCESS)) return true;
@@ -386,7 +394,7 @@ public class MyLandProtect extends Addon {
             return e.getValue() instanceof Boolean && (Boolean) e.getValue();
         }
 
-        if (!canInteract){
+        if (sendMessage && !canInteract) {
             String message = configFile.getString("landWarn");
             message = message.replace("{land}", clanLand? "" : region.land);
             message = message.replace("{player}", player.getDisplayName());

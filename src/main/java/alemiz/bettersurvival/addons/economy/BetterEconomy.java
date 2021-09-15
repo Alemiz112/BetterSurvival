@@ -211,24 +211,23 @@ public class BetterEconomy extends Addon {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onItemFrameDrop(ItemFrameDropItemEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
         Player player = event.getPlayer();
         Item item = event.getItem();
 
         BlockEntityItemFrame itemFrame = event.getItemFrame();
-        if (!itemFrame.namedTag.contains("trade_owner")) return;
+        if (!itemFrame.namedTag.contains("trade_owner"))  {
+            return;
+        }
 
         CompoundTag tag = itemFrame.namedTag;
         String owner = tag.getString("trade_owner");
 
-        //In this case bank note is in item frame
+        // In this case bank note is in item frame
         if (!tag.contains("trade_price")){
-            if (!player.getName().equals(owner)){
+            if (!player.getName().equals(owner)) {
                 player.sendMessage("§c»§7Bank note can pickup only trade owner!");
                 event.setCancelled(true);
-            }else {
+            } else {
                 tag.remove("trade_owner");
             }
             return;
