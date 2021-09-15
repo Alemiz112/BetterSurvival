@@ -182,6 +182,11 @@ public class MyLandProtect extends Addon {
             return;
         }
 
+        if (block.getId() == Block.ITEM_FRAME_BLOCK) {
+            // Allow ItemFrameDropItemEvent to be called
+            return;
+        }
+
         Collection<LandRegion> regions = this.getLandsByPos(block);
         for (LandRegion region : regions) {
             if (!this.interact(player, region, block)) {
