@@ -15,6 +15,7 @@
 
 package alemiz.bettersurvival.addons.shop.forms;
 
+import alemiz.bettersurvival.addons.cubemc.CubeBridge;
 import alemiz.bettersurvival.addons.shop.ShopCategoryElement;
 import alemiz.bettersurvival.addons.shop.ShopItem;
 import alemiz.bettersurvival.utils.form.CustomForm;
@@ -24,7 +25,6 @@ import cn.nukkit.form.element.ElementDropdown;
 import cn.nukkit.form.element.ElementLabel;
 import cn.nukkit.form.element.ElementStepSlider;
 import cn.nukkit.item.Item;
-import cubemc.nukkit.connector.modules.Money;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -82,7 +82,7 @@ public class ItemSellForm extends CustomForm {
 
         player.getInventory().removeItem(item);
 
-        Money.getInstance().addMoney(player, count * shopItem.getSellPrice());
+        CubeBridge.playerManager().addCoins(player, count * shopItem.getSellPrice(), CubeBridge.DEFAULT_COINS);
         player.sendMessage("§a»§7"+item.getName()+" was sold successfully!");
     }
 }

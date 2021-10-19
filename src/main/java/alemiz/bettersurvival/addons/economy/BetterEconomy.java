@@ -17,6 +17,7 @@ package alemiz.bettersurvival.addons.economy;
 
 import alemiz.bettersurvival.addons.clans.Clan;
 import alemiz.bettersurvival.addons.clans.PlayerClans;
+import alemiz.bettersurvival.addons.cubemc.CubeBridge;
 import alemiz.bettersurvival.commands.BankCommand;
 import alemiz.bettersurvival.commands.SpawnerCommand;
 import alemiz.bettersurvival.commands.SpawnerInfoCommand;
@@ -44,7 +45,6 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.StringTag;
 import cn.nukkit.utils.ConfigSection;
-import cubemc.nukkit.connector.modules.Money;
 import cn.nukkit.utils.BlockIterator;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -250,8 +250,9 @@ public class BetterEconomy extends Addon {
             return;
         }
 
-        boolean success = Money.getInstance().reduceMoney(player, price);
-        if (!success){
+        boolean success = CubeBridge.playerManager().canReduceCoins(player, price, CubeBridge.DEFAULT_COINS);
+        if (!success) {
+            CubeBridge.playerManager().reduceCoins(player, price, CubeBridge.DEFAULT_COINS);
             String message = configFile.getString("tradeFailMessage");
             message = message.replace("{player}", player.getDisplayName());
             message = message.replace("{item}", item.getName());
@@ -337,8 +338,8 @@ public class BetterEconomy extends Addon {
 
             owner = clan.getName();
             success = clan.reduceMoney(price);
-        }else {
-            success = Money.getInstance().reduceMoney(player, price);
+        } else {
+            success = CubeBridge.playerManager().reduceCoins(player, price, CubeBridge.DEFAULT_COINS) != null;
             owner = player.getName();
         }
 
@@ -393,8 +394,8 @@ public class BetterEconomy extends Addon {
             clan.onApplyNote(player, value);
             money = clan.getMoney();
         }else {
-            money = Money.getInstance().getMoney(player, false) + value;
-            Money.getInstance().addMoney(player, value);
+            money = CubeBridge.playerManager().getPlayerCachedCoins(player, CubeBridge.DEFAULT_COINS) + value;
+            CubeBridge.playerManager().addCoins(player, value, CubeBridge.DEFAULT_COINS);
         }
 
         String message = configFile.getString(clanMode? "noteApplyMessageClan" : "noteApplyMessage");

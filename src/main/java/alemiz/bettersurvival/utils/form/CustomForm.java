@@ -32,7 +32,7 @@ public class CustomForm extends cubemc.commons.nukkit.utils.forms.CustomForm {
     }
 
     public CustomForm(String title, List<Element> contents) {
-        super(title, contents, (ElementButtonImageData)null);
+        super(title, contents, null);
     }
 
 }

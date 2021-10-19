@@ -15,10 +15,10 @@
 
 package alemiz.bettersurvival.addons.shop;
 
+import alemiz.bettersurvival.addons.cubemc.CubeBridge;
 import cn.nukkit.Player;
 import cn.nukkit.form.element.ElementButtonImageData;
 import cn.nukkit.item.Item;
-import cubemc.nukkit.connector.modules.Money;
 
 public class ShopItem {
 
@@ -49,7 +49,10 @@ public class ShopItem {
     }
 
     public boolean buyItem(Player player, int stackCount){
-        if (player == null || !Money.getInstance().reduceMoney(player, this.getStackPrice(stackCount))) return false;
+        if (player == null || !CubeBridge.playerManager().canReduceCoins(player, this.getStackPrice(stackCount), CubeBridge.DEFAULT_COINS)) {
+            return false;
+        }
+        CubeBridge.playerManager().reduceCoins(player, this.getStackCount(stackCount), CubeBridge.DEFAULT_COINS);
 
         Item item = this.buildItem(stackCount);
         if (!player.getInventory().canAddItem(item)){

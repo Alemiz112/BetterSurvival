@@ -15,6 +15,7 @@
 
 package alemiz.bettersurvival.addons.shop;
 
+import alemiz.bettersurvival.addons.cubemc.CubeBridge;
 import alemiz.bettersurvival.addons.economy.BetterEconomy;
 import alemiz.bettersurvival.addons.shop.forms.ItemSellForm;
 import alemiz.bettersurvival.addons.shop.forms.SellCategoryForm;
@@ -22,7 +23,6 @@ import alemiz.bettersurvival.utils.Addon;
 import cn.nukkit.Player;
 import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.item.Item;
-import cubemc.nukkit.connector.modules.Money;
 
 public class SellManager {
 
@@ -75,7 +75,7 @@ public class SellManager {
             if (price != null) totalPrice += price;
         }
 
-        Money.getInstance().addMoney(player, totalPrice);
+        CubeBridge.playerManager().addCoins(player, totalPrice, CubeBridge.DEFAULT_COINS);
 
         String message = this.loader.configFile.getString("sellAllMessage");
         message = message.replace("{money}", String.valueOf(totalPrice));
@@ -124,7 +124,7 @@ public class SellManager {
         inv.removeItem(handItem);
 
         int totalPrice = count * basePrice;
-        Money.getInstance().addMoney(player, totalPrice);
+        CubeBridge.playerManager().addCoins(player, totalPrice, CubeBridge.DEFAULT_COINS);
 
         String message = this.loader.configFile.getString("sellHandMessage");
         message = message.replace("{money}", String.valueOf(totalPrice));

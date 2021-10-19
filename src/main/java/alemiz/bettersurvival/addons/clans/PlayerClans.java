@@ -15,6 +15,7 @@
 
 package alemiz.bettersurvival.addons.clans;
 
+import alemiz.bettersurvival.addons.cubemc.CubeBridge;
 import alemiz.bettersurvival.addons.myland.MyLandProtect;
 import alemiz.bettersurvival.commands.ClanCommand;
 import alemiz.bettersurvival.commands.ClanLevelsCommand;
@@ -35,7 +36,6 @@ import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.ConfigSection;
 import cn.nukkit.utils.TextFormat;
-import cubemc.nukkit.connector.modules.Money;
 
 import java.io.File;
 import java.util.*;
@@ -241,7 +241,7 @@ public class PlayerClans extends Addon {
         int clanPrice = configFile.getInt("clanCreatePayment");
         int clanRevert = (clanPrice / 100) * 75;
 
-        boolean success = Money.getInstance().reduceMoney(player, clanPrice);
+        boolean success = CubeBridge.playerManager().reduceCoins(player, clanPrice, CubeBridge.DEFAULT_COINS) != null;
         if (!success){
             player.sendMessage("§c»§7You do not have enough coins to pay clan fee." +
                     " Clan fee consists of §e"+ TextUtils.formatBigNumber(clanPrice)+"$§7,\n" +

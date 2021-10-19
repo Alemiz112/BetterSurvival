@@ -15,13 +15,13 @@
 
 package alemiz.bettersurvival.addons.quests;
 
+import alemiz.bettersurvival.addons.cubemc.CubeBridge;
 import alemiz.bettersurvival.tasks.QuestParticleTask;
 import alemiz.bettersurvival.utils.TextUtils;
 import cn.nukkit.Player;
 import cn.nukkit.event.Event;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import cubemc.nukkit.connector.modules.Money;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -88,7 +88,7 @@ public class Quest {
         Event event = new QuestCompletedEvent(player, this);
         player.getServer().getPluginManager().callEvent(event);
 
-        Money.getInstance().addMoney(player, this.rewardValue);
+        CubeBridge.playerManager().addCoins(player, this.rewardValue, CubeBridge.DEFAULT_COINS);
 
         String message = loader.configFile.getString("completedQuestMessage");
         message = message.replace("{quest}", this.questName);

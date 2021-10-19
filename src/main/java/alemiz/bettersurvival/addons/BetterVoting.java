@@ -107,22 +107,20 @@ public class BetterVoting extends Addon {
     }
 
     @EventHandler
-    public void onJoin(PlayerJoinEvent event){
-        if (this.voteCrateParticle != null){
+    public void onJoin(PlayerJoinEvent event) {
+        if (this.voteCrateParticle != null) {
             plugin.getServer().getDefaultLevel().addParticle(this.voteCrateParticle, event.getPlayer());
         }
     }
 
     @EventHandler
     public void onVote(CubeVoteEvent event) {
-        int succeed = 0;
-        for (int i = 0; i < event.getPendingVotes(); i++) {
+        for (int i = 0; i < event.getVoteProfile().getPendingVotes(); i++) {
             if (!this.voteReceive(event.getPlayer())) {
                 break;
             }
-            succeed++;
+            event.setAppliedVotes(event.getAppliedVotes() - 1);
         }
-        event.setAppliedVotes(succeed);
     }
 
     @EventHandler

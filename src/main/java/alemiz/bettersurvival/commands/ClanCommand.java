@@ -18,6 +18,7 @@ package alemiz.bettersurvival.commands;
 import alemiz.bettersurvival.addons.clans.Clan;
 import alemiz.bettersurvival.addons.clans.ClanLand;
 import alemiz.bettersurvival.addons.clans.PlayerClans;
+import alemiz.bettersurvival.addons.cubemc.CubeBridge;
 import alemiz.bettersurvival.utils.Command;
 import alemiz.bettersurvival.utils.ConfigManager;
 import cn.nukkit.Player;
@@ -25,7 +26,6 @@ import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.utils.Config;
-import cubemc.nukkit.connector.modules.Money;
 
 import java.util.Arrays;
 import java.util.List;
@@ -278,7 +278,7 @@ public class ClanCommand extends Command {
             case "donate":
                 try {
                     int value = Integer.parseInt(args[2]);
-                    boolean success = (Money.getInstance().getMoney(player, false) - value) >= 0;
+                    boolean success = (CubeBridge.playerManager().getPlayerCachedCoins(player, CubeBridge.DEFAULT_COINS) - value) >= 0;
 
                     if (!success){
                         player.sendMessage("§c»§7You do not have enough coins to donate!");
@@ -290,7 +290,7 @@ public class ClanCommand extends Command {
                         break;
                     }
 
-                    Money.getInstance().reduceMoney(player, value);
+                    CubeBridge.playerManager().reduceCoins(player, value, CubeBridge.DEFAULT_COINS);
                     clan.onDonate(player, value);
                 }catch (Exception e){
                     player.sendMessage("§c»§7Please provide numerical value!");

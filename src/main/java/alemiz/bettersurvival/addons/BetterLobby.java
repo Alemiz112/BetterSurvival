@@ -90,7 +90,7 @@ public class BetterLobby extends Addon {
 
         CubeConnector connector = CubeConnector.getInstance();
         if (connector != null) {
-            connector.getPlayerManager().getRegisterHelper().setJoinMessage(this.joinMessage);
+            connector.getPlayerManager().setJoinMessage(this.joinMessage);
         }
     }
 

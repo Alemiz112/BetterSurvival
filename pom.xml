@@ -33,37 +33,13 @@
         <dependency>
             <groupId>cubemc.connector</groupId>
             <artifactId>cubeconnector-nukkit</artifactId>
-            <version>2.0-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>cubemc.commons</groupId>
-            <artifactId>cubecommons-common</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>cubemc.commons</groupId>
-            <artifactId>cubecommons-nukkit</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>alemiz.sgu.nukkit</groupId>
-            <artifactId>sgu-nukkit</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>3.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-configuration2</artifactId>
             <version>2.7</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.jodah</groupId>
-            <artifactId>expiringmap</artifactId>
-            <version>0.5.9</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

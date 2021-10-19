@@ -16,12 +16,12 @@
 package alemiz.bettersurvival.addons.shop;
 
 import alemiz.bettersurvival.addons.PlayerPermissions;
+import alemiz.bettersurvival.addons.cubemc.CubeBridge;
 import alemiz.bettersurvival.commands.SellAllCommand;
 import alemiz.bettersurvival.commands.SellCommand;
 import alemiz.bettersurvival.commands.SellHandCommand;
 import alemiz.bettersurvival.commands.ShopCommand;
 import alemiz.bettersurvival.utils.Addon;
-import alemiz.bettersurvival.utils.ConfigManager;
 import alemiz.bettersurvival.utils.TextUtils;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
@@ -40,7 +40,7 @@ import cn.nukkit.level.Position;
 import cn.nukkit.nbt.tag.CompoundTag;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import cubemc.nukkit.connector.modules.Money;
+import cubemc.nukkit.connector.CubeConnector;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -361,7 +361,7 @@ public class SurvivalShop extends Addon {
     }
 
     public String messageFormat(Player player, String messageKey){
-        return this.messageFormat(player, messageKey, Money.getInstance().getMoney(player, false));
+        return this.messageFormat(player, messageKey, CubeBridge.playerManager().getPlayerCachedCoins(player, CubeBridge.DEFAULT_COINS));
     }
 
     public String messageFormat(Player player, String messageKey, int money){

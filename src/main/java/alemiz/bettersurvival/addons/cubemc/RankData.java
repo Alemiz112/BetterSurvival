@@ -17,7 +17,7 @@ package alemiz.bettersurvival.addons.cubemc;
 
 import alemiz.bettersurvival.BetterSurvival;
 import cn.nukkit.Player;
-import cubemc.commons.ranks.Rank;
+import cubemc.commons.structure.Rank;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,14 +27,12 @@ public class RankData {
     private final Rank rank;
     private final List<String> permissions = new ArrayList<>();
 
-    public RankData(Rank rank){
+    public RankData(Rank rank) {
         this.rank = rank;
     }
 
-    public void assignPermissions(Player player, BetterSurvival loader){
-        if (player == null) return;
-
-        for (String permission : this.permissions){
+    public void assignPermissions(Player player, BetterSurvival loader) {
+        for (String permission : this.permissions) {
             player.addAttachment(loader, permission, true);
         }
     }

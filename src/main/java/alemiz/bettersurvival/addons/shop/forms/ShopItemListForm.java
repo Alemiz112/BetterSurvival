@@ -15,6 +15,7 @@
 
 package alemiz.bettersurvival.addons.shop.forms;
 
+import alemiz.bettersurvival.addons.cubemc.CubeBridge;
 import alemiz.bettersurvival.addons.shop.ShopCategory;
 import alemiz.bettersurvival.addons.shop.ShopCategoryElement;
 import alemiz.bettersurvival.addons.shop.ShopItem;
@@ -24,7 +25,6 @@ import alemiz.bettersurvival.utils.form.SimpleForm;
 import cn.nukkit.Player;
 import cn.nukkit.form.element.ElementButton;
 import cn.nukkit.form.element.ElementButtonImageData;
-import cubemc.nukkit.connector.modules.Money;
 
 import java.util.ArrayList;
 
@@ -43,7 +43,7 @@ public class ShopItemListForm extends SimpleForm {
     @Override
     public Form buildForm() {
         this.setTitle("§l§8Shop " + this.category.getFormattedName());
-        this.setContent("§7Pickup item by your own choice. Your coins: §8" + Money.getInstance().getMoney(player, false) + "$");
+        this.setContent("§7Pickup item by your own choice. Your coins: §8" + CubeBridge.playerManager().getPlayerCachedCoins(player, CubeBridge.DEFAULT_COINS) + "$");
 
         if ((category instanceof ShopCategory) && ((ShopCategory) category).hasSubCategories()){
             ShopCategory shopCategory = (ShopCategory) category;

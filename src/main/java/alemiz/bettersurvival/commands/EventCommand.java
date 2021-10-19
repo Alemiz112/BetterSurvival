@@ -16,10 +16,11 @@
 package alemiz.bettersurvival.commands;
 
 import alemiz.bettersurvival.addons.BetterLobby;
+import alemiz.bettersurvival.addons.cubemc.CubeBridge;
 import alemiz.bettersurvival.utils.Command;
-import alemiz.sgu.nukkit.StarGateUniverse;
 import cn.nukkit.Player;
 import cn.nukkit.command.CommandSender;
+import cubemc.commons.nukkit.utils.NukkitUtils;
 
 public class EventCommand extends Command {
 
@@ -45,8 +46,7 @@ public class EventCommand extends Command {
             sender.sendMessage("§cThis command can be run only in game!");
             return true;
         }
-
-        StarGateUniverse.getInstance().transferPlayer(((Player) sender), "event");
+        CubeBridge.playerManager().sendPlayerTransfer(NukkitUtils.getAccount((Player) sender), "event");
         return true;
     }
 }

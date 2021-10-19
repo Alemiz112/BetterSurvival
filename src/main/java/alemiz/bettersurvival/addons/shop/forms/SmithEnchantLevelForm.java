@@ -15,6 +15,7 @@
 
 package alemiz.bettersurvival.addons.shop.forms;
 
+import alemiz.bettersurvival.addons.cubemc.CubeBridge;
 import alemiz.bettersurvival.addons.shop.Enchant;
 import alemiz.bettersurvival.addons.shop.SmithShop;
 import cubemc.commons.nukkit.utils.forms.Form;
@@ -22,7 +23,6 @@ import alemiz.bettersurvival.utils.form.SimpleForm;
 import cn.nukkit.Player;
 import cn.nukkit.form.element.ElementButton;
 import cn.nukkit.item.Item;
-import cubemc.nukkit.connector.modules.Money;
 
 public class SmithEnchantLevelForm extends SimpleForm {
 
@@ -61,9 +61,9 @@ public class SmithEnchantLevelForm extends SimpleForm {
         }
 
         int price = enchant.getPrice(level);
-        boolean success = Money.getInstance().reduceMoney(player, price);
-
-        if (success){
+        boolean success = CubeBridge.playerManager().canReduceCoins(player, price, CubeBridge.DEFAULT_COINS);
+        if (success) {
+            CubeBridge.playerManager().reduceCoins(player, price, CubeBridge.DEFAULT_COINS);
             Item item = enchant.getEnchantItem(level);
             player.getInventory().addItem(item);
         }

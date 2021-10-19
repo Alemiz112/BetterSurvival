@@ -15,13 +15,13 @@
 
 package alemiz.bettersurvival.addons.economy;
 
+import alemiz.bettersurvival.addons.cubemc.CubeBridge;
 import alemiz.bettersurvival.utils.form.CustomForm;
 import cn.nukkit.Player;
 import cn.nukkit.form.element.ElementDropdown;
 import cn.nukkit.form.element.ElementLabel;
 import cn.nukkit.item.Item;
 import cubemc.commons.nukkit.utils.forms.Form;
-import cubemc.nukkit.connector.modules.Money;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +65,7 @@ public class SpawnerUpgradeForm extends CustomForm {
         if (this.levels.size() <= levelId) return;
         SpawnerLevel level = this.levels.get(levelId);
 
-        boolean success = Money.getInstance().reduceMoney(player, level.getPrice());
+        boolean success = CubeBridge.playerManager().reduceCoins(player, level.getPrice(), CubeBridge.DEFAULT_COINS) != null;
         if (!success){
             player.sendMessage("§c»§7You dont have §e"+level.getPrice()+"§7 coins to buy §6spawner upgrade§7!");
             return;

@@ -15,6 +15,7 @@
 
 package alemiz.bettersurvival.addons.economy;
 
+import alemiz.bettersurvival.addons.cubemc.CubeBridge;
 import alemiz.bettersurvival.utils.TextUtils;
 import alemiz.bettersurvival.utils.form.ModalForm;
 import cn.nukkit.Player;
@@ -23,7 +24,6 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
 import cubemc.commons.nukkit.utils.forms.Form;
-import cubemc.nukkit.connector.modules.Money;
 
 public class SpawnerBreakForm extends ModalForm {
 
@@ -54,11 +54,12 @@ public class SpawnerBreakForm extends ModalForm {
             return;
         }
 
-        boolean success = Money.getInstance().reduceMoney(player, this.loader.getSpawnerPrice());
+        boolean success = CubeBridge.playerManager().canReduceCoins(player, this.loader.getSpawnerPrice(), CubeBridge.DEFAULT_COINS);
         if (!success){
             player.sendMessage("§c»§7You do not have enough coins to buy mob spawner!");
             return;
         }
+        CubeBridge.playerManager().reduceCoins(player, this.loader.getSpawnerPrice(), CubeBridge.DEFAULT_COINS);
 
         Level level = this.block.getLevel();
         Item item = player.getInventory().getItemInHand();
