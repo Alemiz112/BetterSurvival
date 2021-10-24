@@ -88,7 +88,7 @@ public class BetterVoting extends Addon {
             configFile.set("voteCrate", true);
             configFile.set("voteCratePos", "0,0,0");
             configFile.set("voteCrateKey", "388:0:§aVote key");
-            configFile.set("voteCrateItems", Arrays.asList("261:0:1","354:00:1","264:0:2","368:0:1","401:0:16","373:7:1","229:9:1","397:4:1","353:0:4","438:15:1","388:0:5","351:15:10","369:0:2","341:0:9","297:0:5","440:0:15","338:0:7","360:0:6","6:3:3","19:0:2","30:0:5","351:1:7"));
+            configFile.set("voteCrateItems", Arrays.asList("261:0:1","354:00:1","264:0:2","368:0:1","401:0:16","373:7:1","229:9:1","397:4:1","353:0:4","438:15:1","388:0:5","351:15:10","369:0:2","341:0:9","297:0:5","338:0:7","360:0:6","6:3:3","19:0:2","30:0:5","351:1:7"));
             configFile.set("voteCrateTitle", "§6Vote §eCrate");
             configFile.set("voteCrateText", "§7Open using vote key");
 
@@ -116,10 +116,9 @@ public class BetterVoting extends Addon {
     @EventHandler
     public void onVote(CubeVoteEvent event) {
         for (int i = 0; i < event.getVoteProfile().getPendingVotes(); i++) {
-            if (!this.voteReceive(event.getPlayer())) {
+            if (!this.voteReceive(event.getPlayer()) || !event.consumeVote()) {
                 break;
             }
-            event.setAppliedVotes(event.getAppliedVotes() - 1);
         }
     }
 
