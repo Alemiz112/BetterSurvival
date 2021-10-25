@@ -52,7 +52,7 @@ public class ShopItem {
         if (player == null || !CubeBridge.playerManager().canReduceCoins(player, this.getStackPrice(stackCount), CubeBridge.DEFAULT_COINS)) {
             return false;
         }
-        CubeBridge.playerManager().reduceCoins(player, this.getStackCount(stackCount), CubeBridge.DEFAULT_COINS);
+        CubeBridge.playerManager().reduceCoins(player, this.getStackPrice(stackCount), CubeBridge.DEFAULT_COINS);
 
         Item item = this.buildItem(stackCount);
         if (!player.getInventory().canAddItem(item)){
