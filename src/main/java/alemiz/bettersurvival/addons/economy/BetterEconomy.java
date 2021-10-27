@@ -252,13 +252,13 @@ public class BetterEconomy extends Addon {
 
         boolean success = CubeBridge.playerManager().canReduceCoins(player, price, CubeBridge.DEFAULT_COINS);
         if (!success) {
-            CubeBridge.playerManager().reduceCoins(player, price, CubeBridge.DEFAULT_COINS);
             String message = configFile.getString("tradeFailMessage");
             message = message.replace("{player}", player.getDisplayName());
             message = message.replace("{item}", item.getName());
             player.sendMessage(message);
             return;
         }
+        CubeBridge.playerManager().reduceCoins(player, price, CubeBridge.DEFAULT_COINS);
 
         Vector3 vector = player.temporalVector.setComponents(itemFrame.x + 0.5, itemFrame.y, itemFrame.z + 0.5);
         this.dropItem(itemFrame, vector, item, false);
