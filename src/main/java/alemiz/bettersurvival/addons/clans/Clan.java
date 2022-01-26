@@ -737,6 +737,7 @@ public class Clan {
     public void chat(String message, Player player){
         if (message == null || message.isEmpty() || player == null) return;
         this.sendMessage(message, player.getName());
+        Server.getInstance().getLogger().info("[" + this.getName() +"] " + player.getName() + " > " + message);
     }
 
     public void sendMessage(String message){
